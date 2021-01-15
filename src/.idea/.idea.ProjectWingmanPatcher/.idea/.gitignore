@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.ProjectWingmanPatcher.iml
+# Datasource local storage ignored files
+/../../../../../../../../../../:\Users\alist\Source\Modding\pwpatch\src\.idea\.idea.ProjectWingmanPatcher\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
