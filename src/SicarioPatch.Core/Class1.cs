@@ -10,18 +10,25 @@ using MediatR;
 
 namespace SicarioPatch.Core
 {
-    public class ModRequest : IRequest<FileInfo>
+    public class ModsRequest : IRequest<Dictionary<string, Mod>>
     {
-        public ModRequest(Dictionary<string, Mod> mods)
+        
+    }
+    
+    public class PatchRequest : IRequest<FileInfo>
+    {
+        public PatchRequest(Dictionary<string, Mod> mods)
         {
             Mods = mods;
         }
 
         public Dictionary<string, Mod> Mods { get; }
         public bool PackResult { get; set; } = false;
+        
+        public string Name { get; set; }
     }
 
-    public class PatchRequestHandler : IRequestHandler<ModRequest, FileInfo>
+    public class PatchRequestHandler : IRequestHandler<PatchRequest, FileInfo>
     {
         private readonly ModPatchServiceBuilder _builder;
 
@@ -29,11 +36,15 @@ namespace SicarioPatch.Core
         {
             _builder = servBuilder;
         }
+
+        private Dictionary<string, IEnumerable<string>> _sideCars = new Dictionary<string, IEnumerable<string>> {
+            [".uexp"] = new string[] {".uasset"}
+        };
         
-        public async Task<FileInfo> Handle(ModRequest request, CancellationToken cancellationToken)
+        public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken)
         {
-            var mpServ = await _builder.GetPatchService(request.Mods);
-            await mpServ.LoadFiles().RunPatches();
+            using var mpServ = await _builder.GetPatchService(request.Mods, request.Name);
+            await mpServ.LoadFiles(HexPatch.Build.FileSelectors.SidecarFiles(_sideCars)).RunPatches();
             (bool Success, FileInfo Result)? result;
             if (request.PackResult)
             {
@@ -45,8 +56,27 @@ namespace SicarioPatch.Core
             {
                 result = mpServ.RunAction(ctx => ctx.WorkingDirectory.ToZipFile());
             }
+            if (result != null && result.Value.Success) {
+                var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), result.Value.Result.Name));
+                result.Value.Result.MoveTo(tempFi.FullName);
+                return tempFi.Exists ? tempFi : null;
+            }
+            return null;
 
-            return result != null ? (result.Value.Success ? result.Value.Result : null) : null;
+            // return result != null ? (result.Value.Success ? result.Value.Result : null) : null;
         }
     }
+
+    /* public class FileMoveBehaviour : IPipelineBehavior<PatchRequest, FileInfo>
+        {
+
+            public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<FileInfo> next)
+            {
+                
+                var response = await next();
+                var dFi = new FileInfo(Path.Combine(Path.GetTempPath(), response.Name));
+                response.CopyTo(dFi.FullName);
+                return dFi;
+            }
+        } */
 }

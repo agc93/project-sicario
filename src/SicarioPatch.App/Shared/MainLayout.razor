@@ -1,0 +1,66 @@
+@using Blazorise.Icons.Material
+@inherits LayoutComponentBase
+@inject BrandProvider Brand
+
+<Layout Sider="true">
+    <LayoutSider>
+        <LayoutSiderContent>
+            <Bar Breakpoint="Breakpoint.Desktop" NavigationBreakpoint="Breakpoint.Tablet" ThemeContrast="ThemeContrast.Dark"
+                 Mode="BarMode.VerticalInline" CollapseMode="BarCollapseMode.Small">
+                <BarToggler />
+                <BarBrand>
+                    <BarItem>
+                        <BarLink To="">
+                            <BarIcon IconName="MaterialIcons.ImportExport" />
+                            @Brand.AppName
+                        </BarLink>
+                    </BarItem>
+                </BarBrand>
+                <BarMenu>
+                    <BarStart>
+                        <BarItem>
+                            <BarLink To="build">
+                                <BarIcon IconName="IconName.Code" />
+                                Build
+                            </BarLink>
+                        </BarItem>
+                    </BarStart>
+                    <BarEnd>
+                        <BarItem>
+                            <BarDropdown>
+                                <BarDropdownToggle>
+                                    <BarIcon IconName="IconName.Info" />
+                                    About
+                                </BarDropdownToggle>
+                                <BarDropdownMenu>
+                                    <BarDropdownItem To="/about">
+                                        About @Brand.AppName
+                                    </BarDropdownItem>
+                                    <BarDropdownItem To="https://www.humblegames.com/games/projectwingman/" Target="Target.Blank">
+                                        Project Wingman
+                                    </BarDropdownItem>
+                                </BarDropdownMenu>
+                            </BarDropdown>
+                        </BarItem>
+                    </BarEnd>
+                </BarMenu>
+            </Bar>
+        </LayoutSiderContent>
+    </LayoutSider>
+    <Layout>
+        <LayoutHeader Fixed="true">
+            @*<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Dark">
+                <BarBrand>
+                    <BarItem>
+                        <BarLink To="">
+                            
+                        </BarLink>
+                    </BarItem>
+                </BarBrand>
+            </Bar>*@
+        </LayoutHeader>
+        <LayoutContent Padding="Padding.Is4.OnAll">
+            @Body
+        </LayoutContent>
+    </Layout>
+</Layout>

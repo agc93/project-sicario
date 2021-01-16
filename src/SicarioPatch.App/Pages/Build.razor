@@ -1,0 +1,112 @@
+﻿@page "/build"
+@using System.IO
+@inject IMediator Mediator
+@inject IJSRuntime JsRuntime
+<h3>Build Merged Mod</h3>
+<Paragraph>Loaded @AvailableMods.Keys.Count mods</Paragraph>
+@if (AvailableMods.Any())
+{
+    <Row>
+        <Column ColumnSize="ColumnSize.Is6">
+            <Card>
+                <CardHeader>Available Mods</CardHeader>
+                <CardBody>
+                    <CardTitle>Select your mods to build:</CardTitle>
+                    @foreach (var (modFile, mod) in AvailableMods)
+                    {
+                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                    }
+                </CardBody>
+            </Card>
+        </Column>
+        @if (EnabledMods.Any())
+        {
+            <Column ColumnSize="ColumnSize.Is6">
+                <Card>
+                    <CardHeader>Enabled Mods</CardHeader>
+                    <CardBody>
+                        <CardText>
+                            You have enabled @EnabledMods.Count mods to modify @GetEnabledFileCount files.
+                            <ul class="list-group">
+                                @foreach (var enabledFile in EnabledMods)
+                                {
+                                    <li class="list-group-item">
+                                        @AvailableMods[enabledFile].GetLabel() (@Path.GetFileName(enabledFile))
+                                    </li>
+                                }
+                            </ul>
+                        </CardText>
+                    </CardBody>
+                </Card>
+            </Column>
+        }
+
+    </Row>
+    <Row>
+        @if (ReadyToBuild)
+        {
+
+            <Column ColumnSize="ColumnSize.Is4.Is8.WithOffset">
+                <div class="container action-container">
+                    <Text Color="TextColor.Muted">Ready to build your mod!</Text>
+                    <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
+                    <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                    @if (ResultFile != null && ResultFile.Exists)
+                    {
+                        <Button Clicked="@OnDownloadResult" Color="Color.Success">Download Merged File</Button>
+                    }
+                </div>
+            </Column>
+        }
+    </Row>
+}
+
+@code {
+    private Dictionary<string, Mod> AvailableMods { get; set; } = new Dictionary<string, Mod>();
+    private List<string> EnabledMods { get; set; } = new List<string>();
+    private FileInfo ResultFile { get; set; }
+    private bool ReadyToBuild => this.EnabledMods.Any();
+    private bool AutoPack {get;set;} = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableMods = await Mediator.Send(new ModsRequest());
+    }
+
+    private async Task OnStartBuild()
+    {
+        var req = new PatchRequest(EnabledMods.ToDictionary(k => k, v => AvailableMods[v])) { PackResult = AutoPack};
+        var buildResult = await Mediator.Send(req);
+        ResultFile = buildResult;
+    }
+
+    private void OptionChecked(string modFile, bool value)
+    {
+        switch (value)
+        {
+            case true when !EnabledMods.Contains(modFile):
+                EnabledMods.Add(modFile);
+                break;
+            case false when EnabledMods.Contains(modFile):
+                EnabledMods.Remove(modFile);
+                break;
+        }
+    }
+
+    private async Task OnDownloadResult()
+    {
+        var bytes = await File.ReadAllBytesAsync(ResultFile.FullName);
+        await JsRuntime.InvokeVoidAsync("BlazorDownloadFile", ResultFile.Name, ResultFile.Extension == ".zip" ? "application/zip" : "application/octet-stream", bytes);
+        ResultFile.Delete();
+    }
+
+    public int GetEnabledFileCount
+    {
+        get
+        {
+            return EnabledMods.Select(em => AvailableMods[em]).SelectMany(m =>
+          m.FilePatches.Keys.ToList()).Distinct().Count();
+        }
+    }
+
+}

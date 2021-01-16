@@ -6,9 +6,9 @@ namespace SicarioPatch.Core
 {
     public static class ArchiveHelpers
     {
-        public static FileInfo ToZipFile(this DirectoryInfo dirInfo)
+        public static FileInfo ToZipFile(this DirectoryInfo dirInfo, DirectoryInfo targetPath = null)
         {
-            var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.zip");
+            var path = Path.Combine(targetPath?.FullName ?? Path.GetTempPath(), $"{Guid.NewGuid():N}.zip");
             ZipFile.CreateFromDirectory(dirInfo.FullName, path);
             return new FileInfo(path);
         }
