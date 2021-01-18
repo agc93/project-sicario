@@ -19,19 +19,26 @@
                 </CardBody>
             </Card>
         </Column>
-        @if (EnabledMods.Any())
+        @if (ModPriority.Keys.Any())
         {
             <Column ColumnSize="ColumnSize.Is6">
                 <Card>
                     <CardHeader>Enabled Mods</CardHeader>
                     <CardBody>
                         <CardText>
-                            You have enabled @EnabledMods.Count mods to modify @GetEnabledFileCount files.
+                            You have enabled @ModPriority.Keys.Count mods to modify @GetEnabledFileCount files.
                             <ul class="list-group">
-                                @foreach (var enabledFile in EnabledMods)
+                                @foreach (var (enabledFile, priority) in SortedMods)
                                 {
-                                    <li class="list-group-item">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
                                         @AvailableMods[enabledFile].GetLabel() (@Path.GetFileName(enabledFile))
+                                        <Tooltip Text="Use the priority to fine-tune the order your mods are applied" Placement="Placement.Left">
+                                            <Buttons>
+                                                <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledFile, true)"><Icon Name="IconName.AngleUp" /></Button>
+                                                @* <Button Style="min-width: 48px;" Disabled="true" Color="Color.Dark"><Text Class="text-muted">@ModPriority[enabledFile]</Text></Button> *@
+                                                <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledFile, false)"><Icon Name="IconName.AngleDown" /></Button>
+                                            </Buttons>
+                                        </Tooltip>
                                     </li>
                                 }
                             </ul>
@@ -60,12 +67,23 @@
         }
     </Row>
 }
+<SnackbarStack @ref="snackbarStack" Interval="2000" Location="SnackbarStackLocation.Left" />
 
 @code {
     private Dictionary<string, Mod> AvailableMods { get; set; } = new Dictionary<string, Mod>();
-    private List<string> EnabledMods { get; set; } = new List<string>();
+    private Dictionary<string, int> ModPriority { get; set; } = new Dictionary<string, int>();
+        private List<KeyValuePair<string, int>> SortedMods
+        {
+            get
+            {
+                return ModPriority.OrderBy(d => d.Value).ToList();
+            }
+        }
+    
+    private SnackbarStack snackbarStack;
+
     private FileInfo ResultFile { get; set; }
-    private bool ReadyToBuild => this.EnabledMods.Any();
+    private bool ReadyToBuild => this.ModPriority.Keys.Any();
     private bool AutoPack {get;set;} = true;
 
     protected override async Task OnInitializedAsync()
@@ -75,20 +93,25 @@
 
     private async Task OnStartBuild()
     {
-        var req = new PatchRequest(EnabledMods.ToDictionary(k => k, v => AvailableMods[v])) { PackResult = AutoPack};
+        var req = new PatchRequest(
+            SortedMods
+                .ToDictionary(k => k.Key, v => AvailableMods[v.Key])
+            ) { PackResult = AutoPack};
+        snackbarStack.Push("Queued mod build!", SnackbarColor.Success);
         var buildResult = await Mediator.Send(req);
         ResultFile = buildResult;
+        //snackbarStack.Push("Merged file successfully built!", SnackbarColor.Success);
     }
 
     private void OptionChecked(string modFile, bool value)
     {
         switch (value)
         {
-            case true when !EnabledMods.Contains(modFile):
-                EnabledMods.Add(modFile);
+            case true when !ModPriority.ContainsKey(modFile):
+                ModPriority.Add(modFile, 10);
                 break;
-            case false when EnabledMods.Contains(modFile):
-                EnabledMods.Remove(modFile);
+            case false when ModPriority.ContainsKey(modFile):
+                ModPriority.Add(modFile, 10);
                 break;
         }
     }
@@ -104,9 +127,24 @@
     {
         get
         {
-            return EnabledMods.Select(em => AvailableMods[em]).SelectMany(m =>
+            return ModPriority.Keys.Select(em => AvailableMods[em]).SelectMany(m =>
           m.FilePatches.Keys.ToList()).Distinct().Count();
         }
+    }
+
+    private void OnChangePriority(string modFile, bool decrement)
+    {
+        var existingPriority = ModPriority[modFile];
+        if (decrement)
+        {
+            existingPriority--;
+        }
+        else
+        {
+            existingPriority++;
+        }
+        ModPriority[modFile] = existingPriority++;
+        StateHasChanged();
     }
 
 }

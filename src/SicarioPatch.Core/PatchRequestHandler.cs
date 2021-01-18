@@ -3,36 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using BuildEngine;
-using HexPatch;
 using HexPatch.Build;
 using MediatR;
 
 namespace SicarioPatch.Core
 {
-    public class ModsRequest : IRequest<Dictionary<string, Mod>>
-    {
-        
-    }
-    
-    public class PatchRequest : IRequest<FileInfo>
-    {
-        public PatchRequest(Dictionary<string, Mod> mods)
-        {
-            Mods = mods;
-        }
-
-        public Dictionary<string, Mod> Mods { get; }
-        public bool PackResult { get; set; } = false;
-        
-        public string Name { get; set; }
-    }
-
     public class PatchRequestHandler : IRequestHandler<PatchRequest, FileInfo>
     {
-        private readonly ModPatchServiceBuilder _builder;
+        private readonly WingmanPatchServiceBuilder _builder;
 
-        public PatchRequestHandler(ModPatchServiceBuilder servBuilder)
+        public PatchRequestHandler(WingmanPatchServiceBuilder servBuilder)
         {
             _builder = servBuilder;
         }
@@ -66,17 +46,4 @@ namespace SicarioPatch.Core
             // return result != null ? (result.Value.Success ? result.Value.Result : null) : null;
         }
     }
-
-    /* public class FileMoveBehaviour : IPipelineBehavior<PatchRequest, FileInfo>
-        {
-
-            public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<FileInfo> next)
-            {
-                
-                var response = await next();
-                var dFi = new FileInfo(Path.Combine(Path.GetTempPath(), response.Name));
-                response.CopyTo(dFi.FullName);
-                return dFi;
-            }
-        } */
 }

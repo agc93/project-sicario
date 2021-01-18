@@ -54,7 +54,7 @@ namespace SicarioPatch.App
                 return config.GetSection("Files").Get<StoreOptions>();
             });
             services
-                .AddSingleton<ModPatchServiceBuilder>()
+                .AddSingleton<WingmanPatchServiceBuilder>()
                 .AddSingleton<SourceFileService>()
                 .AddSingleton<FilePatcher>()
                 .AddSingleton<ModFileLoader>()
