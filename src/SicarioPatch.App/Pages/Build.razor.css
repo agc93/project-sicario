@@ -3,8 +3,10 @@
     align-items: center;
     flex-direction: column;
     margin-top: 1.5em;
+    padding: 5px;
 }
 
-.action-container > button {
+.action-container > .btn,
+::deep .action-btn {
     margin-top: 1em;
 }

@@ -3,7 +3,7 @@
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
 <h3>Build Merged Mod</h3>
-<Paragraph>Loaded @AvailableMods.Keys.Count mods</Paragraph>
+@* <Paragraph>Loaded @AvailableMods.Keys.Count mods</Paragraph> *@
 @if (AvailableMods.Any())
 {
     <Row>
@@ -57,10 +57,21 @@
                 <div class="container action-container">
                     <Text Color="TextColor.Muted">Ready to build your mod!</Text>
                     <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
-                    <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                    @if (IsBuilding)
+                    {
+                        <LoadingSpinner >
+                            <Alert Color="Color.Primary" Visible="true">
+                                Currently building your merged file!
+                            </Alert>
+                        </LoadingSpinner>
+                    }
+                    else
+                    {
+                        <Button class="action-btn" Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>   
+                    }
                     @if (ResultFile != null && ResultFile.Exists)
                     {
-                        <Button Clicked="@OnDownloadResult" Color="Color.Success">Download Merged File</Button>
+                        <Button class="action-btn" Clicked="@OnDownloadResult" Color="Color.Success">Download Merged File</Button>
                     }
                 </div>
             </Column>
@@ -85,6 +96,7 @@
     private FileInfo ResultFile { get; set; }
     private bool ReadyToBuild => this.ModPriority.Keys.Any();
     private bool AutoPack {get;set;} = true;
+    private bool IsBuilding { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,14 +105,22 @@
 
     private async Task OnStartBuild()
     {
+        var timer = new System.Diagnostics.Stopwatch();
         var req = new PatchRequest(
             SortedMods
                 .ToDictionary(k => k.Key, v => AvailableMods[v.Key])
             ) { PackResult = AutoPack};
         snackbarStack.Push("Queued mod build!", SnackbarColor.Success);
+        this.IsBuilding = true;
+        timer.Start();
         var buildResult = await Mediator.Send(req);
         ResultFile = buildResult;
-        //snackbarStack.Push("Merged file successfully built!", SnackbarColor.Success);
+        if (timer.Elapsed.TotalSeconds > 1)
+        {
+            snackbarStack.Push("Merged file successfully built!", SnackbarColor.Success);
+        }
+        timer.Stop();
+        IsBuilding = false;
     }
 
     private void OptionChecked(string modFile, bool value)
