@@ -7,7 +7,7 @@ using HexPatch.Build;
 using MediatR;
 using SicarioPatch.Core;
 
-namespace SicarioPatch.App.Common
+namespace SicarioPatch.App.Infrastructure
 {
     public class ModsRequestHandler : IRequestHandler<ModsRequest, Dictionary<string, Mod>>
     {
