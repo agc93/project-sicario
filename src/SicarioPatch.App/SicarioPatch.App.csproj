@@ -1,24 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>a74f151d-8f4e-42f9-b70e-bba7352eccd4</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="5.0.0" />
     <PackageReference Include="Blazorise.Icons.Material" Version="0.9.2.5" />
     <PackageReference Include="Blazorise.Material" Version="0.9.2.5" />
     <PackageReference Include="Blazorise.Snackbar" Version="0.9.2.5" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SicarioPatch.Components\SicarioPatch.Components.csproj" />
     <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
     <ProjectReference Include="..\..\..\..\Engine\ImageStorEngine\src\ImageStorEngine\ImageStorEngine.csproj" />
+    <ProjectReference Include="..\SicarioPatch.Store\SicarioPatch.Store.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components" />
+    <Content Remove="Pages\Login.razor" />
   </ItemGroup>
 
 </Project>

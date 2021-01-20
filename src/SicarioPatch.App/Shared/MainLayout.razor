@@ -11,7 +11,7 @@
                 <BarBrand>
                     <BarItem>
                         <BarLink To="">
-                            <BarIcon IconName="MaterialIcons.ImportExport" />
+                            <BarIcon IconName="MaterialIcons.Layers" />
                             @Brand.AppName
                         </BarLink>
                     </BarItem>
@@ -24,6 +24,14 @@
                                 Build
                             </BarLink>
                         </BarItem>
+                        <AuthorizeView>
+                            <BarItem>
+                                <BarLink To="upload">
+                                    <BarIcon IconName="IconName.FileUpload" />
+                                    Upload
+                                </BarLink>
+                            </BarItem>
+                        </AuthorizeView>
                     </BarStart>
                     <BarEnd>
                         <BarItem>
@@ -41,6 +49,9 @@
                                     </BarDropdownItem>
                                 </BarDropdownMenu>
                             </BarDropdown>
+                        </BarItem>
+                        <BarItem>
+                            <BarLoginDisplay />
                         </BarItem>
                     </BarEnd>
                 </BarMenu>
@@ -60,7 +71,27 @@
             </Bar>*@
         </LayoutHeader>
         <LayoutContent Padding="Padding.Is4.OnAll">
-            @Body
+            <CascadingValue Value="@_snackbar">
+                @Body
+                <SnackbarStack @ref="_snackbar" Interval="2000" Location="SnackbarStackLocation.Left"/>
+            </CascadingValue>
         </LayoutContent>
     </Layout>
 </Layout>
+
+@code {
+    private SnackbarStack _snackbar;
+    
+    [CascadingParameter]
+    // ReSharper disable once ConvertToAutoProperty
+    // ReSharper disable ArrangeAccessorOwnerBody
+    private SnackbarStack SnackbarStack
+    {
+    
+        get { return _snackbar;}
+    
+        set { _snackbar = value; }
+    }
+    // ReSharper restore ArrangeAccessorOwnerBody
+
+}

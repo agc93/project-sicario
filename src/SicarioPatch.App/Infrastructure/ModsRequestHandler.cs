@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FileStorEngine.Services;
 using HexPatch;
 using HexPatch.Build;
 using MediatR;
@@ -9,6 +12,19 @@ using SicarioPatch.Core;
 
 namespace SicarioPatch.App.Infrastructure
 {
+
+    public record ModUploadRequest : IRequest<string>
+    {
+        public string FileName { get; init; }
+        public Mod Mod { get; init; }
+        public string UploadTarget { get; init; }
+    }
+
+    public record ModDeleteRequest : IRequest<bool>
+    {
+        public string FileName { get; init; }
+    }
+
     public class ModsRequestHandler : IRequestHandler<ModsRequest, Dictionary<string, Mod>>
     {
         private ModFileLoader _loader;
@@ -20,7 +36,7 @@ namespace SicarioPatch.App.Infrastructure
             _fileOpts = loadOpts;
         }
 
-        public Task<Dictionary<string, Mod>> Handle(ModsRequest request, CancellationToken cancellationToken)
+        public async Task<Dictionary<string, Mod>> Handle(ModsRequest request, CancellationToken cancellationToken)
         {
             var allFiles = new List<string>();
             foreach (var sourcePath in _fileOpts?.Sources ?? new List<string>())
@@ -29,7 +45,20 @@ namespace SicarioPatch.App.Infrastructure
                 allFiles.AddRange(localFiles);
             }
             var fileMods = _loader.LoadFromFiles(allFiles);
-            return Task.FromResult(fileMods);
+            var allMods = string.IsNullOrWhiteSpace(request.UserName) 
+                ? fileMods 
+                : fileMods.Where(MatchesAuthor(request.UserName))
+                    .ToDictionary(k => Path.GetFileName(k.Key), v => v.Value);
+            return allMods;
+        }
+
+        private static Func<KeyValuePair<string, Mod>, bool> MatchesAuthor(string author)
+        {
+            return (modPair) =>
+            {
+                var mod = modPair.Value;
+                return mod?.Metadata != null && mod.Metadata.Author == author;
+            };
         }
     }
 }

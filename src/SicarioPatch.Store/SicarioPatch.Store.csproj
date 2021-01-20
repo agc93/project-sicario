@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../Engine/FileStorEngine/src/FileStorEngine/FileStorEngine.csproj" />
+    <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
+  </ItemGroup>
+
+</Project>

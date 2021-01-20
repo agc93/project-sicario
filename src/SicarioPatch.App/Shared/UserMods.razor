@@ -1,0 +1,97 @@
+﻿@using System.IO
+@inject IMediator Mediator
+@inject IJSRuntime JsRuntime
+@inject ModParser ModParser
+
+<AuthorizeView>
+@if (Mods.Any())
+{
+    <Card Class="actions-card">
+        <CardHeader>
+            <div class="d-flex justify-content-between align-items-center">
+            @Title
+            <Button Outline="true" Clicked="RefreshMods"><Icon Name="@("refresh")" /></Button>
+            </div>
+        </CardHeader>
+        <CardBody>
+            <CardText>
+                You have @Mods.Keys.Count mods available.
+                <ul class="list-group">
+                    @foreach (var (fileName, mod) in Mods)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @mod.GetLabel() (@Path.GetFileName(fileName))
+                            <div class="actions d-xl-none">
+                                <Dropdown Direction="Direction.Left">
+                                    <DropdownToggle><Icon Name="IconName.MoreVertical" /></DropdownToggle>
+                                    <DropdownMenu>
+                                        <DropdownItem><Button Size="Size.Small" Color="Color.Danger" Clicked="() => RemoveMod(fileName)"><Icon Name="IconName.Delete" /></Button></DropdownItem>
+                                        <DropdownItem><Button Size="Size.Small" Clicked="() => OnDownloadMod(fileName)"><Icon Name="IconName.Download" /></Button></DropdownItem>        
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </div>
+                            <div class="actions d-none d-xl-inline-block" >
+                                <Tooltip Text="This will immediately delete your mod PERMANENTLY!" Placement="Placement.Left">
+                                    <Button Size="Size.Small" Color="Color.Danger" Clicked="() => RemoveMod(fileName)"><Icon Name="IconName.Delete" /></Button>
+                                </Tooltip>
+                                <Button Size="Size.Small" Clicked="() => OnDownloadMod(fileName)"><Icon Name="IconName.Download" /></Button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </CardText>
+        </CardBody>
+    </Card>
+}
+</AuthorizeView>
+
+@code {
+    
+    public Dictionary<string, Mod> Mods { get; set; } = new Dictionary<string, Mod>();
+    
+    [Parameter]
+    public EventCallback<string> OnRemoveMod { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "User Mods";
+    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshMods();
+    }
+
+    private async Task RefreshMods()
+    {
+        var state = await authenticationStateTask;
+        var user = state.User;
+        var req = new ModsRequest() {UserName = user.Identity.Name, IncludeBeta = true};
+        var mods = await Mediator.Send(req);
+        Mods = mods;
+    }
+
+    private async Task OnDownloadMod(string fileName)
+    {
+        var mod = Mods[fileName];
+        if (mod != null)
+        {
+            var text = ModParser.ToJson(mod);
+            var bytes = System.Text.Encoding.UTF8.GetBytes(text);
+            await JsRuntime.InvokeVoidAsync("BlazorDownloadFile", Path.GetFileName(fileName), "application/json", bytes);
+        }
+    }
+
+    private async Task RemoveMod(string fileName)
+    {
+        if (OnRemoveMod.HasDelegate)
+        {
+            await OnRemoveMod.InvokeAsync(fileName);
+            await RefreshMods();
+        }
+    }
+    
+    
+
+}

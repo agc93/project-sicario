@@ -1,0 +1,14 @@
+﻿@page
+@using AspNet.Security.OAuth.Discord
+@using Microsoft.AspNetCore.Authentication
+
+@functions{
+    public async Task OnGet(string redirectUri)
+    {
+        await HttpContext.ChallengeAsync(DiscordAuthenticationDefaults.AuthenticationScheme,
+            new AuthenticationProperties
+            {
+                RedirectUri = "/"
+            });
+    }
+}

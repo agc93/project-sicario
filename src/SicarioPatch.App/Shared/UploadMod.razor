@@ -1,0 +1,101 @@
+﻿@using System.IO
+@using System.Text.Json
+@inject ModParser ModParser
+@if (string.IsNullOrWhiteSpace(RawModFile))
+{
+    <Container Style="margin-top: 1.5em;">
+        <FileEdit Filter=".dtm" Changed="@OnFileChanged"/>
+    </Container>
+}
+else if (ParsedMod != null)
+{
+    <Field>
+        <FieldLabel>File Name</FieldLabel>
+        <TextEdit @bind-Text="@FileName" />
+        <FieldHelp>This is the name of the actual mod file itself</FieldHelp>
+    </Field>
+    <Field>
+        <FieldLabel>Mod Name</FieldLabel>
+        <TextEdit @bind-Text="@ParsedMod.Metadata.DisplayName" />
+        <FieldHelp>This can be anything you want and is what's shown to users</FieldHelp>
+    </Field>
+    <Field>
+        <FieldLabel>Description</FieldLabel>
+        <MemoEdit @bind-Text="@ParsedMod.Metadata.Description" Rows="2" />
+    </Field>
+    <Divider />
+    <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Files Modified
+            <Badge Color="Color.Secondary">@ParsedMod.FilePatches.Count</Badge>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Total Patches
+            <Badge Color="Color.Secondary">@ParsedMod.FilePatches.Sum(fp => fp.Value.Sum(ps => ps.Patches.Count))</Badge>
+        </li>
+    </ul>
+    <Divider />
+    <Button Clicked="@SaveMod" Color="Color.Primary" Block="true">Upload your mod</Button>
+}
+
+
+@code {
+    [CascadingParameter] SnackbarStack snackbarStack { get; set; }
+    private string RawModFile { get; set; }
+    private Mod ParsedMod { get; set; }
+    private string FileName { get; set;}
+    
+    
+    private async Task OnFileChanged(FileChangedEventArgs ev)
+    {
+        ParsedMod = null;
+        var memStream = new MemoryStream();
+        var inFile = ev.Files.FirstOrDefault();
+        if (inFile != null)
+        {
+            await inFile.WriteToStreamAsync(memStream);
+            memStream.Position = 0;
+            var reader = new StreamReader(memStream);
+            var str = await reader.ReadToEndAsync();
+            RawModFile = str;
+            TryLoadMod(inFile.Name);
+        }
+    }
+
+    private async Task TryLoadMod(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(RawModFile)) return;
+        try
+        {
+            
+            if (ModParser.ParseMod(RawModFile) is var jsonMod && jsonMod?.FilePatches != null && jsonMod.FilePatches.Any())
+            {
+                jsonMod.Metadata ??= new SetMetadata();
+                ParsedMod = jsonMod;
+                FileName = fileName;
+                snackbarStack.Push("Successfully loaded mod!", SnackbarColor.Success);
+            }
+        }
+        catch (Exception e)
+        {
+            snackbarStack.Push($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
+            Console.WriteLine(e);
+            // throw;
+            RawModFile = null;
+            FileName = null;
+        }
+    }
+    
+    private async Task SaveMod()
+    {
+        if (ParsedMod != null && OnSaveMod.HasDelegate)
+        {
+            Console.WriteLine("Running OnSaveMod callback");
+            await OnSaveMod.InvokeAsync((FileName, ParsedMod));
+            RawModFile = null;
+        }
+    }
+    
+    [Parameter]
+    public EventCallback<(string FileName, Mod Mod)> OnSaveMod { get; set; }
+}

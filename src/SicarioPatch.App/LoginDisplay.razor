@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authentication
+
+@inject NavigationManager Navigation
+@inject IAuthenticationService authService
+
+<AuthorizeView>
+    <Authorized>
+        Signed in as @context.User.Identity.Name
+        <Button Clicked="@BeginSignOut">Log Out</Button>
+    </Authorized>
+    <NotAuthorized>
+        <Button Clicked="@BeginSignIn">Log in</Button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private async Task BeginSignOut()
+    {
+        
+        Navigation.NavigateTo("/Logout");
+    }
+
+    private void BeginSignIn() {
+        @* await authStateProvider.Login(); *@
+        Navigation.NavigateTo("/Login");
+    }
+}

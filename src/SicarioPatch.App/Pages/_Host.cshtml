@@ -26,6 +26,13 @@
 
     <link href="css/site.css" rel="stylesheet" />
     <link href="SicarioPatch.App.styles.css" rel="stylesheet" />
+    
+    <script>
+        openPage = (url) => {
+            window.open(url, "_blank");
+            return "";
+        }
+    </script>
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />

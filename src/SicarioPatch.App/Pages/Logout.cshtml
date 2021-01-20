@@ -1,0 +1,13 @@
+﻿@page
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+
+
+@functions{
+    public async Task<IActionResult> OnGet()
+    {
+    // await HttpContext.SignOutAsync(DiscordAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties { RedirectUri = "/" });
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties {RedirectUri = "/"});
+        return Redirect("/");
+    }
+}

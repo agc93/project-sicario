@@ -10,7 +10,7 @@
         <Column ColumnSize="ColumnSize.Is6">
             <Card>
                 <CardHeader>Available Mods</CardHeader>
-                <CardBody>
+                <CardBody Style="max-height: 60vh;">
                     <CardTitle>Select your mods to build:</CardTitle>
                     @foreach (var (modFile, mod) in AvailableMods)
                     {
@@ -24,7 +24,7 @@
             <Column ColumnSize="ColumnSize.Is6">
                 <Card>
                     <CardHeader>Enabled Mods</CardHeader>
-                    <CardBody>
+                    <CardBody Style="max-height: 60vh;">
                         <CardText>
                             You have enabled @ModPriority.Keys.Count mods to modify @GetEnabledFileCount files.
                             <ul class="list-group">
@@ -71,14 +71,16 @@
                     }
                     @if (ResultFile != null && ResultFile.Exists)
                     {
-                        <Button class="action-btn" Clicked="@OnDownloadResult" Color="Color.Success">Download Merged File</Button>
+                        <FileDownload ResultFile="ResultFile" DeleteAfter="true">
+                            Download Merged File
+                        </FileDownload>
                     }
                 </div>
             </Column>
         }
     </Row>
 }
-<SnackbarStack @ref="snackbarStack" Interval="2000" Location="SnackbarStackLocation.Left" />
+
 
 @code {
     private Dictionary<string, Mod> AvailableMods { get; set; } = new Dictionary<string, Mod>();
@@ -91,7 +93,7 @@
             }
         }
     
-    private SnackbarStack snackbarStack;
+    [CascadingParameter] SnackbarStack snackbarStack { get; set; }
 
     private FileInfo ResultFile { get; set; }
     private bool ReadyToBuild => this.ModPriority.Keys.Any();
@@ -136,19 +138,12 @@
         }
     }
 
-    private async Task OnDownloadResult()
-    {
-        var bytes = await File.ReadAllBytesAsync(ResultFile.FullName);
-        await JsRuntime.InvokeVoidAsync("BlazorDownloadFile", ResultFile.Name, ResultFile.Extension == ".zip" ? "application/zip" : "application/octet-stream", bytes);
-        ResultFile.Delete();
-    }
 
     public int GetEnabledFileCount
     {
         get
         {
-            return ModPriority.Keys.Select(em => AvailableMods[em]).SelectMany(m =>
-          m.FilePatches.Keys.ToList()).Distinct().Count();
+            return ModPriority.Keys.Select(em => AvailableMods[em]).ToFileCount();
         }
     }
 

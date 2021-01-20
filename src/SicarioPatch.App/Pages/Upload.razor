@@ -1,0 +1,70 @@
+﻿@page "/upload"
+@using System.IO
+@using SicarioPatch.App.Infrastructure
+@inject IMediator Mediator
+@inject IJSRuntime JsRuntime
+<h3>Upload Patch Mod</h3>
+
+<Row>
+    <Column>
+        <UploadMod OnSaveMod="@OnSaveMod" />
+    </Column>
+    <Column ColumnSize="ColumnSize.IsAuto">
+        <UserMods Title="Your Mods" OnRemoveMod="@OnDeleteMod" />
+    </Column>
+</Row>
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [CascadingParameter] SnackbarStack snackbarStack { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // await RefreshMods();
+    }
+
+    private async Task OnSaveMod((string fileName, Mod mod) evt)
+    {
+        var state = await authenticationStateTask;
+        if (state?.User != null)
+        {
+            evt.mod.Metadata.Author = state.User.Identity.Name;
+            var req = new ModUploadRequest { Mod = evt.mod, FileName = evt.fileName};
+            try
+            {
+                Console.WriteLine("Sending upload request");
+                var result = await Mediator.Send(req);
+                if (!string.IsNullOrWhiteSpace(result))
+                {
+                    snackbarStack.Push($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
+                }
+                else
+                {
+                    snackbarStack.Push("Error during upload! Please contact agc93 to fix your upload", SnackbarColor.Warning);
+                }
+            }
+            catch (Exception e)
+            {
+                snackbarStack.Push($"Error encountered during upload!{Environment.NewLine}{e.ToString()}");
+            }
+        }
+        else
+        {
+            snackbarStack.Push("Failed to determine user information!", SnackbarColor.Danger);
+        }
+        
+    }
+    
+    private async Task OnDeleteMod(string fileName)
+    {
+        var req = new ModDeleteRequest{FileName = Path.GetFileName(fileName)};
+        var result = await Mediator.Send(req);
+        snackbarStack.Push(
+            result ? $"Successfully deleted '{fileName}'" : "Failed to delete mod file",
+            result ? SnackbarColor.Success : SnackbarColor.Danger);
+    }
+
+}
