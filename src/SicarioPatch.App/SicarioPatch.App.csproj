@@ -16,8 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
-    <ProjectReference Include="..\..\..\..\Engine\ImageStorEngine\src\ImageStorEngine\ImageStorEngine.csproj" />
-    <ProjectReference Include="..\SicarioPatch.Store\SicarioPatch.Store.csproj" />
   </ItemGroup>
 
   <ItemGroup>

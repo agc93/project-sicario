@@ -7,8 +7,6 @@ using Blazorise.Icons.Material;
 using Blazorise.Material;
 using BuildEngine;
 using BuildEngine.Scripts;
-using FileStorEngine.Configuration;
-using FileStorEngine.Services;
 using HexPatch;
 using HexPatch.Build;
 using MediatR;
@@ -55,10 +53,7 @@ namespace SicarioPatch.App
                 var config = provider.GetService<IConfiguration>();
                 return config.GetSection("Mods").Get<ModLoadOptions>();
             });
-            services.AddSingleton<StoreOptions>(provider => {
-                var config = provider.GetService<IConfiguration>();
-                return config.GetSection("Store").Get<StoreOptions>();
-            });
+            
             services
                 .AddSingleton<WingmanPatchServiceBuilder>()
                 .AddSingleton<SourceFileService>()
@@ -77,8 +72,7 @@ namespace SicarioPatch.App
                 .AddDiscord(Configuration.GetSection("Discord"));
             services
                 .AddSingleton<BrandProvider>()
-                .AddSingleton<ModParser>()
-                .AddSingleton<IFileIndexService, LocalFileIndexService>();
+                .AddSingleton<ModParser>();
             services.AddBlazorise(opts =>
                 {
                     opts.ChangeTextOnKeyPress = true;
