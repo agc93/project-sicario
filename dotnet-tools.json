@@ -1,0 +1,24 @@
+﻿{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "cake.tool": {
+      "version": "1.0.0-rc0002",
+      "commands": [
+        "dotnet-cake"
+      ]
+    },
+    "gpr": {
+      "version": "0.1.224",
+      "commands": [
+        "gpr"
+      ]
+    },
+    "minver-cli": {
+      "version": "2.3.0",
+      "commands": [
+        "minver"
+      ]
+    }
+  }
+}
