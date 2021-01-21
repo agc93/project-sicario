@@ -71,7 +71,7 @@
             </Bar>*@
         </LayoutHeader>
         <LayoutContent Padding="Padding.Is4.OnAll">
-            <CascadingValue Value="@_snackbar">
+            <CascadingValue Value="@_snackbar" Name="SnackbarStack">
                 @Body
                 <SnackbarStack @ref="_snackbar" Interval="2000" Location="SnackbarStackLocation.Left"/>
             </CascadingValue>
@@ -80,18 +80,19 @@
 </Layout>
 
 @code {
-    private SnackbarStack _snackbar;
+    SnackbarStack _snackbar;
     
-    [CascadingParameter]
+    
     // ReSharper disable once ConvertToAutoProperty
     // ReSharper disable ArrangeAccessorOwnerBody
+    /*[CascadingParameter]
     private SnackbarStack SnackbarStack
     {
     
         get { return _snackbar;}
     
         set { _snackbar = value; }
-    }
+    }*/
     // ReSharper restore ArrangeAccessorOwnerBody
 
 }

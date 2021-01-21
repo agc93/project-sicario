@@ -3,7 +3,6 @@
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
 <h3>Build Merged Mod</h3>
-@* <Paragraph>Loaded @AvailableMods.Keys.Count mods</Paragraph> *@
 @if (AvailableMods.Any())
 {
     <Row>
@@ -80,6 +79,18 @@
         }
     </Row>
 }
+else
+{
+    <Row Gutter=(32,16)>
+        <Column ColumnSize="ColumnSize.Is8.Is2.WithOffset">
+            <Container Style="margin-top: 1.5em;">
+                <Alert Color="Color.Primary" Visible="true">
+                    There are no mods currently available!
+                </Alert>
+            </Container>
+        </Column>
+    </Row>  
+}
 
 
 @code {
@@ -93,7 +104,8 @@
             }
         }
     
-    [CascadingParameter] SnackbarStack snackbarStack { get; set; }
+    [CascadingParameter(Name = "SnackbarStack")] 
+    SnackbarStack snackbarStack { get; set; }
 
     private FileInfo ResultFile { get; set; }
     private bool ReadyToBuild => this.ModPriority.Keys.Any();
@@ -112,14 +124,14 @@
             SortedMods
                 .ToDictionary(k => k.Key, v => AvailableMods[v.Key])
             ) { PackResult = AutoPack};
-        snackbarStack.Push("Queued mod build!", SnackbarColor.Success);
+        snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
         timer.Start();
         var buildResult = await Mediator.Send(req);
         ResultFile = buildResult;
         if (timer.Elapsed.TotalSeconds > 1)
         {
-            snackbarStack.Push("Merged file successfully built!", SnackbarColor.Success);
+            snackbarStack?.Push("Merged file successfully built!", SnackbarColor.Success);
         }
         timer.Stop();
         IsBuilding = false;
@@ -133,7 +145,7 @@
                 ModPriority.Add(modFile, 10);
                 break;
             case false when ModPriority.ContainsKey(modFile):
-                ModPriority.Add(modFile, 10);
+                ModPriority.Remove(modFile);
                 break;
         }
     }

@@ -9894,8 +9894,8 @@ textarea.form-control-sm:not([rows='1']) {
 }
 
 .custom-file-input:hover ~ .custom-file-label, .custom-file-input:focus ~ .custom-file-label {
-  border-bottom-color: #6200ee;
-  box-shadow: inset 0 -2px 0 -1px #6200ee;
+  border-bottom-color: #ba4615;
+  box-shadow: inset 0 -2px 0 -1px #ba4615;
 }
 
 .custom-file-label {

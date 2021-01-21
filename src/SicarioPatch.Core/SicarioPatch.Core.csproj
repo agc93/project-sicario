@@ -6,7 +6,7 @@
 
     <ItemGroup>
 <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
-      <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.6" />
+      <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.7" />
       <PackageReference Include="MediatR" Version="9.0.0" />
     </ItemGroup>
 

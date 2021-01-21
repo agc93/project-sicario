@@ -19,7 +19,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    [CascadingParameter] SnackbarStack snackbarStack { get; set; }
+    [CascadingParameter(Name = "SnackbarStack")] SnackbarStack snackbarStack { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,21 +39,22 @@
                 var result = await Mediator.Send(req);
                 if (!string.IsNullOrWhiteSpace(result))
                 {
-                    snackbarStack.Push($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
+                    snackbarStack?.Push($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
                 }
                 else
                 {
-                    snackbarStack.Push("Error during upload! Please contact agc93 to fix your upload", SnackbarColor.Warning);
+                    snackbarStack?.Push("Error during upload! Please contact agc93 to fix your upload", SnackbarColor.Warning);
                 }
             }
             catch (Exception e)
             {
-                snackbarStack.Push($"Error encountered during upload!{Environment.NewLine}{e.ToString()}");
+                Console.WriteLine(e);
+                snackbarStack?.Push($"Error encountered during upload!{Environment.NewLine}{e.ToString()}");
             }
         }
         else
         {
-            snackbarStack.Push("Failed to determine user information!", SnackbarColor.Danger);
+            snackbarStack?.Push("Failed to determine user information!", SnackbarColor.Danger);
         }
         
     }
@@ -62,7 +63,7 @@
     {
         var req = new ModDeleteRequest{FileName = Path.GetFileName(fileName)};
         var result = await Mediator.Send(req);
-        snackbarStack.Push(
+        snackbarStack?.Push(
             result ? $"Successfully deleted '{fileName}'" : "Failed to delete mod file",
             result ? SnackbarColor.Success : SnackbarColor.Danger);
     }

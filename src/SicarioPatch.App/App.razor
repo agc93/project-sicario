@@ -1,12 +1,62 @@
 ﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        </Found>
-        <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p>Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
+    <ThemeProvider Theme="@theme">
+        <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+            </Found>
+            <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p>Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </ThemeProvider>
 </CascadingAuthenticationState>
+
+@code {
+
+    private Theme theme = new Theme
+    {
+        ColorOptions = new ThemeColorOptions
+        {
+            Primary = "#ba4615",
+            Secondary = "#2c363f",
+        },
+        InputOptions = new ThemeInputOptions()
+        {
+            // Color = "#ba4615",
+            CheckColor = "#ba4615",
+            SliderColor = "#ba4615"
+        },
+        TextColorOptions = new ThemeTextColorOptions
+        {
+            Secondary = "#ba4615"
+        },
+        BackgroundOptions = new ThemeBackgroundOptions
+        {
+            Primary = "#ba4615",
+            Secondary = "#2c363f"
+        },
+        SidebarOptions = new ThemeSidebarOptions
+        {
+            BackgroundColor = "#2C2F33",
+            Color = "#2C2F33"
+        },
+        BarOptions = new ThemeBarOptions()
+        {
+            DarkColors = new ThemeBarColorOptions
+            {
+                BackgroundColor = "#2C2F33",
+                Color = "#fdfffc",
+                ItemColorOptions = new ThemeBarItemColorOptions()
+                {
+                    ActiveColor = "#fdfffc",
+                    ActiveBackgroundColor = "ba4615",
+                    HoverColor = "#ffffff",
+                    HoverBackgroundColor = "#E75D23"
+                }
+            }
+        }
+    };
+
+}
