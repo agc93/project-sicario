@@ -1,0 +1,176 @@
+﻿@page "/test"
+@using System.IO
+@using System.Timers
+@inject ModParser ModParser;
+@inject IMediator Mediator
+@using BlazorMonaco
+@using BlazorMonaco.Bridge
+<DisplayHeading Size="DisplayHeadingSize.Is4">Test Patch File</DisplayHeading>
+<Row Style="height: 50vh;">
+    <Column ColumnSize="ColumnSize.Is8" Style="display: inline-flex; flex-direction: column; justify-content: space-evenly">
+        @* <MemoEdit Rows="16" @bind-Text="@RawModFile" TextChanged="OnTextChanged" /> *@
+        <div class="test-editor-container">
+            <MonacoEditor Id="test-editor" CssClass="test-editor" ConstructionOptions="GetEditorOptions" @ref="_editor" OnDidInit="OnEditorInit" OnKeyUp="HandleKeyUp" />
+        </div>
+    </Column>
+    <Column ColumnSize="ColumnSize.Is4" Style="display: inline-flex; flex-direction: column; justify-content: space-evenly">
+        <div class="container action-container">
+            <Alert Color="Color.Secondary" Visible="true">
+                You can drop your patch file in the editor to the left. If your mod is valid, you will see the mod details and be able to download the patched files below.
+            </Alert>
+        </div>
+        @if (ParsedMod == null && IsLoading)
+        {
+            <LoadingSpinner/>
+        }
+        @if (!string.IsNullOrWhiteSpace(LastError))
+        {
+            <div class="container action-container">
+                <Alert Color="Color.Warning" Visible="true">
+                    Error encountered loading mod: @LastError
+                </Alert>
+            </div>
+        }
+    </Column>
+</Row>
+<Row>
+@if (ParsedMod != null)
+{
+    <Column ColumnSize="ColumnSize.Is6">
+        <Card>
+            <CardBody>
+                <ModInfo Mod="@ParsedMod" ReadOnly="true"/>
+            </CardBody>
+        </Card>
+    </Column>
+    <Column ColumnSize="ColumnSize.Is6">
+
+        <Card>
+            <div class="container action-container">
+                <Text Color="TextColor.Muted">Ready to build your mod!</Text>
+                @*@if (IsBuilding)
+                        {
+                            <LoadingSpinner >
+                                <Alert Color="Color.Primary" Visible="true">
+                                    Currently building your merged file!
+                                </Alert>
+                            </LoadingSpinner>
+                        }
+                        else
+                        {
+                            <Button class="action-btn" Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                        }*@
+                <Button class="action-btn" Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                @if (ResultFile != null && ResultFile.Exists)
+                {
+                    <FileDownload ResultFile="ResultFile" DeleteAfter="true">
+                        Download Merged File
+                    </FileDownload>
+                }
+            </div>
+        </Card>
+    </Column>
+}
+</Row>
+
+@code {
+    
+    [CascadingParameter(Name = "SnackbarStack")] SnackbarStack snackbarStack { get; set; }
+    private string RawModFile { get; set; }
+    private Mod ParsedMod { get; set; }
+    
+    private FileInfo ResultFile { get; set; }
+    
+    private string LastError { get; set; }
+    private System.Timers.Timer aTimer;
+    private bool IsLoading { get; set; }
+
+    private StandaloneEditorConstructionOptions GetEditorOptions(MonacoEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            AutoIndent = true,
+            Language = "json",
+            Theme = "vs-dark"
+        };
+    }
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        aTimer = new Timer(750);
+        aTimer.Elapsed += (source, evt) => OnLoadEditor();
+        aTimer.AutoReset = false;
+    }
+    
+    private async Task OnStartBuild()
+    {
+        var req = new PatchRequest(new Dictionary<string, Mod> {["TestPatch.dtm"] = ParsedMod});
+        var buildResult = await Mediator.Send(req);
+        ResultFile = buildResult;
+    // IsBuilding = false;
+    }
+    
+    private async Task TryLoadMod()
+    {
+        IsLoading = true;
+        LastError = string.Empty;
+        if (string.IsNullOrWhiteSpace(RawModFile)) return;
+        try
+        {
+            
+            if (ModParser.ParseMod(RawModFile) is var jsonMod && jsonMod?.FilePatches != null && jsonMod.FilePatches.Any())
+            {
+                jsonMod.Metadata ??= new SetMetadata();
+                ParsedMod = jsonMod;
+                //snackbarStack?.Push("Successfully loaded mod!", SnackbarColor.Success);
+            }
+        }
+        catch (Exception e)
+        {
+            //snackbarStack?.Push($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
+            ParsedMod = null;
+            LastError = e.Message;
+        }
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task OnTextChanged(string arg)
+    {
+        if (arg.Any())
+        {
+            await TryLoadMod();
+        }
+    }
+
+    private async Task OnLoadEditor()
+    {
+        ParsedMod = null;
+        var rawText = await _editor.GetValue();
+        if (!string.IsNullOrWhiteSpace(rawText))
+        {
+            RawModFile = rawText;
+            await TryLoadMod();
+        }
+    }
+
+    private MonacoEditor _editor;
+
+    private void OnEditorInit(MonacoEditorBase obj)
+    {
+        Console.WriteLine("Editor init running");
+        var mod = new Mod();
+        var json = ModParser.ToJson(mod);
+        _editor.Layout();
+        _editor.SetValue(json);
+    }
+
+    private void HandleKeyUp(KeyboardEvent obj)
+    {
+        aTimer.Stop();
+        aTimer.Start();
+    }
+
+}

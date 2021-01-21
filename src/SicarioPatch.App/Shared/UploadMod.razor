@@ -9,7 +9,8 @@
 }
 else if (ParsedMod != null)
 {
-    <Field>
+    <ModInfo Mod="@ParsedMod" ReadOnly="false" FileName="@FileName" /> 
+    @*<Field>
         <FieldLabel>File Name</FieldLabel>
         <TextEdit @bind-Text="@FileName" />
         <FieldHelp>This is the name of the actual mod file itself</FieldHelp>
@@ -34,7 +35,7 @@ else if (ParsedMod != null)
             <Badge Color="Color.Secondary">@ParsedMod.FilePatches.Sum(fp => fp.Value.Sum(ps => ps.Patches.Count))</Badge>
         </li>
     </ul>
-    <Divider />
+    <Divider />*@
     @if (IsLoading)
     {
         <LoadingSpinner />

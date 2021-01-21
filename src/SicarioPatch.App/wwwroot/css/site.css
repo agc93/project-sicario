@@ -52,3 +52,9 @@ html, body {
     a, a:hover {
         color: #ba4615;
     }
+
+.test-editor {
+    height: 40vh;
+    margin: 5vh;
+    /*width: 60vw;*/
+}
