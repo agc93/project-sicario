@@ -77,7 +77,11 @@ namespace SicarioPatch.App
                 })
                 .AddCookie()
                 .AddDiscord(Configuration.GetSection("Discord"));
-            services.AddAuthHandlers(Configuration.GetSection("Access"));
+            if (Configuration.GetSection("Access") is var accessOpts && accessOpts.Exists())
+            {
+                services.AddAuthHandlers(accessOpts);    
+            }
+            
             services
                 .AddSingleton<BrandProvider>()
                 .AddSingleton<ModParser>();
