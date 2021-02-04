@@ -11,6 +11,11 @@
         <FieldHelp>This can be anything you want and is what's shown to users</FieldHelp>
     </Field>
     <Field>
+        <FieldLabel>Mod Group</FieldLabel>
+        <TextEdit @bind-Disabled="@ReadOnly" @bind-Text="@Mod.Group"/>
+        <FieldHelp>Don't set this unless you know what you're doing!</FieldHelp>
+    </Field>
+    <Field>
         <FieldLabel>Description</FieldLabel>
         <MemoEdit @bind-Disabled="@ReadOnly" @bind-Text="@Mod.Metadata.Description" Rows="2"/>
     </Field>
@@ -33,7 +38,7 @@
     public string FileName { get; set; } = string.Empty;
     
     [Parameter]
-    public Mod Mod { get; set; }
+    public WingmanMod Mod { get; set; }
 
     [Parameter]
     public bool ReadOnly { get; set; } = false;

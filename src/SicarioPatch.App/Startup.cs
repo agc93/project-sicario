@@ -41,7 +41,8 @@ namespace SicarioPatch.App
         {
             services.AddMediatR(
                 mc => mc.AsScoped(),
-                typeof(Startup), typeof(PatchRequest));
+                typeof(Startup), typeof(PatchRequest))
+                .AddBehaviours();
             // services.AddSingleton<IPipelineBehavior<ModUploadRequest, string>, ModIndexHandler>();
             services.AddLogging();
             services.AddSingleton<SourceFileOptions>(provider =>
@@ -63,7 +64,8 @@ namespace SicarioPatch.App
                 .AddSingleton<WingmanPatchServiceBuilder>()
                 .AddSingleton<SourceFileService>()
                 .AddSingleton<FilePatcher>()
-                .AddSingleton<ModFileLoader>()
+                .AddSingleton<ModFileLoader<WingmanMod>>()
+                .AddSingleton<WingmanModLoader>()
                 .AddSingleton<BuildContextFactory>()
                 .AddSingleton<IAppInfoProvider, AppInfoProvider>()
                 .AddSingleton<AppInfoProvider>()
@@ -75,6 +77,7 @@ namespace SicarioPatch.App
                 })
                 .AddCookie()
                 .AddDiscord(Configuration.GetSection("Discord"));
+            services.AddAuthHandlers(Configuration.GetSection("Access"));
             services
                 .AddSingleton<BrandProvider>()
                 .AddSingleton<ModParser>();

@@ -18,16 +18,18 @@
                 </BarBrand>
                 <BarMenu>
                     <BarStart>
-                        <BarItem>
-                            <BarLink To="build">
-                                <BarIcon IconName="IconName.Code" />
-                                Build
-                            </BarLink>
-                        </BarItem>
-                        <AuthorizeView>
+                        <AuthorizeView Policy="@Policies.IsUser">
+                            <BarItem>
+                                <BarLink To="build">
+                                    <BarIcon IconName="IconName.Code"/>
+                                    Build
+                                </BarLink>
+                            </BarItem>
+                        </AuthorizeView>
+                        <AuthorizeView Policy="@Policies.IsUploader">
                             <BarItem>
                                 <BarLink To="upload">
-                                    <BarIcon IconName="IconName.FileUpload" />
+                                    <BarIcon IconName="IconName.FileUpload"/>
                                     Upload
                                 </BarLink>
                             </BarItem>

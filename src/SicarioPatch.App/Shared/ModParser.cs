@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using HexPatch;
+using SicarioPatch.Core;
 
 namespace SicarioPatch.App.Shared
 {
@@ -19,9 +20,9 @@ namespace SicarioPatch.App.Shared
             return JsonSerializer.Serialize(mod, _jsonOpts);
         }
 
-        public Mod ParseMod(string rawJson)
+        public WingmanMod ParseMod(string rawJson)
         {
-            return JsonSerializer.Deserialize<Mod>(rawJson, _jsonOpts);
+            return JsonSerializer.Deserialize<WingmanMod>(rawJson, _jsonOpts);
         }
     }
 }

@@ -15,11 +15,11 @@ namespace SicarioPatch.App.Infrastructure
 {
     public class ModLibraryHandler : IRequestHandler<ModUploadRequest, string>, IRequestHandler<ModDeleteRequest, bool>
     {
-        private ModFileLoader _loader;
+        private ModFileLoader<WingmanMod> _loader;
         private ModLoadOptions _fileOpts;
         private ModParser _parser;
 
-        public ModLibraryHandler(ModFileLoader loader, ModLoadOptions loadOpts, ModParser parser)
+        public ModLibraryHandler(ModFileLoader<WingmanMod> loader, ModLoadOptions loadOpts, ModParser parser)
         {
             _loader = loader;
             _fileOpts = loadOpts;

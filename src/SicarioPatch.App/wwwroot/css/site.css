@@ -58,3 +58,7 @@ html, body {
     margin: 5vh;
     /*width: 60vw;*/
 }
+
+.row {
+    margin-bottom: 2em;
+}

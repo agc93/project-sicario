@@ -1,20 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using HexPatch;
+using System.Linq;
 using MediatR;
 
 namespace SicarioPatch.Core
 {
     public class PatchRequest : IRequest<FileInfo>
     {
-        public PatchRequest(Dictionary<string, Mod> mods)
+        public PatchRequest(Dictionary<string, WingmanMod> mods)
         {
-            Mods = mods;
+            Mods = mods.Values.ToList();
         }
 
-        public Dictionary<string, Mod> Mods { get; }
+        public PatchRequest(IEnumerable<WingmanMod> mods)
+        {
+            Mods = mods.ToList();
+        }
+
+        public List<WingmanMod> Mods { get; }
         public bool PackResult { get; set; } = false;
         
         public string Name { get; set; }
+        public Dictionary<string, string> TemplateInputs { get; set; }
     }
 }

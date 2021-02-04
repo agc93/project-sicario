@@ -4,25 +4,30 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BuildEngine;
+using Fluid;
 using HexPatch;
 using HexPatch.Build;
 using Microsoft.Extensions.Logging;
 
 namespace SicarioPatch.Core
 {
-    public class WingmanPatchService : ModPatchService
+    public class WingmanPatchService : ModPatchService<WingmanMod>
     {
         private Dictionary<string, int> OriginalFileSize { get; init; } = new Dictionary<string, int>();
-        protected internal WingmanPatchService(FilePatcher patcher, SourceFileService fileService, BuildContext context, List<KeyValuePair<string, Mod>> mods, ILogger<ModPatchService> logger) : base(patcher, fileService, context, mods, logger)
+        private FluidParser _parser;
+        protected internal WingmanPatchService(FilePatcher patcher, SourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger)
         {
+            TemplateContext.GlobalMemberAccessStrategy.MemberNameStrategy = MemberNameStrategies.CamelCase;
+            _parser = new FluidParser();
         }
 
-        public override async Task<ModPatchService> RunPatches()
+
+        public override async Task<ModPatchService<WingmanMod>> RunPatches()
         {
-            foreach (var (dtmFile, mod) in Mods)
+            foreach (var mod in Mods)
             {
                 var modifiedFiles = new List<FileInfo>();
-                _logger?.LogInformation($"Running patches for {mod.GetLabel(dtmFile)}");
+                _logger?.LogInformation($"Running patches for {mod.GetLabel()}");
                 foreach (var (targetFile, patchSets) in mod.FilePatches)
                 {
                     var srcPath = Path.Join(_ctx.WorkingDirectory.FullName, targetFile);
@@ -77,9 +82,9 @@ namespace SicarioPatch.Core
             private readonly SourceFileService _fileService;
             private readonly FilePatcher _filePatcher;
             private readonly BuildContextFactory _ctxFactory;
-            private readonly ILogger<ModPatchService> _tgtLogger;
+            private readonly ILogger<ModPatchService<WingmanMod>> _tgtLogger;
 
-            public WingmanPatchServiceBuilder(SourceFileService sourceFileService, FilePatcher filePatcher, BuildContextFactory contextFactory, ILogger<ModPatchService> logger)
+            public WingmanPatchServiceBuilder(SourceFileService sourceFileService, FilePatcher filePatcher, BuildContextFactory contextFactory, ILogger<ModPatchService<WingmanMod>> logger)
             {
                 _fileService = sourceFileService;
                 _filePatcher = filePatcher;
@@ -87,12 +92,18 @@ namespace SicarioPatch.Core
                 _tgtLogger = logger;
             }
 
-            public async Task<WingmanPatchService> GetPatchService(IEnumerable<KeyValuePair<string, Mod>> modCollection, string ctxName = null)
+            public async Task<WingmanPatchService> GetPatchService(IEnumerable<KeyValuePair<string, WingmanMod>> modCollection, string ctxName = null)
+            {
+                var mods = modCollection.Select(v => v.Value).ToList();
+                var ctx = await _ctxFactory.Create(ctxName);
+                return new WingmanPatchService(_filePatcher, _fileService, ctx, mods, _tgtLogger);
+
+            }
+            public async Task<WingmanPatchService> GetPatchService(IEnumerable<WingmanMod> modCollection, string ctxName = null)
             {
                 var mods = modCollection.ToList();
                 var ctx = await _ctxFactory.Create(ctxName);
                 return new WingmanPatchService(_filePatcher, _fileService, ctx, mods, _tgtLogger);
-
             }
         }
 }

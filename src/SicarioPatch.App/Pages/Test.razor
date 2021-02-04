@@ -77,7 +77,7 @@
     
     [CascadingParameter(Name = "SnackbarStack")] SnackbarStack snackbarStack { get; set; }
     private string RawModFile { get; set; }
-    private Mod ParsedMod { get; set; }
+    private WingmanMod ParsedMod { get; set; }
     
     private FileInfo ResultFile { get; set; }
     
@@ -106,7 +106,7 @@
     
     private async Task OnStartBuild()
     {
-        var req = new PatchRequest(new Dictionary<string, Mod> {["TestPatch.dtm"] = ParsedMod});
+        var req = new PatchRequest(new Dictionary<string, WingmanMod> {["TestPatch.dtm"] = ParsedMod});
         var buildResult = await Mediator.Send(req);
         ResultFile = buildResult;
     // IsBuilding = false;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,6 +16,12 @@ namespace SicarioPatch.Core
             this IEnumerable<KeyValuePair<TKey, TValue>> pairs)
         {
             return pairs.ToDictionary(k => k.Key, v => v.Value);
+        }
+
+        [Obsolete("Probably not a good idea")]
+        public static string WithPrefix(this string input, string prefix)
+        {
+            return input.StartsWith(prefix) ? input : $"{prefix}{input}";
         }
     }
 }

@@ -2,32 +2,48 @@
 @using System.IO
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
+@attribute [Authorize(Policy = Policies.IsUser)]
 <h3>Build Merged Mod</h3>
 @if (AvailableMods.Any())
 {
     <Row>
-        <Column ColumnSize="ColumnSize.Is6">
-            <Card>
-                <CardHeader>Available Mods</CardHeader>
-                <CardBody Style="max-height: 60vh;">
-                    <CardTitle>Select your mods to build:</CardTitle>
-                    @foreach (var (modFile, mod) in AvailableMods)
-                    {
-                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
-                    }
-                </CardBody>
-            </Card>
+        <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
+            <ModSelection AvailableMods="@AvailableMods" OnModDisabled="@((mf) => OptionChecked(mf, false))" OnModEnabled="@((mf) => OptionChecked(mf, true))" />
         </Column>
+        <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
+            <div class="mod-params">
+                <Accordion Style="max-height: 60vh;">
+                    @foreach (var paramReqd in SortedMods.Where(m => m.Key.Parameters.Any()))
+                    {
+                        var paramMod = paramReqd.Key;
+                        <Collapse Visible="true">
+                            <CollapseHeader>
+                                <Text Weight="TextWeight.Bold">@paramMod.GetLabel()</Text>
+                                @* <Heading Size="HeadingSize.Is6">@paramMod.GetLabel()</Heading> *@
+                            </CollapseHeader>
+                            <CollapseBody>
+                                @foreach (var param in paramMod.Parameters)
+                                {
+                                    <ParameterInput @bind-Value="@InputParameters[param.Id]" Parameter="@param" />
+                                }
+                            </CollapseBody>
+                        </Collapse>
+                    }
+                </Accordion>
+            </div>
+        </Column>
+        </Row>
+            <Row>
         @if (ModPriority.Keys.Any())
         {
-            <Column ColumnSize="ColumnSize.Is6">
+            <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is8.OnWidescreen.Is12.OnTablet">
                 <Card>
                     <CardHeader>Enabled Mods</CardHeader>
                     <CardBody Style="max-height: 60vh;">
                         <CardText>
                             You have enabled @ModPriority.Keys.Count mods to modify @GetEnabledFileCount files.
                             <ul class="list-group">
-                                @foreach (var (enabledFile, priority) in SortedMods)
+                                @foreach (var (enabledFile, priority) in ModPriority.OrderBy(d => d.Value))
                                 {
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         @AvailableMods[enabledFile].GetLabel() (@Path.GetFileName(enabledFile))
@@ -47,13 +63,12 @@
             </Column>
         }
 
-    </Row>
-    <Row>
+    
         @if (ReadyToBuild)
         {
 
-            <Column ColumnSize="ColumnSize.Is4.Is8.WithOffset">
-                <div class="container action-container">
+            <Column ColumnSize="ColumnSize.Is4.Is2.WithOffset.OnFullHD.Is4.OnWidescreen.Is12.OnTablet">
+                @*<div class="container action-container">
                     <Text Color="TextColor.Muted">Ready to build your mod!</Text>
                     <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
                     @if (IsBuilding)
@@ -74,7 +89,8 @@
                             Download Merged File
                         </FileDownload>
                     }
-                </div>
+                </div>*@
+                <BuildAction BuildParameters="@InputParameters" Mods="@SortedMods" />
             </Column>
         }
     </Row>
@@ -94,23 +110,44 @@ else
 
 
 @code {
-    private Dictionary<string, Mod> AvailableMods { get; set; } = new Dictionary<string, Mod>();
+    private Dictionary<string, WingmanMod> AvailableMods { get; set; } = new Dictionary<string, WingmanMod>();
     private Dictionary<string, int> ModPriority { get; set; } = new Dictionary<string, int>();
-        private List<KeyValuePair<string, int>> SortedMods
+    /*private List<KeyValuePair<string, int>> SortedMods
+    {
+        get
         {
-            get
-            {
-                return ModPriority.OrderBy(d => d.Value).ToList();
-            }
+            return ModPriority.OrderBy(d => d.Value).ToList();
         }
+    }*/
+
+    private Dictionary<WingmanMod, int> SortedMods
+    {
+        get { return ModPriority.OrderBy(d => d.Value).ToDictionary(k => AvailableMods[k.Key], v => v.Value); }
+    }
+
+    /*private Dictionary<string, PatchParameter> Parameters
+    {
+        get
+        {
+            return ModPriority
+                .Select(m => AvailableMods[m.Key])
+                .SelectMany(m => m.Parameters)
+                .GroupBy(p => p.Id)
+                .ToDictionary(g => g.Key, g => g.First());            
+        }
+    }*/
+
+    
+
+    private SafeDictionary<string, string> InputParameters { get; set; } = new SafeDictionary<string, string>(string.Empty);
     
     [CascadingParameter(Name = "SnackbarStack")] 
     SnackbarStack snackbarStack { get; set; }
 
-    private FileInfo ResultFile { get; set; }
     private bool ReadyToBuild => this.ModPriority.Keys.Any();
+    /*private FileInfo ResultFile { get; set; }
     private bool AutoPack {get;set;} = true;
-    private bool IsBuilding { get; set; }
+    private bool IsBuilding { get; set; }*/
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,11 +156,12 @@ else
 
     private async Task OnStartBuild()
     {
-        var timer = new System.Diagnostics.Stopwatch();
+        /*var timer = new System.Diagnostics.Stopwatch();
+        var inputParams = InputParameters.FallbackToDefaults(Parameters.Values);
         var req = new PatchRequest(
             SortedMods
                 .ToDictionary(k => k.Key, v => AvailableMods[v.Key])
-            ) { PackResult = AutoPack};
+            ) { PackResult = AutoPack, TemplateInputs = inputParams.ToDictionary()};
         snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
         timer.Start();
@@ -134,7 +172,7 @@ else
             snackbarStack?.Push("Merged file successfully built!", SnackbarColor.Success);
         }
         timer.Stop();
-        IsBuilding = false;
+        IsBuilding = false;*/
     }
 
     private void OptionChecked(string modFile, bool value)
@@ -143,6 +181,7 @@ else
         {
             case true when !ModPriority.ContainsKey(modFile):
                 ModPriority.Add(modFile, 10);
+                
                 break;
             case false when ModPriority.ContainsKey(modFile):
                 ModPriority.Remove(modFile);

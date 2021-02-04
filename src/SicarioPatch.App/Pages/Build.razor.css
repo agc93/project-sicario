@@ -1,12 +1,3 @@
-.action-container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    margin-top: 1.5em;
-    padding: 5px;
-}
-
-.action-container > .btn,
-::deep .action-btn {
-    margin-top: 1em;
+::deep .row {
+    margin-top: 0.25em;
 }

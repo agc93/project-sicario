@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SicarioPatch.App.Infrastructure;
 
 namespace SicarioPatch.App
 {
@@ -20,5 +22,22 @@ namespace SicarioPatch.App
             });
 
         }
+
+        public static IServiceCollection AddAuthHandlers(this IServiceCollection services, IConfigurationSection config)
+        {
+            services.AddAuthorization(opts => opts.UseUserPolicies(config));
+            return services.AddSingleton<IAuthorizationHandler, UserAccessHandler>()
+                .AddSingleton<IAuthorizationHandler, UploadAccessHandler>();
+        }
+
+        public static AuthorizationOptions UseUserPolicies(this AuthorizationOptions opts, IConfigurationSection config)
+        {
+            var conf = config.Get<AccessOptions>();
+            opts.AddPolicy(Policies.IsUser, policy => policy.Requirements.Add(new UserRequirement(conf)));
+            opts.AddPolicy(Policies.IsUploader, policy => policy.Requirements.Add(new UploaderRequirement(conf)));
+            return opts;
+        }
+        
+        
     }
 }

@@ -24,18 +24,18 @@ namespace SicarioPatch.App.Infrastructure
         public string FileName { get; init; }
     }
 
-    public class ModsRequestHandler : IRequestHandler<ModsRequest, Dictionary<string, Mod>>
+    public class ModsRequestHandler : IRequestHandler<ModsRequest, Dictionary<string, WingmanMod>>
     {
-        private ModFileLoader _loader;
+        private WingmanModLoader _loader;
         private ModLoadOptions _fileOpts;
 
-        public ModsRequestHandler(ModFileLoader loader, ModLoadOptions loadOpts)
+        public ModsRequestHandler(WingmanModLoader loader, ModLoadOptions loadOpts)
         {
             _loader = loader;
             _fileOpts = loadOpts;
         }
 
-        public async Task<Dictionary<string, Mod>> Handle(ModsRequest request, CancellationToken cancellationToken)
+        public async Task<Dictionary<string, WingmanMod>> Handle(ModsRequest request, CancellationToken cancellationToken)
         {
             var allFiles = new List<string>();
             foreach (var sourcePath in _fileOpts?.Sources ?? new List<string>())
@@ -51,7 +51,7 @@ namespace SicarioPatch.App.Infrastructure
             return allMods;
         }
 
-        private static Func<KeyValuePair<string, Mod>, bool> MatchesAuthor(string author)
+        private static Func<KeyValuePair<string, WingmanMod>, bool> MatchesAuthor(string author)
         {
             return (modPair) =>
             {

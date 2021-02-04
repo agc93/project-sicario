@@ -9,33 +9,7 @@
 }
 else if (ParsedMod != null)
 {
-    <ModInfo Mod="@ParsedMod" ReadOnly="false" FileName="@FileName" /> 
-    @*<Field>
-        <FieldLabel>File Name</FieldLabel>
-        <TextEdit @bind-Text="@FileName" />
-        <FieldHelp>This is the name of the actual mod file itself</FieldHelp>
-    </Field>
-    <Field>
-        <FieldLabel>Mod Name</FieldLabel>
-        <TextEdit @bind-Text="@ParsedMod.Metadata.DisplayName" />
-        <FieldHelp>This can be anything you want and is what's shown to users</FieldHelp>
-    </Field>
-    <Field>
-        <FieldLabel>Description</FieldLabel>
-        <MemoEdit @bind-Text="@ParsedMod.Metadata.Description" Rows="2" />
-    </Field>
-    <Divider />
-    <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            Files Modified
-            <Badge Color="Color.Secondary">@ParsedMod.FilePatches.Count</Badge>
-        </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            Total Patches
-            <Badge Color="Color.Secondary">@ParsedMod.FilePatches.Sum(fp => fp.Value.Sum(ps => ps.Patches.Count))</Badge>
-        </li>
-    </ul>
-    <Divider />*@
+    <ModInfo Mod="@ParsedMod" ReadOnly="false" FileName="@FileName" />
     @if (IsLoading)
     {
         <LoadingSpinner />
@@ -51,7 +25,7 @@ else if (ParsedMod != null)
 @code {
     [CascadingParameter(Name = "SnackbarStack")] SnackbarStack snackbarStack { get; set; }
     private string RawModFile { get; set; }
-    private Mod ParsedMod { get; set; }
+    private WingmanMod ParsedMod { get; set; }
     private string FileName { get; set;}
     
     private bool IsLoading { get; set; }

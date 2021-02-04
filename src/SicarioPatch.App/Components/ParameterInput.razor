@@ -1,0 +1,50 @@
+﻿<Field Horizontal="true">
+    <FieldLabel Style="margin-right: 1em;">@param.Message.TrimEnd(':') :</FieldLabel>
+    <FieldBody>
+        @if (param.Type == ParameterType.String)
+        {
+            <TextEdit Placeholder="@param.Default" @bind-Value="@Value" />
+        }
+        else if (param.Type == ParameterType.Number)
+        {
+            <NumericEdit TValue="decimal?" Value="@(decimal.TryParse(Value, out var d) ? d : decimal.Parse(param.Default))" ValueChanged="d => Value = d?.ToString() ?? string.Empty"/>
+        }
+    </FieldBody>
+</Field>
+@code {
+
+    [Parameter]
+    public EventCallback<PatchParameter> ParameterChanged { get; set; }
+
+    [Parameter]
+    public PatchParameter Parameter
+    {
+        get => param;
+        set
+        {
+            if (param == value) return;
+            param = value;
+            Value = param.Default;
+            ParameterChanged.InvokeAsync(value);
+        }
+    }
+    
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+    
+    [Parameter]
+    public string Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+
+    private PatchParameter param { get; set; } = new PatchParameter();
+    private string _value { get; set; }
+}

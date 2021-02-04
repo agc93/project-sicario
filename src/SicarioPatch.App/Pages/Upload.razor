@@ -3,6 +3,7 @@
 @using SicarioPatch.App.Infrastructure
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
+@attribute [Authorize(Policy = Policies.IsUploader)]
 <h3>Upload Patch Mod</h3>
 
 <Row>
