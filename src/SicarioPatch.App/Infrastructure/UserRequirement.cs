@@ -15,7 +15,7 @@ namespace SicarioPatch.App.Infrastructure
 
         protected UserAuthorization(AccessOptions opts)
         {
-            _opts = _opts;
+            _opts = opts;
         }
 
         protected UserAuthorization(AccessOptions opts, Func<AccessOptions, List<string>> userFunc) : this(opts)
