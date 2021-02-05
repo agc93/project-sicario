@@ -19,8 +19,6 @@ namespace SicarioPatch.Core
         public ParameterType Type { get; set; }
         public string Message { get; set; }
         public string Default { get; set; }
-        [JsonIgnore]
-        public string Value { get; set; }
     }
 
     public enum ParameterType

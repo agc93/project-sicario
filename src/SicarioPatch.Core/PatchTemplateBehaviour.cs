@@ -49,7 +49,7 @@ namespace SicarioPatch.Core
             return await next();
         }
 
-        private TemplateContext GetContext(object templateInputs)
+        private static TemplateContext GetContext(object templateInputs)
         {
             var templCtx = new TemplateContext(templateInputs).AddFilters();
             return templCtx;

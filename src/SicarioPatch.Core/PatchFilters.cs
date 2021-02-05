@@ -25,12 +25,6 @@ namespace SicarioPatch.Core
             return new StringValue(
                 BitConverter.ToString(BitConverter.GetBytes(Convert.ToSingle(input.ToNumberValue()))));
         }
-        
-        /*public static FluidValue FromDecimal(FluidValue input, FilterArguments arguments, TemplateContext ctx)
-        {
-            return new StringValue(
-                BitConverter.ToString(BitConverter.GetBytes(Convert.ToDecimal(input.ToNumberValue()))));
-        }*/
 
         public static FluidValue MultiplyValue(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {

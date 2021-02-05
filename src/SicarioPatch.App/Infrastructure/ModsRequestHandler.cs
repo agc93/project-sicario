@@ -40,7 +40,7 @@ namespace SicarioPatch.App.Infrastructure
             var allFiles = new List<string>();
             foreach (var sourcePath in _fileOpts?.Sources ?? new List<string>())
             {
-                var localFiles = Directory.EnumerateFiles(sourcePath, "*.dtm", SearchOption.TopDirectoryOnly);
+                var localFiles = Directory.EnumerateFiles(sourcePath, _fileOpts.Filter, SearchOption.TopDirectoryOnly);
                 allFiles.AddRange(localFiles);
             }
             var fileMods = _loader.LoadFromFiles(allFiles);

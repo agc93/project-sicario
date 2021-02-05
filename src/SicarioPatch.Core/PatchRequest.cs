@@ -18,9 +18,9 @@ namespace SicarioPatch.Core
         }
 
         public List<WingmanMod> Mods { get; }
-        public bool PackResult { get; set; } = false;
+        public bool PackResult { get; init; } = false;
         
-        public string Name { get; set; }
+        public string Name { get; init; }
         public Dictionary<string, string> TemplateInputs { get; set; }
     }
 }

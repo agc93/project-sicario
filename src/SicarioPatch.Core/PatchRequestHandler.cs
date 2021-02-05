@@ -17,7 +17,7 @@ namespace SicarioPatch.Core
             _builder = servBuilder;
         }
 
-        private Dictionary<string, IEnumerable<string>> _sideCars = new Dictionary<string, IEnumerable<string>> {
+        private readonly Dictionary<string, IEnumerable<string>> _sideCars = new Dictionary<string, IEnumerable<string>> {
             [".uexp"] = new string[] {".uasset"}
         };
         
@@ -42,8 +42,6 @@ namespace SicarioPatch.Core
                 return tempFi.Exists ? tempFi : null;
             }
             return null;
-
-            // return result != null ? (result.Value.Success ? result.Value.Result : null) : null;
         }
     }
 }

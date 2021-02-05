@@ -5,10 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using HexPatch;
 using HexPatch.Build;
 using MediatR;
-using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.App.Infrastructure
@@ -16,8 +14,8 @@ namespace SicarioPatch.App.Infrastructure
     public class ModLibraryHandler : IRequestHandler<ModUploadRequest, string>, IRequestHandler<ModDeleteRequest, bool>
     {
         private ModFileLoader<WingmanMod> _loader;
-        private ModLoadOptions _fileOpts;
-        private ModParser _parser;
+        private readonly ModLoadOptions _fileOpts;
+        private readonly ModParser _parser;
 
         public ModLibraryHandler(ModFileLoader<WingmanMod> loader, ModLoadOptions loadOpts, ModParser parser)
         {
@@ -50,13 +48,9 @@ namespace SicarioPatch.App.Infrastructure
         public async Task<bool> Handle(ModDeleteRequest request, CancellationToken cancellationToken)
         {
             var allSources = _fileOpts?.Sources ?? new List<string>();
-            foreach (var sourcePath in allSources)
+            foreach (var localFi in allSources.Select(sourcePath => new FileInfo(Path.Combine(sourcePath, request.FileName))).Where(localFi => localFi.Exists))
             {
-                var localFi = new FileInfo(Path.Combine(sourcePath, request.FileName));
-                if (localFi.Exists)
-                {
-                    localFi.Delete();
-                }
+                localFi.Delete();
             }
 
             return !allSources.Any(f =>

@@ -16,10 +16,10 @@ namespace SicarioPatch.Core
             return _modFileLoader.LoadFromFiles(filePaths);
         }
 
-        public Dictionary<string, Dictionary<string, WingmanMod>> LoadAllMods(IEnumerable<string> filePaths)
+        /*public Dictionary<string, Dictionary<string, WingmanMod>> LoadAllMods(IEnumerable<string> filePaths)
         {
             var allMods = LoadFromFiles(filePaths);
             return allMods.GroupBy(d => d.Value.Group ?? ".").ToDictionary(g => g.Key, g => g.ToDictionary());
-        }
+        }*/
     }
 }

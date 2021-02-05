@@ -1,12 +1,11 @@
 ﻿using System.Text.Json;
 using HexPatch;
-using SicarioPatch.Core;
 
-namespace SicarioPatch.App.Shared
+namespace SicarioPatch.Core
 {
     public class ModParser
     {
-        private JsonSerializerOptions _jsonOpts = new JsonSerializerOptions {
+        private readonly JsonSerializerOptions _jsonOpts = new JsonSerializerOptions {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,

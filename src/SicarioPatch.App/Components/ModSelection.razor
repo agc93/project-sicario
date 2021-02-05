@@ -4,7 +4,7 @@
         <CardTitle>Select your mods to build:</CardTitle>
         @foreach (var (modFile, mod) in AvailableMods.Where(m => string.IsNullOrWhiteSpace(m.Value.Group)))
         {
-            <div class="custom-control" @onmouseover="() => OnHover(mod)" @onmouseout="() => OnHover()">
+            <div class="custom-control">
                 @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
                 {
                     <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
@@ -12,9 +12,7 @@
                 else
                 {
                     <FadeTooltip Text="@mod.Metadata.Description">
-                        @* <Tooltip Text="@mod.Metadata.Description" Placement="Placement.Right" Multiline="true" > *@
-                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>    
-                        @*</Tooltip>*@
+                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
                     </FadeTooltip>
                 }
             </div>
@@ -27,12 +25,11 @@
                     <Collapse Visible="GroupAccordion[group.Key]">
                         <CollapseHeader>
                             <Button style="justify-content: flex-start;" Block="true" Clicked="@(()=>GroupAccordion[group.Key] = !GroupAccordion[group.Key])">@group.Key</Button>
-                            @* <Text Weight="TextWeight.Bold">@group.Key</Text> *@
                         </CollapseHeader>
                         <CollapseBody>
                             @foreach (var (modFile, mod) in group)
                             {
-                                <div class="custom-control" @onmouseover="() => OnHover(mod)" @onmouseout="() => OnHover()">
+                                <div class="custom-control">
                                     <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
                                 </div>
                             }
@@ -43,9 +40,6 @@
         }
         
     </CardBody>
-    @* <CardFooter> *@
-    @*     @CurrentDescription *@
-    @* </CardFooter> *@
 </Card>
 @code {
     private string CurrentDescription { get; set; } = string.Empty;
@@ -71,12 +65,6 @@
                 OnModDisabled.InvokeAsync(modFile);
                 break;
         }
-    }
-    
-    private void OnHover(Mod currentMod = null)
-    {
-        // CurrentDescription = currentMod?.Metadata?.Description ?? string.Empty;
-        StateHasChanged();
     }
 
     private string GetAvailableCount()

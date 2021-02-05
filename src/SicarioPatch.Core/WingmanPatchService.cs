@@ -92,13 +92,6 @@ namespace SicarioPatch.Core
                 _tgtLogger = logger;
             }
 
-            public async Task<WingmanPatchService> GetPatchService(IEnumerable<KeyValuePair<string, WingmanMod>> modCollection, string ctxName = null)
-            {
-                var mods = modCollection.Select(v => v.Value).ToList();
-                var ctx = await _ctxFactory.Create(ctxName);
-                return new WingmanPatchService(_filePatcher, _fileService, ctx, mods, _tgtLogger);
-
-            }
             public async Task<WingmanPatchService> GetPatchService(IEnumerable<WingmanMod> modCollection, string ctxName = null)
             {
                 var mods = modCollection.ToList();

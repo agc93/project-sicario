@@ -13,7 +13,9 @@ namespace SicarioPatch.Core
             var result = await next();
             if (!string.IsNullOrWhiteSpace(request?.Name))
             {
+                
                 var targetFileName = Path.GetFileNameWithoutExtension(request.Name.MakeSafe());
+                targetFileName = (result.Extension == ".pak" && targetFileName.EndsWith("_P")) ? targetFileName : targetFileName + "_P";
                 var targetFilePath = Path.Combine(result.Directory.FullName, targetFileName + result.Extension);
                 result.MoveTo(targetFilePath, true);
                 return new FileInfo(targetFilePath);

@@ -4,6 +4,18 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackageId>SicarioPatch.Core</PackageId>
+        <Description>The core types and messages used by Project Sicario.</Description>
+        <Authors>agc93</Authors>
+        <Copyright>© Alistair Chapman 2021</Copyright>
+        <PackageTags>project-wingman;modding;</PackageTags>
+        <RepositoryUrl>https://github.com/agc93/project-sicario</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/agc93/project-sicario</PackageProjectUrl>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Fluid.Core" Version="2.0.0-beta-1003" />
 <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
