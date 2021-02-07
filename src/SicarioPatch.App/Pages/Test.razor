@@ -5,6 +5,7 @@
 @inject IMediator Mediator
 @using BlazorMonaco
 @using BlazorMonaco.Bridge
+@attribute [Authorize(Policy = Policies.IsUploader)]
 <DisplayHeading Size="DisplayHeadingSize.Is4">Test Patch File</DisplayHeading>
 <Row Style="height: 50vh;">
     <Column ColumnSize="ColumnSize.Is8" Style="display: inline-flex; flex-direction: column; justify-content: space-evenly">

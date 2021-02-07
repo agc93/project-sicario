@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Blazorise;
 using Blazorise.Icons.Material;
 using Blazorise.Material;
@@ -12,15 +8,11 @@ using HexPatch.Build;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
 
@@ -43,19 +35,12 @@ namespace SicarioPatch.App
                 mc => mc.AsScoped(),
                 typeof(Startup), typeof(PatchRequest))
                 .AddBehaviours();
-            // services.AddSingleton<IPipelineBehavior<ModUploadRequest, string>, ModIndexHandler>();
-            services.AddLogging();
-            services.AddSingleton<SourceFileOptions>(provider =>
-            {
-                var config = provider.GetService<IConfiguration>();
-                return config.GetSection("Files").Get<SourceFileOptions>();
-            });
-            services.AddSingleton<ModLoadOptions>(provider =>
-            {
-                var config = provider.GetService<IConfiguration>();
-                return config.GetSection("Mods").Get<ModLoadOptions>();
-            });
-            services.Configure<ForwardedHeadersOptions>(opts =>
+            services
+                .AddLogging()
+                .AddConfigOptions()
+                .AddSingleton<BrandProvider>()
+                .AddSingleton<ModParser>()
+                .Configure<ForwardedHeadersOptions>(opts =>
             {
                 opts.ForwardedHeaders = ForwardedHeaders.All;
             });
@@ -71,20 +56,19 @@ namespace SicarioPatch.App
                 .AddSingleton<AppInfoProvider>()
                 .AddSingleton<IScriptService, PythonScriptDownloadService>()
                 ;
-            services.AddAuthentication(opts =>
-                {
-                    opts.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                })
-                .AddCookie()
-                .AddDiscord(Configuration.GetSection("Discord"));
+            if (Configuration.GetSection("Discord") is var discordOpts && discordOpts.Exists())
+            {
+                services.AddAuthentication(opts =>
+                    {
+                        opts.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    })
+                    .AddCookie()
+                    .AddDiscord(Configuration.GetSection("Discord"));
+            }
             if (Configuration.GetSection("Access") is var accessOpts && accessOpts.Exists())
             {
                 services.AddAuthHandlers(accessOpts);    
             }
-            
-            services
-                .AddSingleton<BrandProvider>()
-                .AddSingleton<ModParser>();
             services.AddBlazorise(opts =>
                 {
                     opts.ChangeTextOnKeyPress = true;

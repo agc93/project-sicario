@@ -1,14 +1,31 @@
 ﻿using System.Collections.Generic;
+using HexPatch.Build;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SicarioPatch.App.Infrastructure;
+using SicarioPatch.Core;
 
 namespace SicarioPatch.App
 {
     public static class StartupExtensions
     {
+        public static IServiceCollection AddConfigOptions(this IServiceCollection services)
+        {
+            services.AddSingleton<SourceFileOptions>(provider =>
+            {
+                var config = provider.GetService<IConfiguration>();
+                return config.GetSection("Files").Get<SourceFileOptions>();
+            });
+            services.AddSingleton<ModLoadOptions>(provider =>
+            {
+                var config = provider.GetService<IConfiguration>();
+                return config.GetSection("Mods").Get<ModLoadOptions>();
+            });
+            return services;
+        }
+
         public static AuthenticationBuilder AddDiscord(this AuthenticationBuilder builder, IConfigurationSection config)
         {
             return builder.AddDiscord(opts =>
@@ -20,7 +37,6 @@ namespace SicarioPatch.App
                     opts.Scope.Add(scope);
                 }
             });
-
         }
 
         public static IServiceCollection AddAuthHandlers(this IServiceCollection services, IConfigurationSection config)
@@ -37,7 +53,5 @@ namespace SicarioPatch.App
             opts.AddPolicy(Policies.IsUploader, policy => policy.Requirements.Add(new UploaderRequirement(conf)));
             return opts;
         }
-        
-        
     }
 }
