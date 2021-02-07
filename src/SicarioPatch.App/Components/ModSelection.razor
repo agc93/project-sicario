@@ -30,7 +30,16 @@
                             @foreach (var (modFile, mod) in group)
                             {
                                 <div class="custom-control">
-                                    <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                                    @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
+                                    {
+                                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                                    }
+                                    else
+                                    {
+                                        <FadeTooltip Text="@mod.Metadata.Description">
+                                            <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                                        </FadeTooltip>
+                                    }
                                 </div>
                             }
                         </CollapseBody>
@@ -73,5 +82,4 @@
             ? AvailableMods.Keys.Count.ToString()
             : "";
     }
-    
 }

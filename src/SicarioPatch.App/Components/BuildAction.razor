@@ -4,39 +4,41 @@
 
 <Card>
     <CardHeader><Text Color="TextColor.Muted">Ready to build your mod!</Text></CardHeader>
-    <CardBody>
-        <div class="action-container">
-            @if (IsBuilding)
+    <AcceptTerms Mods="Mods.Select(m => m.Key)">
+        <CardBody>
+            <div class="action-container">
+                @if (IsBuilding)
+                {
+                    <LoadingSpinner >
+                        <Alert Color="Color.Primary" Visible="true">
+                            Currently building your merged file!
+                        </Alert>
+                    </LoadingSpinner>
+                }
+                else
+                {
+                    <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
+                    <Field Style="margin-top: 0.5em; width: 85%;">
+                        <FieldLabel>Enter an (optional) file name</FieldLabel>
+                        <TextEdit @bind-Text="@FileName" />
+                    </Field>
+                }
+            </div>
+        </CardBody>
+        <CardFooter>
+            @if (!IsBuilding || ResultFile == null || !ResultFile.Exists)
             {
-                <LoadingSpinner >
-                    <Alert Color="Color.Primary" Visible="true">
-                        Currently building your merged file!
-                    </Alert>
-                </LoadingSpinner>
+                <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
             }
-            else
+            @if (ResultFile != null && ResultFile.Exists)
             {
-                <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
-                <Field Style="margin-top: 0.5em; width: 85%;">
-                    <FieldLabel>Enter an (optional) file name</FieldLabel>
-                    <TextEdit @bind-Text="@FileName" />
-                </Field>
+                <FileDownload ResultFile="ResultFile" DeleteAfter="true">
+                    Download Merged File
+                </FileDownload>
+                <Button Clicked="@(() => ResultFile.Delete())" Color="Color.Danger"><Icon Name="Blazorise.Icons.Material.MaterialIcons.Refresh" /></Button>
             }
-        </div>
-    </CardBody>
-    <CardFooter>
-        @if (!IsBuilding || ResultFile == null || !ResultFile.Exists)
-        {
-            <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
-        }
-        @if (ResultFile != null && ResultFile.Exists)
-        {
-            <FileDownload ResultFile="ResultFile" DeleteAfter="true">
-                Download Merged File
-            </FileDownload>
-            <Button Clicked="@(() => ResultFile.Delete())" Color="Color.Danger"><Icon Name="Blazorise.Icons.Material.MaterialIcons.Refresh" /></Button>
-        }
-    </CardFooter>
+        </CardFooter>
+    </AcceptTerms>
 </Card>
 
 @code {
@@ -48,16 +50,13 @@
     
     [CascadingParameter(Name = "SnackbarStack")] 
     SnackbarStack snackbarStack { get; set; }
-    
-    /*[Parameter]
-    public EventCallback OnBuildStart { get; set; }*/
 
     [Parameter]
     public Dictionary<string, string> BuildParameters { get; set; } = new Dictionary<string, string>();
 
     [Parameter]
     public Dictionary<WingmanMod, int> Mods { get; set; } = new Dictionary<WingmanMod, int>();
-    
+
     private async Task OnStartBuild()
     {
         var timer = new System.Diagnostics.Stopwatch();
@@ -82,5 +81,4 @@
     {
         return Mods.Keys.SelectMany(m => m.Parameters);
     }
-
 }

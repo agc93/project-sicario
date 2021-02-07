@@ -1,0 +1,53 @@
+﻿@inject BrandProvider Info
+@using System.Security.Principal
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@if (_requireAcceptance)
+{
+    @if (_acceptTerms)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <div class="alert container">
+            <Paragraph>Only use patches and mods that you have express documented permission from the authors to use. Do not use patches you do not own unless you have verified that the author has given permission to use the patches and that they do not replace, resemble, recreate or integrate with any other mod without permission.</Paragraph>
+            <Paragraph>@Info.AppName (or @Info.AuthorName) take no responsibility for the content of these patches or their usage.</Paragraph>
+            <Check TValue="bool" @bind-Checked="@_acceptTerms">Do you accept the above terms?</Check>
+        </div>
+    }
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    private bool _requireAcceptance => !_skipTerms && GetUsers().Any(u => u != _user?.Name);
+    private bool _acceptTerms { get; set; }
+    [Parameter]
+    public IEnumerable<WingmanMod> Mods { get; set; } = new List<WingmanMod>();    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await authenticationStateTask;
+        if (state.User?.Identity?.Name != null)
+        {
+            _user = state.User.Identity;
+        }
+        _skipTerms = Configuration.GetValue<bool>("SkipTerms");
+    }
+
+    private IEnumerable<string> GetUsers()
+    {
+        return Mods.Select(m => m?.Metadata?.Author ?? string.Empty);
+    }
+
+    private IIdentity _user;
+    private bool _skipTerms;
+}
