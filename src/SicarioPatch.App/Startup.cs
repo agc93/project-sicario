@@ -71,6 +71,7 @@ namespace SicarioPatch.App
             }
             services.AddBlazorise(opts =>
                 {
+                    opts.DelayTextOnKeyPress = true;
                     opts.ChangeTextOnKeyPress = true;
                 })
                 .AddMaterialProviders()
