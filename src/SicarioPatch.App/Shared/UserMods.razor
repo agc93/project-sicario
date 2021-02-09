@@ -67,7 +67,7 @@
     {
         var state = await authenticationStateTask;
         var user = state.User;
-        var req = new ModsRequest() {UserName = user.Identity.Name, IncludeBeta = true};
+        var req = new ModsRequest() {UserName = user.Identity.Name, IncludePrivate = true, OnlyOwnMods = true};
         var mods = await Mediator.Send(req);
         Mods = mods;
     }

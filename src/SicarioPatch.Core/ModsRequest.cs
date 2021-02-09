@@ -8,6 +8,7 @@ namespace SicarioPatch.Core
     public class ModsRequest : IRequest<Dictionary<string, WingmanMod>>
     {
         public string UserName { get; set; }
-        public bool IncludeBeta { get; set; }
+        public bool IncludePrivate { get; set; }
+        public bool OnlyOwnMods { get; set; }
     }
 }

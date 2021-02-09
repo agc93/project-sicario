@@ -68,28 +68,6 @@
         {
 
             <Column ColumnSize="ColumnSize.Is4.Is2.WithOffset.OnFullHD.Is4.OnWidescreen.Is12.OnTablet">
-                @*<div class="container action-container">
-                    <Text Color="TextColor.Muted">Ready to build your mod!</Text>
-                    <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
-                    @if (IsBuilding)
-                    {
-                        <LoadingSpinner >
-                            <Alert Color="Color.Primary" Visible="true">
-                                Currently building your merged file!
-                            </Alert>
-                        </LoadingSpinner>
-                    }
-                    else
-                    {
-                        <Button class="action-btn" Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>   
-                    }
-                    @if (ResultFile != null && ResultFile.Exists)
-                    {
-                        <FileDownload ResultFile="ResultFile" DeleteAfter="true">
-                            Download Merged File
-                        </FileDownload>
-                    }
-                </div>*@
                 <BuildAction BuildParameters="@InputParameters" Mods="@SortedMods" />
             </Column>
         }
@@ -125,24 +103,13 @@ else
         get { return ModPriority.OrderBy(d => d.Value).ToDictionary(k => AvailableMods[k.Key], v => v.Value); }
     }
 
-    /*private Dictionary<string, PatchParameter> Parameters
-    {
-        get
-        {
-            return ModPriority
-                .Select(m => AvailableMods[m.Key])
-                .SelectMany(m => m.Parameters)
-                .GroupBy(p => p.Id)
-                .ToDictionary(g => g.Key, g => g.First());            
-        }
-    }*/
-
-    
-
     private SafeDictionary<string, string> InputParameters { get; set; } = new SafeDictionary<string, string>(string.Empty);
     
     [CascadingParameter(Name = "SnackbarStack")] 
     SnackbarStack snackbarStack { get; set; }
+    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private bool ReadyToBuild => this.ModPriority.Keys.Any();
     /*private FileInfo ResultFile { get; set; }
@@ -151,7 +118,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        AvailableMods = await Mediator.Send(new ModsRequest());
+        var state = await authenticationStateTask;
+        if (state.User?.Identity?.Name != null)
+        {
+            AvailableMods = await Mediator.Send(new ModsRequest {IncludePrivate = true, UserName = state.User.Identity.Name});
+        }
+        else
+        {
+            AvailableMods = await Mediator.Send(new ModsRequest());            
+        }
+        
     }
 
     private async Task OnStartBuild()

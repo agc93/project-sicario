@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HexPatch;
-using HexPatch.Build;
 using MediatR;
 using SicarioPatch.Core;
 
@@ -43,12 +42,16 @@ namespace SicarioPatch.App.Infrastructure
                 var localFiles = Directory.EnumerateFiles(sourcePath, _fileOpts.Filter, SearchOption.TopDirectoryOnly);
                 allFiles.AddRange(localFiles);
             }
-            var fileMods = _loader.LoadFromFiles(allFiles);
-            var allMods = string.IsNullOrWhiteSpace(request.UserName) 
-                ? fileMods 
-                : fileMods.Where(MatchesAuthor(request.UserName))
-                    .ToDictionary(k => Path.GetFileName(k.Key), v => v.Value);
-            return allMods;
+            var fileMods = _loader.LoadFromFiles(allFiles).ToDictionary(k => Path.GetFileName(k.Key) ?? k.Key, v => v.Value);
+            var allMods = (request.OnlyOwnMods && !string.IsNullOrWhiteSpace(request.UserName))
+                ? fileMods.Where(m => !m.Value.Private).Where(MatchesAuthor(request.UserName))
+                : fileMods.Where(m => !m.Value.Private);
+            if (request.IncludePrivate && !string.IsNullOrWhiteSpace(request.UserName))
+            {
+                var privateMods = fileMods.Where(m => m.Value.Private).Where(MatchesAuthor(request.UserName));
+                allMods = allMods.Concat(privateMods);
+            }
+            return allMods.ToDictionary();
         }
 
         private static Func<KeyValuePair<string, WingmanMod>, bool> MatchesAuthor(string author)
