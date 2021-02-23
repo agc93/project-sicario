@@ -4,7 +4,7 @@
 
 <Card>
     <CardHeader><Text Color="TextColor.Muted">Ready to build your mod!</Text></CardHeader>
-    <AcceptTerms Mods="Mods.Select(m => m.Key)">
+    <AcceptTerms Mods="Mods">
         <CardBody>
             <div class="action-container">
                 @if (IsBuilding)
@@ -30,7 +30,7 @@
             </div>
         </CardBody>
         <CardFooter>
-            @if (!IsBuilding || ResultFile == null || !ResultFile.Exists)
+            @if (!IsBuilding && (ResultFile == null || !ResultFile.Exists))
             {
                 <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
             }
@@ -59,14 +59,14 @@
     public Dictionary<string, string> BuildParameters { get; set; } = new Dictionary<string, string>();
 
     [Parameter]
-    public Dictionary<WingmanMod, int> Mods { get; set; } = new Dictionary<WingmanMod, int>();
+    public List<WingmanMod> Mods { get; set; } = new List<WingmanMod>();
 
     private async Task OnStartBuild()
     {
         var timer = new System.Diagnostics.Stopwatch();
         var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters());
         var req = new PatchRequest(
-            Mods.OrderBy(k => k.Value).Select(k => k.Key).ToList()
+            Mods.ToList()
             ) { PackResult = AutoPack, TemplateInputs = inputParams.ToDictionary(), Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName};
         snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
@@ -83,6 +83,6 @@
 
     private IEnumerable<PatchParameter> GetAllParameters()
     {
-        return Mods.Keys.SelectMany(m => m.Parameters);
+        return Mods.SelectMany(m => m.Parameters);
     }
 }

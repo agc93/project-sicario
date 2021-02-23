@@ -8,6 +8,11 @@
         else if (param.Type == ParameterType.Number)
         {
             <NumericEdit TValue="decimal?" Value="@(decimal.TryParse(Value, out var d) ? d : decimal.Parse(param.Default))" ValueChanged="d => Value = d?.ToString() ?? string.Empty"/>
+        } else if (param.Type == ParameterType.Boolean)
+        {
+            <div style="margin-top: 0.5em;">
+                <Check TValue="bool" CheckedChanged="(v) => Value = v.ToString()" />    
+            </div>
         }
     </FieldBody>
 </Field>
@@ -47,4 +52,9 @@
 
     private PatchParameter param { get; set; } = new PatchParameter();
     private string _value { get; set; }
+
+    private void OptionChecked(string key, bool value)
+    {
+        // Value = value.ToString()
+    }
 }

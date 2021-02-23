@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using HexPatch;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.App.Infrastructure
@@ -27,11 +29,13 @@ namespace SicarioPatch.App.Infrastructure
     {
         private WingmanModLoader _loader;
         private ModLoadOptions _fileOpts;
+        private bool _enableTesting;
 
-        public ModsRequestHandler(WingmanModLoader loader, ModLoadOptions loadOpts)
+        public ModsRequestHandler(WingmanModLoader loader, ModLoadOptions loadOpts, IWebHostEnvironment env)
         {
             _loader = loader;
             _fileOpts = loadOpts;
+            _enableTesting = env.IsDevelopment();
         }
 
         public async Task<Dictionary<string, WingmanMod>> Handle(ModsRequest request, CancellationToken cancellationToken)
@@ -51,6 +55,8 @@ namespace SicarioPatch.App.Infrastructure
                 var privateMods = fileMods.Where(m => m.Value.ModInfo.Private).Where(MatchesAuthor(request.UserName));
                 allMods = allMods.Concat(privateMods);
             }
+
+            allMods = allMods.Where(m => _enableTesting || !GetName(m.Value, string.Empty).Contains("[TEST]"));
             return allMods.ToDictionary();
         }
 
@@ -61,6 +67,12 @@ namespace SicarioPatch.App.Infrastructure
                 var mod = modPair.Value;
                 return mod?.Metadata != null && mod.Metadata.Author == author;
             };
+        }
+
+        private static string GetName(Mod mod, string defaultValue = null)
+        {
+            var name = mod?.Metadata?.DisplayName;
+            return string.IsNullOrWhiteSpace(name) ? defaultValue : name;
         }
     }
 }

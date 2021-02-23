@@ -59,11 +59,11 @@ namespace SicarioPatch.App
             if (item != null)
             {
                 var oldIndex = list.IndexOf(item);
-                if (oldIndex > -1)
+                if (oldIndex > -1 && newIndex > -1 && newIndex < list.Count)
                 {
                     list.RemoveAt(oldIndex);
 
-                    if (newIndex > oldIndex) newIndex--;
+                    if (newIndex > list.Count) newIndex = list.Count;
                     // the actual index could have shifted due to the removal
 
                     list.Insert(newIndex, item);

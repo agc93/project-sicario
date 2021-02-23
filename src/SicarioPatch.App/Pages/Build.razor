@@ -8,40 +8,25 @@
 {
     <Row>
         <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
-            <ModSelection AvailableMods="@AvailableMods.Values" OnModDisabled="@(mf => SortedMods.AddToOrder(mf, false))" OnModEnabled="@((mf) => SortedMods.AddToOrder(mf, true))" />
+            <div class="mod-selection" style="max-height: 60vh;">
+                <ModSelection AvailableMods="@AvailableMods.Values" OnModDisabled="@(mf => SortedMods.Remove(mf))" OnModEnabled="@((mf) => SortedMods.Add(mf))"/>
+            </div>
         </Column>
         <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
-            <div class="mod-params">
-                <Accordion Style="max-height: 60vh;">
-                    @foreach (var paramReqd in SortedMods.Where(m => m.Key.Parameters.Any()))
-                    {
-                        var paramMod = paramReqd.Key;
-                        <Collapse Visible="true">
-                            <CollapseHeader>
-                                <Text Weight="TextWeight.Bold">@paramMod.GetLabel()</Text>
-                                @* <Heading Size="HeadingSize.Is6">@paramMod.GetLabel()</Heading> *@
-                            </CollapseHeader>
-                            <CollapseBody>
-                                @foreach (var param in paramMod.Parameters)
-                                {
-                                    <ParameterInput @bind-Value="@InputParameters[param.Id]" Parameter="@param" />
-                                }
-                            </CollapseBody>
-                        </Collapse>
-                    }
-                </Accordion>
+            <div class="mod-params" style="max-height: 60vh;">
+                <ParameterList Mods="@SortedMods" InputParameters="@InputParameters" />
             </div>
         </Column>
         </Row>
             <Row>
-        @if (SortedMods.Keys.Any())
+        @if (SortedMods.Any())
         {
             <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is8.OnWidescreen.Is12.OnTablet">
                 <Card>
                     <CardHeader>Enabled Mods</CardHeader>
                     <CardBody Style="max-height: 60vh;">
                         <CardText>
-                            You have enabled @SortedMods.Keys.Count mods to modify @GetEnabledFileCount files.
+                            You have enabled @SortedMods.Count mods to modify @GetEnabledFileCount files.
                             <ModOrder @ref="_loadOrder" Order="SortedMods"></ModOrder>
                         </CardText>
                     </CardBody>
@@ -84,7 +69,7 @@ else
         }
     }*/
 
-    private Dictionary<WingmanMod, int> SortedMods { get; set; } = new Dictionary<WingmanMod, int>();
+    private List<WingmanMod> SortedMods { get; set; } = new List<WingmanMod>();
 
     private SafeDictionary<string, string> InputParameters { get; set; } = new SafeDictionary<string, string>(string.Empty);
     
@@ -96,7 +81,7 @@ else
 
     private ModOrder _loadOrder;
 
-    private bool ReadyToBuild => this.SortedMods.Keys.Any();
+    private bool ReadyToBuild => this.SortedMods.Any();
     /*private FileInfo ResultFile { get; set; }
     private bool AutoPack {get;set;} = true;
     private bool IsBuilding { get; set; }*/
@@ -115,6 +100,6 @@ else
         
     }
     
-    public int GetEnabledFileCount => SortedMods.Keys.ToFileCount();
+    public int GetEnabledFileCount => SortedMods.ToFileCount();
 
 }

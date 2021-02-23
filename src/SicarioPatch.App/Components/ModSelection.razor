@@ -1,53 +1,60 @@
-﻿<Card>
+﻿<Card Style="max-height: inherit; box-sizing: border-box;">
     <CardHeader>@GetAvailableCount() Available Mods</CardHeader>
-    <CardBody Style="max-height: 60vh;">
+    <CardBody>
         <CardTitle>Select your mods to build:</CardTitle>
-        @foreach (var mod in AvailableMods.Where(m => string.IsNullOrWhiteSpace(m.ModInfo?.Group)))
-        {
-            <div class="custom-control">
-                @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
-                {
-                    <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
-                }
-                else
-                {
-                    <FadeTooltip Text="@mod.Metadata.Description">
-                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
-                    </FadeTooltip>
-                }
-            </div>
-        }
+        <Accordion Style="margin-top: 1.5em;">
+            <Collapse Visible="@(GroupAccordion["General"])">
+                <CollapseHeader>
+                    <Button style="justify-content: flex-start;" Block="true" Clicked="@(()=>GroupAccordion["General"] = !GroupAccordion["General"])">General</Button>
+                </CollapseHeader>
+                <CollapseBody>
+                    @foreach (var mod in AvailableMods.Where(m => string.IsNullOrWhiteSpace(m.ModInfo?.Group)))
+                    {
+                        <div class="custom-control">
+                            @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
+                            {
+                                <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
+                            }
+                            else
+                            {
+                                <FadeTooltip Text="@mod.Metadata.Description">
+                                    <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
+                                </FadeTooltip>
+                            }
+                        </div>
+                    }
+                </CollapseBody>
+            </Collapse>
         @if (AvailableMods.Where(m => !string.IsNullOrWhiteSpace(m.ModInfo?.Group)) is var mods && mods.Any())
         {
-            <Accordion Style="margin-top: 1.5em;">
-                @foreach (var group in mods.GroupBy(m => m.ModInfo?.Group).Where(g => g.Count() > 1))
-                {
-                    <Collapse Visible="GroupAccordion[group.Key]">
-                        <CollapseHeader>
-                            <Button style="justify-content: flex-start;" Block="true" Clicked="@(()=>GroupAccordion[group.Key] = !GroupAccordion[group.Key])">@group.Key</Button>
-                        </CollapseHeader>
-                        <CollapseBody>
-                            @foreach (var mod in group)
-                            {
-                                <div class="custom-control">
-                                    @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
-                                    {
+            
+            @foreach (var group in mods.GroupBy(m => m.ModInfo?.Group).Where(g => g.Count() > 1))
+            {
+                <Collapse Visible="GroupAccordion[group.Key]">
+                    <CollapseHeader>
+                        <Button style="justify-content: flex-start;" Block="true" Clicked="@(()=>GroupAccordion[group.Key] = !GroupAccordion[group.Key])">@group.Key</Button>
+                    </CollapseHeader>
+                    <CollapseBody>
+                        @foreach (var mod in group)
+                        {
+                            <div class="custom-control">
+                                @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
+                                {
+                                    <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
+                                }
+                                else
+                                {
+                                    <FadeTooltip Text="@mod.Metadata.Description">
                                         <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
-                                    }
-                                    else
-                                    {
-                                        <FadeTooltip Text="@mod.Metadata.Description">
-                                            <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
-                                        </FadeTooltip>
-                                    }
-                                </div>
-                            }
-                        </CollapseBody>
-                    </Collapse>
-                }        
-            </Accordion>
+                                    </FadeTooltip>
+                                }
+                            </div>
+                        }
+                    </CollapseBody>
+                </Collapse>
+            }
         }
-        
+        </Accordion>
     </CardBody>
 </Card>
 @code {
