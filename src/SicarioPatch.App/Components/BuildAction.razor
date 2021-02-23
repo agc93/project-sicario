@@ -18,10 +18,14 @@
                 else
                 {
                     <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
-                    <Field Style="margin-top: 0.5em; width: 85%;">
+                    <div class="form-group" style="margin-top: 0.5em; width: 85%">
+                        <label>Enter an (optional) file name</label>
+                        <input @bind="FileName" type="text" class="form-control" >
+                    </div>
+                    @*<Field Style="margin-top: 0.5em; width: 85%;">
                         <FieldLabel>Enter an (optional) file name</FieldLabel>
                         <TextEdit @bind-Text="@FileName" />
-                    </Field>
+                    </Field>*@
                 }
             </div>
         </CardBody>

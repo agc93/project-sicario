@@ -44,11 +44,11 @@ namespace SicarioPatch.App.Infrastructure
             }
             var fileMods = _loader.LoadFromFiles(allFiles).ToDictionary(k => Path.GetFileName(k.Key) ?? k.Key, v => v.Value);
             var allMods = (request.OnlyOwnMods && !string.IsNullOrWhiteSpace(request.UserName))
-                ? fileMods.Where(m => !m.Value.Private).Where(MatchesAuthor(request.UserName))
-                : fileMods.Where(m => !m.Value.Private);
+                ? fileMods.Where(m => !m.Value.ModInfo.Private).Where(MatchesAuthor(request.UserName))
+                : fileMods.Where(m => !m.Value.ModInfo.Private);
             if (request.IncludePrivate && !string.IsNullOrWhiteSpace(request.UserName))
             {
-                var privateMods = fileMods.Where(m => m.Value.Private).Where(MatchesAuthor(request.UserName));
+                var privateMods = fileMods.Where(m => m.Value.ModInfo.Private).Where(MatchesAuthor(request.UserName));
                 allMods = allMods.Concat(privateMods);
             }
             return allMods.ToDictionary();

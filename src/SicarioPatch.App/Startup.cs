@@ -38,7 +38,7 @@ namespace SicarioPatch.App
             services
                 .AddLogging()
                 .AddConfigOptions()
-                .AddSingleton<BrandProvider>()
+                .AddBrandProvider()
                 .AddSingleton<ModParser>()
                 .Configure<ForwardedHeadersOptions>(opts =>
             {

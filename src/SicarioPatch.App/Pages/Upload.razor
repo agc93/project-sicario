@@ -1,14 +1,30 @@
 ﻿@page "/upload"
 @using System.IO
+@using Microsoft.Extensions.Configuration
 @using SicarioPatch.App.Infrastructure
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
+@inject IConfiguration Configuration
+@inject BrandProvider Brand
 @attribute [Authorize(Policy = Policies.IsUploader)]
 <h3>Upload Patch Mod</h3>
 
 <Row>
     <Column>
-        <UploadMod OnSaveMod="@OnSaveMod" />
+        @if (!_uploadPublic) {
+            <div role="alert" class="alert alert-primary">
+                <h6 class="text-secondary">
+                    All uploaded mods are private by default!
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </h6>
+                <p>
+                    You will need to contact @Brand.OwnerName to make your mod available for other users.
+                </p>
+            </div>
+            }
+        <UploadMod OnSaveMod="@OnSaveMod"/>
     </Column>
     <Column ColumnSize="ColumnSize.IsAuto">
         <UserMods Title="Your Mods" OnRemoveMod="@OnDeleteMod" />
@@ -25,14 +41,17 @@
     protected override async Task OnInitializedAsync()
     {
         // await RefreshMods();
+        var uploadPublic = Configuration.GetValue<bool>("UploadPublic", false);
+        _uploadPublic = uploadPublic;
     }
 
-    private async Task OnSaveMod((string fileName, Mod mod) evt)
+    private async Task OnSaveMod((string fileName, WingmanMod mod) evt)
     {
         var state = await authenticationStateTask;
         if (state?.User != null)
         {
             evt.mod.Metadata.Author = state.User.Identity.Name;
+            evt.mod.ModInfo.Private = !_uploadPublic;
             var req = new ModUploadRequest { Mod = evt.mod, FileName = evt.fileName};
             try
             {
@@ -69,4 +88,5 @@
             result ? SnackbarColor.Success : SnackbarColor.Danger);
     }
 
+    private bool _uploadPublic;
 }

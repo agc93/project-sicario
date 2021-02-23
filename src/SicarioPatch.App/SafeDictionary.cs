@@ -10,7 +10,7 @@ namespace SicarioPatch.App
             _defaultValue = defaultValue;
         }
         private readonly TValue _defaultValue;
-        public TValue this[TKey key]
+        public new TValue this[TKey key]
         {
             get
             {

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SicarioPatch.App.Infrastructure;
+using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.App
@@ -22,6 +23,21 @@ namespace SicarioPatch.App
             {
                 var config = provider.GetService<IConfiguration>();
                 return config.GetSection("Mods").Get<ModLoadOptions>();
+            });
+            return services;
+        }
+
+        public static IServiceCollection AddBrandProvider(this IServiceCollection services, string sectionName = "AppDetails")
+        {
+            services.AddSingleton<BrandProvider>(provider =>
+            {
+                var config = provider.GetService<IConfiguration>();
+                if (config.GetSection(sectionName) is var details && details.Exists())
+                {
+                    return details.Get<BrandProvider>();
+                }
+
+                return new BrandProvider();
             });
             return services;
         }
