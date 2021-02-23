@@ -2,42 +2,42 @@
     <CardHeader>@GetAvailableCount() Available Mods</CardHeader>
     <CardBody Style="max-height: 60vh;">
         <CardTitle>Select your mods to build:</CardTitle>
-        @foreach (var (modFile, mod) in AvailableMods.Where(m => string.IsNullOrWhiteSpace(m.Value.ModInfo?.Group)))
+        @foreach (var mod in AvailableMods.Where(m => string.IsNullOrWhiteSpace(m.ModInfo?.Group)))
         {
             <div class="custom-control">
                 @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
                 {
-                    <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                    <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
                 }
                 else
                 {
                     <FadeTooltip Text="@mod.Metadata.Description">
-                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
                     </FadeTooltip>
                 }
             </div>
         }
-        @if (AvailableMods.Where(m => !string.IsNullOrWhiteSpace(m.Value.ModInfo?.Group)) is var mods && mods.Any())
+        @if (AvailableMods.Where(m => !string.IsNullOrWhiteSpace(m.ModInfo?.Group)) is var mods && mods.Any())
         {
             <Accordion Style="margin-top: 1.5em;">
-                @foreach (var group in mods.GroupBy(m => m.Value.ModInfo?.Group).Where(g => g.Count() > 1))
+                @foreach (var group in mods.GroupBy(m => m.ModInfo?.Group).Where(g => g.Count() > 1))
                 {
                     <Collapse Visible="GroupAccordion[group.Key]">
                         <CollapseHeader>
                             <Button style="justify-content: flex-start;" Block="true" Clicked="@(()=>GroupAccordion[group.Key] = !GroupAccordion[group.Key])">@group.Key</Button>
                         </CollapseHeader>
                         <CollapseBody>
-                            @foreach (var (modFile, mod) in group)
+                            @foreach (var mod in group)
                             {
                                 <div class="custom-control">
                                     @if (string.IsNullOrWhiteSpace(mod?.Metadata?.Description))
                                     {
-                                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                                        <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
                                     }
                                     else
                                     {
                                         <FadeTooltip Text="@mod.Metadata.Description">
-                                            <Check TValue="bool" CheckedChanged="(v) => OptionChecked(modFile, v)">@mod.GetLabel()</Check>
+                                            <Check TValue="bool" CheckedChanged="(v) => OptionChecked(mod, v)">@mod.GetLabel()</Check>
                                         </FadeTooltip>
                                     }
                                 </div>
@@ -53,25 +53,25 @@
 @code {
     private string CurrentDescription { get; set; } = string.Empty;
     [Parameter]
-    public Dictionary<string, WingmanMod> AvailableMods { get; set; } = new Dictionary<string, WingmanMod>();
+    public IEnumerable<WingmanMod> AvailableMods { get; set; } = new List<WingmanMod>();
     
     private SafeDictionary<string, bool> GroupAccordion { get; set; } = new SafeDictionary<string, bool>(false);
     
     [Parameter]
-    public EventCallback<string> OnModEnabled { get; set; }
+    public EventCallback<WingmanMod> OnModEnabled { get; set; }
     
     [Parameter]
-    public EventCallback<string> OnModDisabled { get; set; }
+    public EventCallback<WingmanMod> OnModDisabled { get; set; }
     
-    private void OptionChecked(string modFile, bool value)
+    private void OptionChecked(WingmanMod mod, bool value)
     {
         switch (value)
         {
             case true:
-                OnModEnabled.InvokeAsync(modFile);
+                OnModEnabled.InvokeAsync(mod);
                 break;
             case false:
-                OnModDisabled.InvokeAsync(modFile);
+                OnModDisabled.InvokeAsync(mod);
                 break;
         }
     }
@@ -79,7 +79,7 @@
     private string GetAvailableCount()
     {
         return AvailableMods.Any()
-            ? AvailableMods.Keys.Count.ToString()
+            ? AvailableMods.Count().ToString()
             : "";
     }
 }

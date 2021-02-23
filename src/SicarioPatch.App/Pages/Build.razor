@@ -8,7 +8,7 @@
 {
     <Row>
         <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
-            <ModSelection AvailableMods="@AvailableMods" OnModDisabled="@((mf) => OptionChecked(mf, false))" OnModEnabled="@((mf) => OptionChecked(mf, true))" />
+            <ModSelection AvailableMods="@AvailableMods.Values" OnModDisabled="@(mf => SortedMods.AddToOrder(mf, false))" OnModEnabled="@((mf) => SortedMods.AddToOrder(mf, true))" />
         </Column>
         <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
             <div class="mod-params">
@@ -34,40 +34,15 @@
         </Column>
         </Row>
             <Row>
-        @if (ModPriority.Keys.Any())
+        @if (SortedMods.Keys.Any())
         {
             <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is8.OnWidescreen.Is12.OnTablet">
                 <Card>
                     <CardHeader>Enabled Mods</CardHeader>
                     <CardBody Style="max-height: 60vh;">
                         <CardText>
-                            You have enabled @ModPriority.Keys.Count mods to modify @GetEnabledFileCount files.
-                            <ul class="list-group">
-                                @foreach (var (enabledFile, priority) in ModPriority.OrderBy(d => d.Value))
-                                {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        @{ var enabledMod = AvailableMods[enabledFile]; }
-                                        <span>
-                                            @enabledMod.GetLabel()
-                                            @if (enabledMod.GetAllPatches().Any(ps => ps.Type == SubstitutionType.Before))
-                                            {
-                                                <FadeTooltip Text="This mod might overwrite other mods in your selection, regardless of order">
-                                                    <Icon Name="IconName.ExclamationTriangle"/>
-                                                </FadeTooltip>
-                                                @*<Tooltip Placement="Placement.Right" Text="This mod might overwrite other mods in your selection, regardless of order"><Icon Name="IconName.ExclamationTriangle"/></Tooltip>*@
-                                            }
-                                        </span>
-                                        @*@AvailableMods[enabledFile].GetLabel() (@Path.GetFileName(enabledFile))*@
-                                        <Tooltip Text="Use the priority to fine-tune the order your mods are applied" Placement="Placement.Left">
-                                            <Buttons>
-                                                <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledFile, true)"><Icon Name="IconName.AngleUp"/></Button>
-                                                @* <Button Style="min-width: 48px;" Disabled="true" Color="Color.Dark"><Text Class="text-muted">@ModPriority[enabledFile]</Text></Button> *@
-                                                <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledFile, false)"><Icon Name="IconName.AngleDown"/></Button>
-                                            </Buttons>
-                                        </Tooltip>
-                                    </li>
-                                }
-                            </ul>
+                            You have enabled @SortedMods.Keys.Count mods to modify @GetEnabledFileCount files.
+                            <ModOrder @ref="_loadOrder" Order="SortedMods"></ModOrder>
                         </CardText>
                     </CardBody>
                 </Card>
@@ -100,7 +75,7 @@ else
 
 @code {
     private Dictionary<string, WingmanMod> AvailableMods { get; set; } = new Dictionary<string, WingmanMod>();
-    private Dictionary<string, int> ModPriority { get; set; } = new Dictionary<string, int>();
+    // private Dictionary<string, int> ModPriority { get; set; } = new Dictionary<string, int>();
     /*private List<KeyValuePair<string, int>> SortedMods
     {
         get
@@ -109,10 +84,7 @@ else
         }
     }*/
 
-    private Dictionary<WingmanMod, int> SortedMods
-    {
-        get { return ModPriority.OrderBy(d => d.Value).ToDictionary(k => AvailableMods[k.Key], v => v.Value); }
-    }
+    private Dictionary<WingmanMod, int> SortedMods { get; set; } = new Dictionary<WingmanMod, int>();
 
     private SafeDictionary<string, string> InputParameters { get; set; } = new SafeDictionary<string, string>(string.Empty);
     
@@ -122,7 +94,9 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private bool ReadyToBuild => this.ModPriority.Keys.Any();
+    private ModOrder _loadOrder;
+
+    private bool ReadyToBuild => this.SortedMods.Keys.Any();
     /*private FileInfo ResultFile { get; set; }
     private bool AutoPack {get;set;} = true;
     private bool IsBuilding { get; set; }*/
@@ -140,64 +114,7 @@ else
         }
         
     }
-
-    private async Task OnStartBuild()
-    {
-        /*var timer = new System.Diagnostics.Stopwatch();
-        var inputParams = InputParameters.FallbackToDefaults(Parameters.Values);
-        var req = new PatchRequest(
-            SortedMods
-                .ToDictionary(k => k.Key, v => AvailableMods[v.Key])
-            ) { PackResult = AutoPack, TemplateInputs = inputParams.ToDictionary()};
-        snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
-        this.IsBuilding = true;
-        timer.Start();
-        var buildResult = await Mediator.Send(req);
-        ResultFile = buildResult;
-        if (timer.Elapsed.TotalSeconds > 1)
-        {
-            snackbarStack?.Push("Merged file successfully built!", SnackbarColor.Success);
-        }
-        timer.Stop();
-        IsBuilding = false;*/
-    }
-
-    private void OptionChecked(string modFile, bool value)
-    {
-        switch (value)
-        {
-            case true when !ModPriority.ContainsKey(modFile):
-                ModPriority.Add(modFile, 10);
-                
-                break;
-            case false when ModPriority.ContainsKey(modFile):
-                ModPriority.Remove(modFile);
-                break;
-        }
-    }
-
-
-    public int GetEnabledFileCount
-    {
-        get
-        {
-            return ModPriority.Keys.Select(em => AvailableMods[em]).ToFileCount();
-        }
-    }
-
-    private void OnChangePriority(string modFile, bool decrement)
-    {
-        var existingPriority = ModPriority[modFile];
-        if (decrement)
-        {
-            existingPriority--;
-        }
-        else
-        {
-            existingPriority++;
-        }
-        ModPriority[modFile] = existingPriority++;
-        StateHasChanged();
-    }
+    
+    public int GetEnabledFileCount => SortedMods.Keys.ToFileCount();
 
 }

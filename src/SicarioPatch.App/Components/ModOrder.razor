@@ -1,5 +1,5 @@
 ﻿<ul class="list-group">
-    @foreach (var (enabledMod, priority) in Order)
+    @foreach (var (enabledMod, priority) in Order.OrderBy(p => p.Value))
     {
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
@@ -38,9 +38,19 @@
     }
     
     private Dictionary<WingmanMod, int> _order { get; set; }
+
+    // private List<WingmanMod> _mods { get; set; } = new List<WingmanMod>();
     
     private void OnChangePriority(WingmanMod mod, bool decrement)
     {
+        /*if (decrement)
+        {
+            _mods.Move(mod, _mods.IndexOf(mod) -1);
+        }
+        else
+        {
+            _mods.Move(mod, _mods.IndexOf(mod) + 1);
+        }*/
         var existingPriority = _order[mod];
         if (decrement)
         {
@@ -51,6 +61,33 @@
             existingPriority++;
         }
         _order[mod] = existingPriority;
+        StateHasChanged();
+    }
+
+    public void ToggleMod(WingmanMod mod)
+    {
+        if (!Order.ContainsKey(mod))
+        {
+            Order.Add(mod, 10 + _order.Keys.Count);
+        }
+        else
+        {
+            Order.Remove(mod);
+        }
+        StateHasChanged();
+    }
+
+    public void ToggleMod(WingmanMod mod, bool state)
+    {
+        switch (state)
+        {
+            case true when !Order.ContainsKey(mod):
+                Order.Add(mod, 10 + Order.Keys.Count);
+                break;
+            case false when Order.ContainsKey(mod):
+                Order.Remove(mod);
+                break;
+        }
         StateHasChanged();
     }
     
