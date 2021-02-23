@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
+using SicarioPatch.Core.Templating;
 
 namespace SicarioPatch.App
 {
@@ -68,6 +69,14 @@ namespace SicarioPatch.App
             opts.AddPolicy(Policies.IsUser, policy => policy.Requirements.Add(new UserRequirement(conf)));
             opts.AddPolicy(Policies.IsUploader, policy => policy.Requirements.Add(new UploaderRequirement(conf)));
             return opts;
+        }
+
+        public static IServiceCollection AddTemplating(this IServiceCollection services)
+        {
+            // services.AddSingleton<IPipelineBehavior<PatchRequest, FileInfo>, PatchTemplateBehaviour>()
+            services.AddSingleton<ITemplateModelProvider, ConfigModelProvider>();
+            services.AddSingleton<ITemplateModelProvider, IniModelProvider>();
+            return services;
         }
     }
 }

@@ -39,6 +39,7 @@ namespace SicarioPatch.App
                 .AddLogging()
                 .AddConfigOptions()
                 .AddBrandProvider()
+                .AddTemplating()
                 .AddSingleton<ModParser>()
                 .Configure<ForwardedHeadersOptions>(opts =>
             {

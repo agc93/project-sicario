@@ -5,15 +5,33 @@ using System.Threading;
 using System.Threading.Tasks;
 using Fluid;
 using MediatR;
+using SicarioPatch.Core.Templating;
 
 namespace SicarioPatch.Core
 {
     public class PatchTemplateBehaviour : IPipelineBehavior<PatchRequest, FileInfo>
     {
         private readonly FluidParser _parser;
+        private IEnumerable<ITemplateFilter> Filters { get; } = new List<ITemplateFilter>();
+        private IEnumerable<ITemplateModel> Models { get; } = new List<ITemplateModel>();
+        
+
         public PatchTemplateBehaviour()
         {
             _parser = new FluidParser();
+        }
+
+        public PatchTemplateBehaviour(IEnumerable<ITemplateFilterProvider> templates, IEnumerable<ITemplateModelProvider> modelProviders) : this()
+        {
+            if (templates.Any())
+            {
+                Filters = templates.SelectMany(provider => provider.LoadFilters());
+            }
+
+            if (modelProviders.Any())
+            {
+                Models = modelProviders.SelectMany(provider => provider.LoadModels());
+            }
         }
 
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken,
@@ -37,9 +55,8 @@ namespace SicarioPatch.Core
 
                             if (_parser.TryParse(p.Template, out var template))
                             {
-                                p.Template = template.Render(GetContext(new {inputs = request.TemplateInputs}));
+                                p.Template = template.Render(GetContext(new { inputs = request.TemplateInputs}));
                             }
-
                             return p;
                         }).ToList();
                         return psList;
@@ -49,9 +66,17 @@ namespace SicarioPatch.Core
             return await next();
         }
 
-        private static TemplateContext GetContext(object templateInputs)
+        private TemplateContext GetContext(object templateInputs)
         {
             var templCtx = new TemplateContext(templateInputs).AddFilters();
+            foreach (var templateModel in Models)
+            {
+                templCtx.SetValue(templateModel.Name, templateModel.GetModel());
+            }
+            foreach (var filter in Filters)
+            {
+                templCtx.Filters.AddFilter(filter.Name, filter.RunFilter);
+            }
             return templCtx;
         }
     }
