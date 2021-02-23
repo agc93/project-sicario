@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HexPatch;
 
 namespace SicarioPatch.Core
 {
@@ -18,10 +19,10 @@ namespace SicarioPatch.Core
             return pairs.ToDictionary(k => k.Key, v => v.Value);
         }
 
-        [Obsolete("Probably not a good idea")]
-        public static string WithPrefix(this string input, string prefix)
+        public static IEnumerable<Patch> GetAllPatches(this Mod mod)
         {
-            return input.StartsWith(prefix) ? input : $"{prefix}{input}";
+            var allPatches = mod.FilePatches.SelectMany(fp => fp.Value).SelectMany(ps => ps.Patches);
+            return allPatches;
         }
     }
 }

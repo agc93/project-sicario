@@ -2,7 +2,15 @@
     @foreach (var (enabledMod, priority) in Order)
     {
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            @enabledMod.GetLabel()
+            <span>
+                @enabledMod.GetLabel()
+                @if (enabledMod.GetAllPatches().Any(ps => ps.Type == SubstitutionType.Before))
+                {
+                    <FadeTooltip Text="This mod might overwrite other mods in your selection, regardless of order">
+                        <Icon Name="IconName.ExclamationTriangle"/>
+                    </FadeTooltip>
+                }
+            </span>
             <Tooltip Text="Use the priority to fine-tune the order your mods are applied" Placement="Placement.Left">
                 <Buttons>
                     <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledMod, true)"><Icon Name="IconName.AngleUp" /></Button>
