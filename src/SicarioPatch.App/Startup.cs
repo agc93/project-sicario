@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
 
@@ -34,12 +35,14 @@ namespace SicarioPatch.App
             services.AddMediatR(
                 mc => mc.AsScoped(),
                 typeof(Startup), typeof(PatchRequest))
-                .AddBehaviours();
+                .AddBehaviours()
+                .AddPatchBehaviour<SignatureFileBehaviour>();
             services
                 .AddLogging()
                 .AddConfigOptions()
                 .AddBrandProvider()
                 .AddTemplating()
+                .AddSingleton<IBuildLog, FileBuildLog>()
                 .AddSingleton<ModParser>()
                 .Configure<ForwardedHeadersOptions>(opts =>
             {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MediatR;
@@ -10,17 +11,23 @@ namespace SicarioPatch.Core
         public PatchRequest(Dictionary<string, WingmanMod> mods)
         {
             Mods = mods.Values.ToList();
+            Id = Guid.NewGuid().ToString("N");
         }
 
         public PatchRequest(IEnumerable<WingmanMod> mods)
         {
             Mods = mods.ToList();
+            Id = Guid.NewGuid().ToString("N");
         }
+        
+        public string Id { get; }
 
         public List<WingmanMod> Mods { get; }
         public bool PackResult { get; init; } = false;
         
         public string Name { get; init; }
         public Dictionary<string, string> TemplateInputs { get; set; }
+
+        public Dictionary<string, FileInfo> AdditionalFiles { get; set; } = new Dictionary<string, FileInfo>();
     }
 }

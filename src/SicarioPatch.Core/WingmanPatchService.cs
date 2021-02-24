@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BuildEngine;
-using Fluid;
 using HexPatch;
 using HexPatch.Build;
 using Microsoft.Extensions.Logging;
@@ -14,11 +13,9 @@ namespace SicarioPatch.Core
     public class WingmanPatchService : ModPatchService<WingmanMod>
     {
         private Dictionary<string, int> OriginalFileSize { get; init; } = new Dictionary<string, int>();
-        private FluidParser _parser;
+
         protected internal WingmanPatchService(FilePatcher patcher, SourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger)
         {
-            TemplateContext.GlobalMemberAccessStrategy.MemberNameStrategy = MemberNameStrategies.CamelCase;
-            _parser = new FluidParser();
         }
 
 

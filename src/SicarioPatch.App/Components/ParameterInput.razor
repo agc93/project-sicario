@@ -11,7 +11,7 @@
         } else if (param.Type == ParameterType.Boolean)
         {
             <div style="margin-top: 0.5em;">
-                <Check TValue="bool" CheckedChanged="(v) => Value = v.ToString()" />    
+                <Check TValue="bool" CheckedChanged="(v) => Value = v.ToString()" Checked="bool.TryParse(Value, out var b) ? b : bool.TryParse(param.Default, out var d) && d" />    
             </div>
         }
     </FieldBody>

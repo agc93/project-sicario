@@ -23,5 +23,7 @@ namespace SicarioPatch.Core
         {
             return JsonSerializer.Deserialize<WingmanMod>(rawJson, _jsonOpts);
         }
+
+        public JsonSerializerOptions Options => _jsonOpts;
     }
 }

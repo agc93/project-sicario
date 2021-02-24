@@ -31,6 +31,11 @@ namespace SicarioPatch.Core
             return new StringValue(BitConverter.ToString(BitConverter.GetBytes(bool.Parse(input.ToStringValue()))));
         }
 
+        public static FluidValue FromShort(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        {
+            return new StringValue(BitConverter.ToString(BitConverter.GetBytes(Convert.ToInt16(input.ToNumberValue()))));
+        }
+
         public static FluidValue MultiplyValue(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             if (arguments.Count > 2)
@@ -71,6 +76,7 @@ namespace SicarioPatch.Core
             templCtx.Filters.AddFilter("amp", PatchFilters.AmplifyInput);
             templCtx.Filters.AddFilter("row", PatchFilters.ToRow);
             templCtx.Filters.AddFilter("bool", PatchFilters.FromBool);
+            templCtx.Filters.AddFilter("int16", PatchFilters.FromShort);
             return templCtx;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HexPatch.Build;
@@ -24,6 +25,17 @@ namespace SicarioPatch.Core
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken)
         {
             using var mpServ = await _builder.GetPatchService(request.Mods, request.Name);
+            if (request.AdditionalFiles.Any())
+            {
+                mpServ.PreBuildAction = context =>
+                {
+                    foreach (var (relPath, file) in request.AdditionalFiles)
+                    {
+                        context.AddFile(Path.Combine(context.WorkingDirectory.GetDirectories().First().Name, relPath), file);
+                    }
+                    return null;
+                };
+            }
             await mpServ.LoadFiles(HexPatch.Build.FileSelectors.SidecarFiles(_sideCars)).RunPatches();
             (bool Success, FileInfo Result)? result;
             if (request.PackResult)
