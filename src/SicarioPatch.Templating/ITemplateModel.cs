@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SicarioPatch.Core.Templating
+namespace SicarioPatch.Templating
 {
     public interface ITemplateModel
     {

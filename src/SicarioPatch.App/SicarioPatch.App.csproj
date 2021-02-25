@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
+    <ProjectReference Include="..\SicarioPatch.Templating\SicarioPatch.Templating.csproj" />
   </ItemGroup>
 
   <ItemGroup>

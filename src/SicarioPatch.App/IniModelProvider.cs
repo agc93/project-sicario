@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using IniParser;
 using Microsoft.Extensions.Configuration;
-using SicarioPatch.Core.Templating;
+using SicarioPatch.Templating;
 
 namespace SicarioPatch.App
 {

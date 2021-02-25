@@ -5,7 +5,7 @@ using Fluid;
 using Fluid.Values;
 using HexPatch;
 
-namespace SicarioPatch.Core
+namespace SicarioPatch.Templating
 {
     public static class PatchFilters
     {
@@ -34,6 +34,15 @@ namespace SicarioPatch.Core
         public static FluidValue FromShort(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(BitConverter.ToString(BitConverter.GetBytes(Convert.ToInt16(input.ToNumberValue()))));
+        }
+
+        public static FluidValue InvertBoolean(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        {
+            var defaultState = arguments.Count > 0 && (bool.TryParse(arguments.At(0).ToStringValue(), out var def) && def);
+            var resultValue = new StringValue(bool.TryParse(input.ToStringValue(), out var inputBool)
+                ? (!inputBool).ToString()
+                : input.ToStringValue());
+            return resultValue;
         }
 
         public static FluidValue MultiplyValue(FluidValue input, FilterArguments arguments, TemplateContext ctx)
@@ -77,6 +86,7 @@ namespace SicarioPatch.Core
             templCtx.Filters.AddFilter("row", PatchFilters.ToRow);
             templCtx.Filters.AddFilter("bool", PatchFilters.FromBool);
             templCtx.Filters.AddFilter("int16", PatchFilters.FromShort);
+            templCtx.Filters.AddFilter("not", PatchFilters.InvertBoolean);
             return templCtx;
         }
     }

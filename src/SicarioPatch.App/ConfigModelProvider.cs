@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
-using SicarioPatch.Core.Templating;
+using SicarioPatch.Templating;
 
 namespace SicarioPatch.App
 {

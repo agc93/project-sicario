@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Fluid;
 using MediatR;
-using SicarioPatch.Core.Templating;
+using SicarioPatch.Core;
 
-namespace SicarioPatch.Core
+namespace SicarioPatch.Templating
 {
     public class PatchTemplateBehaviour : IPipelineBehavior<PatchRequest, FileInfo>
     {
@@ -42,42 +42,80 @@ namespace SicarioPatch.Core
             
             foreach (var mod in request.Mods)
             {
-                mod.FilePatches = mod.FilePatches.ToDictionary(k => k.Key, kvp =>
+                var modelVars = RenderVariables(request, mod);
+                var dict = mod.FilePatches.ToDictionary(k => k.Key, kvp =>
                 {
-                    return kvp.Value.Select(psList =>
+                    var finalPatches = kvp.Value.Where(psList =>
                     {
-                        var setList = psList.Patches.Select(p =>
+                        // REMEMBER: this is to keep the step, so have to return false to skip it
+                        if (mod.ModInfo.StepsEnabled.ContainsKey(psList.Name) && _parser.TryParse(mod.ModInfo.StepsEnabled[psList.Name], out var skipTemplate))
+                        {
+                            var rendered = skipTemplate.Render(GetInputContext(request, modelVars));
+                            var result = bool.TryParse(rendered, out var skip) || skip;
+                            // do NOT invert result: result *is* inverted
+                            return result;
+                        }
+                        return true;
+                    }).Select(psList =>
+                    {
+                        psList.Patches = psList.Patches.Select(p =>
                         {
                             if (_parser.TryParse(p.Substitution, out var subTemplate))
                             {
-                                p.Substitution = subTemplate.Render(GetContext(new { inputs = request.TemplateInputs}));
+                                p.Substitution = subTemplate.Render(GetInputContext(request, modelVars));
                             }
-
                             if (_parser.TryParse(p.Template, out var template))
                             {
-                                p.Template = template.Render(GetContext(new { inputs = request.TemplateInputs}));
+                                p.Template = template.Render(GetInputContext(request, modelVars));
                             }
                             return p;
                         }).ToList();
                         return psList;
                     }).ToList();
+                    return finalPatches;
                 });
+                mod.FilePatches = dict;
             }
             return await next();
         }
 
-        private TemplateContext GetContext(object templateInputs)
+        private TemplateContext GetContext(object templateInputs, Dictionary<string, string> additionalVars = null)
         {
             var templCtx = new TemplateContext(templateInputs).AddFilters();
             foreach (var templateModel in Models)
             {
                 templCtx.SetValue(templateModel.Name, templateModel.GetModel());
             }
+            if (additionalVars != null)
+            {
+                templCtx.SetValue("vars", additionalVars);
+            }
             foreach (var filter in Filters)
             {
                 templCtx.Filters.AddFilter(filter.Name, filter.RunFilter);
             }
             return templCtx;
+        }
+
+        private Dictionary<string, string> RenderVariables(PatchRequest request, WingmanMod mod)
+        {
+            var validVars = new Dictionary<string, string>();
+            if (mod.Variables != null)
+            {
+                foreach (var (varName, varTemplate) in mod.Variables)
+                {
+                    if (_parser.TryParse(varTemplate, out var subTemplate))
+                    {
+                        validVars.Add(varName, subTemplate.Render(GetInputContext(request)));
+                    }
+                }
+            }
+            return validVars;
+        }
+
+        private TemplateContext GetInputContext(PatchRequest request, Dictionary<string, string> additionalVars = null)
+        {
+            return GetContext(new {inputs = request.TemplateInputs}, additionalVars);
         }
     }
 }

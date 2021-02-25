@@ -10,7 +10,6 @@ namespace SicarioPatch.Core
         public static IServiceCollection AddBehaviours(this IServiceCollection services)
         {
             return services
-                .AddSingleton<IPipelineBehavior<PatchRequest, FileInfo>, PatchTemplateBehaviour>()
                 .AddSingleton<IPipelineBehavior<PatchRequest, FileInfo>, FileRenameBehaviour>()
                 .AddSingleton<IPipelineBehavior<PatchRequest, FileInfo>, BuildLogBehaviour>();
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using MediatR;
 
 namespace SicarioPatch.Core
@@ -10,14 +11,21 @@ namespace SicarioPatch.Core
     {
         public PatchRequest(Dictionary<string, WingmanMod> mods)
         {
-            Mods = mods.Values.ToList();
+            Mods = RebuildModList(mods.Values.ToList());
             Id = Guid.NewGuid().ToString("N");
         }
 
         public PatchRequest(IEnumerable<WingmanMod> mods)
         {
-            Mods = mods.ToList();
+            Mods = RebuildModList(mods.ToList());
             Id = Guid.NewGuid().ToString("N");
+        }
+        
+        //this is a horrible hack but otherwise the build process mutates the original mod selection
+        private static List<WingmanMod> RebuildModList(List<WingmanMod> sourceList)
+        {
+            var json = JsonSerializer.Serialize(sourceList);
+            return JsonSerializer.Deserialize<List<WingmanMod>>(json);
         }
         
         public string Id { get; }

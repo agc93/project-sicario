@@ -17,7 +17,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Fluid.Core" Version="2.0.0-beta-1003" />
 <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
       <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.9" />
       <PackageReference Include="MediatR" Version="9.0.0" />

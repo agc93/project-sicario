@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace SicarioPatch.Core.Templating
+namespace SicarioPatch.Templating
 {
     public interface ITemplateFilterProvider
     {

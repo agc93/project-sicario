@@ -13,7 +13,13 @@ namespace SicarioPatch.Core
         private readonly IModFileLoader<WingmanMod> _modFileLoader;
         public Dictionary<string, WingmanMod> LoadFromFiles(IEnumerable<string> filePaths)
         {
-            return _modFileLoader.LoadFromFiles(filePaths);
+            var loadedMods = _modFileLoader.LoadFromFiles(filePaths);
+            foreach (var (fileName, mod) in loadedMods)
+            {
+                mod.Id = System.IO.Path.GetFileName(fileName);
+            }
+
+            return loadedMods;
         }
 
         /*public Dictionary<string, Dictionary<string, WingmanMod>> LoadAllMods(IEnumerable<string> filePaths)

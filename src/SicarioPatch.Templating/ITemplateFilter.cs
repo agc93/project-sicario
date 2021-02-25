@@ -1,7 +1,7 @@
 ﻿using Fluid;
 using Fluid.Values;
 
-namespace SicarioPatch.Core.Templating
+namespace SicarioPatch.Templating
 {
     public interface ITemplateFilter
     {

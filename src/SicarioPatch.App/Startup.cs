@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
+using SicarioPatch.Templating;
 
 namespace SicarioPatch.App
 {
@@ -42,6 +43,7 @@ namespace SicarioPatch.App
                 .AddConfigOptions()
                 .AddBrandProvider()
                 .AddTemplating()
+                .AddConfigTemplating()
                 .AddSingleton<IBuildLog, FileBuildLog>()
                 .AddSingleton<ModParser>()
                 .Configure<ForwardedHeadersOptions>(opts =>

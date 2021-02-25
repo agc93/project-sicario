@@ -7,11 +7,17 @@ namespace SicarioPatch.Core
 {
     public class WingmanMod : Mod
     {
+        [JsonPropertyName("_id")] 
+        public string Id { get; set; } = string.Empty;
+        
         [JsonPropertyName("_sicario")] 
         public SicarioMetadata ModInfo { get; set; } = new SicarioMetadata();
 
         [JsonPropertyName("_inputs")]
         public List<PatchParameter> Parameters { get; set; } = new List<PatchParameter>();
+
+        [JsonPropertyName("_vars")]
+        public Dictionary<string, string> Variables { get; set; } = new Dictionary<string, string>();
     }
 
     public class SicarioMetadata
@@ -21,6 +27,9 @@ namespace SicarioPatch.Core
         
         [JsonPropertyName("group")]
         public string Group { get; set; }
+
+        [JsonPropertyName("enableSteps")]
+        public Dictionary<string, string> StepsEnabled { get; set; } = new Dictionary<string, string>();
     }
 
     public class PatchParameter

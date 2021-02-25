@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
-using SicarioPatch.Core.Templating;
+using SicarioPatch.Templating;
 
 namespace SicarioPatch.App
 {
@@ -71,7 +71,7 @@ namespace SicarioPatch.App
             return opts;
         }
 
-        public static IServiceCollection AddTemplating(this IServiceCollection services)
+        public static IServiceCollection AddConfigTemplating(this IServiceCollection services)
         {
             // services.AddSingleton<IPipelineBehavior<PatchRequest, FileInfo>, PatchTemplateBehaviour>()
             services.AddSingleton<ITemplateModelProvider, ConfigModelProvider>();
