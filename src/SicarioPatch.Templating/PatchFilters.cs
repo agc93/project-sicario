@@ -36,6 +36,11 @@ namespace SicarioPatch.Templating
             return new StringValue(BitConverter.ToString(BitConverter.GetBytes(Convert.ToInt16(input.ToNumberValue()))));
         }
 
+        public static FluidValue FromUInt8(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        {
+            return new StringValue(BitConverter.ToString(new[] {byte.Parse(input.ToStringValue())}));
+        }
+
         public static FluidValue InvertBoolean(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             var defaultState = arguments.Count > 0 && (bool.TryParse(arguments.At(0).ToStringValue(), out var def) && def);
@@ -87,6 +92,7 @@ namespace SicarioPatch.Templating
             templCtx.Filters.AddFilter("bool", PatchFilters.FromBool);
             templCtx.Filters.AddFilter("int16", PatchFilters.FromShort);
             templCtx.Filters.AddFilter("not", PatchFilters.InvertBoolean);
+            templCtx.Filters.AddFilter("byte", PatchFilters.FromUInt8);
             return templCtx;
         }
     }
