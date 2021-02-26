@@ -1,0 +1,43 @@
+﻿@if (Mod != null)
+{
+    <div class="custom-control">
+        <FadeTooltip Text="@Mod?.Metadata?.Description">
+            <Check TValue="bool" CheckedChanged="(v) => OptionChecked(Mod, v)">
+                @Mod.GetLabel()
+            </Check>
+        </FadeTooltip>
+        @if (Mod.ModInfo?.Unstable ?? false)
+        {
+            <Tooltip Placement="Placement.Left" Inline="true" Multiline="true" Text="This mod is in preview and is considered unstable. Use at your own risk!">
+                <Badge Color="Color.Danger"><span style="font-variant: all-small-caps">Unstable</span></Badge>
+            </Tooltip>
+            @*<FadeTooltip Text="This mod is in preview and is considered unstable. Use at your own risk!">
+                <Icon Name="IconName.ExclamationCircle"/>
+            </FadeTooltip>*@
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public WingmanMod Mod { get; set; }
+    
+    [Parameter]
+    public EventCallback<WingmanMod> OnModChecked { get; set; }
+    
+    [Parameter]
+    public EventCallback<WingmanMod> OnModUnchecked { get; set; }
+    
+    private void OptionChecked(WingmanMod mod, bool value)
+    {
+        switch (value)
+        {
+            case true:
+                OnModChecked.InvokeAsync(mod);
+                break;
+            case false:
+                OnModUnchecked.InvokeAsync(mod);
+                break;
+        }
+    }
+}

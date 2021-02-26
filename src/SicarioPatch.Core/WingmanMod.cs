@@ -27,6 +27,9 @@ namespace SicarioPatch.Core
         
         [JsonPropertyName("group")]
         public string Group { get; set; }
+        
+        [JsonPropertyName("preview")]
+        public bool Unstable { get; set; }
 
         [JsonPropertyName("enableSteps")]
         public Dictionary<string, string> StepsEnabled { get; set; } = new Dictionary<string, string>();

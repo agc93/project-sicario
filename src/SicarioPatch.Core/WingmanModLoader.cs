@@ -17,6 +17,10 @@ namespace SicarioPatch.Core
             foreach (var (fileName, mod) in loadedMods)
             {
                 mod.Id = System.IO.Path.GetFileName(fileName);
+                if (mod.GetLabel(string.Empty).Contains("[TEST]"))
+                {
+                    mod.ModInfo.Unstable = true;
+                }
             }
 
             return loadedMods;
