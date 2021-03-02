@@ -51,7 +51,8 @@ namespace SicarioPatch.Templating
                         if (mod.ModInfo.StepsEnabled.ContainsKey(psList.Name) && _parser.TryParse(mod.ModInfo.StepsEnabled[psList.Name], out var skipTemplate))
                         {
                             var rendered = skipTemplate.Render(GetInputContext(request, modelVars));
-                            var result = bool.TryParse(rendered, out var skip) || skip;
+                            var result = !bool.TryParse(rendered, out var skip) || skip;
+                            // var result = bool.TryParse(rendered, out var skip) || skip;
                             // do NOT invert result: result *is* inverted
                             return result;
                         }
@@ -68,6 +69,12 @@ namespace SicarioPatch.Templating
                             {
                                 p.Template = template.Render(GetInputContext(request, modelVars));
                             }
+
+                            if (p.Window != null)
+                            {
+                                p.Window.After = SafeRender(request, p.Window.After, modelVars);
+                                p.Window.Before = SafeRender(request, p.Window.Before, modelVars);
+                            }
                             return p;
                         }).ToList();
                         return psList;
@@ -77,6 +84,19 @@ namespace SicarioPatch.Templating
                 mod.FilePatches = dict;
             }
             return await next();
+        }
+
+        private string SafeRender(PatchRequest request, string inputKey, Dictionary<string, string> modelVars = null)
+        {
+            modelVars ??= new Dictionary<string, string>();
+            if (!string.IsNullOrWhiteSpace(inputKey) && _parser.TryParse(inputKey, out var template))
+            {
+                return template.Render(GetInputContext(request, modelVars));
+            }
+            else
+            {
+                return inputKey;
+            }
         }
 
         private TemplateContext GetContext(object templateInputs, Dictionary<string, string> additionalVars = null)

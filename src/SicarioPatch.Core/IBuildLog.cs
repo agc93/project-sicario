@@ -21,5 +21,6 @@ namespace SicarioPatch.Core
         public List<string> IncludedPatches { get; init; } = new List<string>();
         public Dictionary<string, string> Inputs { get; init; } = new Dictionary<string, string>();
         public string FileName { get; set; }
+        public string UserName { get; set; }
     }
 }
