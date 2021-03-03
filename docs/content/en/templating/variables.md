@@ -4,7 +4,7 @@ linkTitle: "Variables"
 weight: 33
 ---
 
-This is a little more niche and mostly just used to save time while _building_ patches, but Sicario also supports storing and retrieving variables in templates.
+This is a little more niche and mostly just used to save time while _building_ patches, but {{< shortName >}} also supports storing and retrieving variables in templates.
 
 ### Defining Variables
 

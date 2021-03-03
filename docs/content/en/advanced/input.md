@@ -4,7 +4,7 @@ linkTitle: "User Input"
 weight: 51
 ---
 
-For some more complex cases, you might need to get user input to control how your patches are applied or change the values you're using in your patches. For this reason, Sicario supports  some basic input types that will be shown to users when they enable your mod in a build process.
+For some more complex cases, you might need to get user input to control how your patches are applied or change the values you're using in your patches. For this reason, {{< shortName >}} supports  some basic input types that will be shown to users when they enable your mod in a build process.
 
 ## Defining Inputs
 
@@ -29,7 +29,7 @@ Inputs need to be separately defined in a special `_inputs` key in your mod file
 }
 ```
 
-When the user enables a mod that defines inputs, Sicario will show a collection of input fields (grouped by mod) for the user to enter their own values. The `message` field is what will be shown to users, and you **must** define a `default` value or the input may not be shown or parsed correctly.
+When the user enables a mod that defines inputs, {{< shortName >}} will show a collection of input fields (grouped by mod) for the user to enter their own values. The `message` field is what will be shown to users, and you **must** define a `default` value or the input may not be shown or parsed correctly.
 
 ## Using Inputs
 

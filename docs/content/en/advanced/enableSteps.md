@@ -89,6 +89,6 @@ As mentioned, you can use all the usual features in the patch sets conditional i
 
 ## Usage
 
-It is worth reiterating again that conditional patches should be a a **very niche** and/or last-resort feature. In general, you should use multiple mod files to create variants of a mod. For example, OP Weapons is built as 6 separate files so that users can most easily opt-in or opt-out of individual changes. This also makes Sicario's job easier since changes are applied mod-by-mod.
+It is worth reiterating again that conditional patches should be a a **very niche** and/or last-resort feature. In general, you should use multiple mod files to create variants of a mod. For example, OP Weapons is built as 6 separate files so that users can most easily opt-in or opt-out of individual changes. This also makes {{< shortName >}}'s job easier since changes are applied mod-by-mod.
 
 Conditional patches should _only_ be used in very specific scenarios where a small change that cannot be defined separately may have a large impact on the final mod.

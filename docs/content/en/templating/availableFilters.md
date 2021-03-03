@@ -4,7 +4,7 @@ linkTitle: "Available Filters"
 weight: 32
 ---
 
-For convenience, Project Sicario has a **lot** of non-standard filters available for patch files to use that will make a lot of actions much simpler. In no particular order, they are summarized below:
+For convenience, {{< appName >}} has a **lot** of non-standard filters available for patch files to use that will make a lot of actions much simpler. In no particular order, they are summarized below:
 
 ## Number Types
 

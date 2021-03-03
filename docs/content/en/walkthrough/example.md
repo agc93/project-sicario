@@ -3,7 +3,7 @@ title: "Example Mod"
 weight: 22
 ---
 
-So now you've seen one basic example, but just to expand on that, here's another very simple Sicario patch to _unlock all currently locked modifiers_:
+So now you've seen one basic example, but just to expand on that, here's another very simple {{< shortName >}} patch to _unlock all currently locked modifiers_:
 
 ```json
 {

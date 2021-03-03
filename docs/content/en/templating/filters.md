@@ -4,7 +4,7 @@ linkTitle: "Introduction to Filters"
 weight: 31
 ---
 
-Filters are one of the most useful parts of the Liquid template engine we're using since it allows you to write some or all of your mod files in more "natural" formats then have Sicario convert it to the underlying hex for you.
+Filters are one of the most useful parts of the Liquid template engine we're using since it allows you to write some or all of your mod files in more "natural" formats then have {{< shortName >}} convert it to the underlying hex for you.
 
 ## Basics
 
@@ -47,11 +47,11 @@ Let's look at a simple example: text. In an earlier example we saw using the spe
 }
 ```
 
-You'll see that in our `window.after` and `window.before` we could use the original string, run it through the `string` filter and Sicario will automatically change those values to their hex equivalents
+You'll see that in our `window.after` and `window.before` we could use the original string, run it through the `string` filter and {{< shortName >}} will automatically change those values to their hex equivalents
 
 ## Number Conversions
 
-One of the other most common uses for Sicario's filters is for converting different numbers to hex automatically. For example, if you wanted to change every plane with a `RollInterpSpeed` statistic of 2 to 2.5, you could use this patch:
+One of the other most common uses for {{< shortName >}}'s filters is for converting different numbers to hex automatically. For example, if you wanted to change every plane with a `RollInterpSpeed` statistic of 2 to 2.5, you could use this patch:
 
 ```json
 {
@@ -62,7 +62,7 @@ One of the other most common uses for Sicario's filters is for converting differ
 }
 ```
 
-When the patch is run, Sicario will automatically convert 2, to its appropriate hex equivalent _as a floating point value_, and likewise for 2.5. So that patch will effectively "become": 
+When the patch is run, {{< shortName >}} will automatically convert 2, to its appropriate hex equivalent _as a floating point value_, and likewise for 2.5. So that patch will effectively "become": 
 
 ```json
 {

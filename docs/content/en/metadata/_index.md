@@ -8,7 +8,7 @@ As we covered in the earlier sections, you can provide some very basic metadata 
 
 ### `_meta`
 
-As a refresher, the `_meta` object is a simple object just allows you to add a little metadata about your patch mod that will be shown to users. The `displayName` (as you'd guess) is the name that is shown to users. You can also include a `description` key in this object if you'd like (it's not required though). The `author` field is used to show the author of a patch mod, but note that if you upload your mod to a Sicario server, the author field will be overwritten (to prevent impersonation).
+As a refresher, the `_meta` object is a simple object just allows you to add a little metadata about your patch mod that will be shown to users. The `displayName` (as you'd guess) is the name that is shown to users. You can also include a `description` key in this object if you'd like (it's not required though). The `author` field is used to show the author of a patch mod, but note that if you upload your mod to a {{< shortName >}} server, the author field will be overwritten (to prevent impersonation).
 
 ### `_sicario`
 
@@ -30,7 +30,7 @@ All of these properties are optional.
 }
 ```
 
-Including a group will tell Sicario to visually group matching mods together in the UI. This is optional and should only be used where it makes sense, or you will risk your mod being completely hidden from users
+Including a group will tell {{< shortName >}} to visually group matching mods together in the UI. This is optional and should only be used where it makes sense, or you will risk your mod being completely hidden from users
 
 #### Private (`private`)
 
