@@ -10,7 +10,7 @@ For some more complex cases, you might need to get user input to control how you
 
 Inputs need to be separately defined in a special `_inputs` key in your mod file:
 
-```json5
+```json
 {
     "_meta": {
         //trimmed for brevity
@@ -37,7 +37,7 @@ Now that's easy but where do those values go? They are available in any template
 
 The `id` of your input is the important part as that will be how you access your input's final value in the patch definition. For example, if we define this input:
 
-```json5
+```json
 "_inputs": [
     {
         "id": "customRollRate",
@@ -50,7 +50,7 @@ The `id` of your input is the important part as that will be how you access your
 
 We can then use the value from this input in a patch with a template, the special `inputs` object and the `id` of our input:
 
-```json5
+```json
 "ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp": [
         {
             "name": "Stat Changes",

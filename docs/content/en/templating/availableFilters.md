@@ -37,7 +37,7 @@ This one is used where the binary includes a string that's prefixed by the strin
 {{ "0,stdm,saa,mlaa" | row }}
 ```
 
-```json5
+```json
 {
     "description": "Add weapons to second slot",
     "template": "{{ \"0,saa,mlaa,mlag\" | row }}",

@@ -4,7 +4,11 @@ linkTitle: "Extended Metadata"
 weight: 40
 ---
 
-As we covered in the earlier sections, you can provide some very basic metadata on your mod in the special `_meta` object. There's actually a few extra bits of information you can also optionally provide.
+As we covered in the earlier sections, you can provide some very basic metadata on your mod in the special `_meta` object. There's actually a few extra bits of information you can also optionally provide, that will be covered in more detail below.
+
+### `_meta`
+
+As a refresher, the `_meta` object is a simple object just allows you to add a little metadata about your patch mod that will be shown to users. The `displayName` (as you'd guess) is the name that is shown to users. You can also include a `description` key in this object if you'd like (it's not required though). The `author` field is used to show the author of a patch mod, but note that if you upload your mod to a Sicario server, the author field will be overwritten (to prevent impersonation).
 
 ### `_sicario`
 

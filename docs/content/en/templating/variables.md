@@ -10,7 +10,7 @@ This is a little more niche and mostly just used to save time while _building_ p
 
 To define your variables, you can add a top-level key called `_vars` to your file and add your variables with name and value to that:
 
-```json5
+```json
 {
   "_meta": {
     // removed for brevity
@@ -26,7 +26,7 @@ To define your variables, you can add a top-level key called `_vars` to your fil
 
 Then, your patches can retrieve that value using `vars.variableNameHere` in a template:
 
-```json5
+```json
 {
   "_vars": {
     "pilotCount": "00 00 00 1С 01"

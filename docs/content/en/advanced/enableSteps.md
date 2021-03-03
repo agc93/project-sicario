@@ -18,7 +18,7 @@ Conditional patches are (a little counter-intuitively) defined completely separa
 
 For the sakes of this document, let's look at this complete mod file:
 
-```json5
+```json
 {
     "_meta": {
         "displayName": "Demo-Style FE-18",

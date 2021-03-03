@@ -1,5 +1,5 @@
 ﻿---
-title: "Documentation"
+title: "Project Sicario Documentation"
 linkTitle: "Documentation"
 type: "docs"
 weight: 1
@@ -15,12 +15,10 @@ cascade:
     path: "/**"
 ---
 
+This site holds the official documentation for Project Sicario, and how to build mods for the platform.
 
-This section is where the user documentation for your project lives - all the information your users need to understand and successfully use your project.
+Please note that this site is specifically intended for **mod authors** looking to **build mods for Sicario**, not for users building mods. If you're looking for a merged mod, head back to [the app](/build) and start building!
 
-For large documentation sets we recommend adding content under the headings in this section, though if some or all of them don’t apply to your project feel free to remove them or add your own. You can see an example of a smaller Docsy documentation site in the [Docsy User Guide](https://docsy.dev/docs/), which lives in the [Docsy theme repo](https://github.com/google/docsy/tree/master/userguide) if you'd like to copy its docs section.
+If you're looking for information on how to actually build a patch, or reimplement your existing blueprint mods as mergeable Sicario patches, then read through the docs using the sections on the left.
 
-Other content such as marketing material, case studies, and community updates should live in the [About](/about/) and [Community](/community/) pages.
-
-Find out how to use the Docsy theme in the [Docsy User Guide](https://docsy.dev/docs/). You can learn more about how to organize your documentation (and how we organized this site) in [Organizing Your Content](https://docsy.dev/docs/best-practices/organizing-content/).
-
+> For queries about these documentations or this Sicario server, please contact `@agc93#0001` on Discord, or [raise an issue on GitHub](https://github.com/agc93/project-sicario)

@@ -34,9 +34,7 @@ The first thing you'll usually find in a Sicario patch file is the `_meta` field
 - `Author`: Take a guess what this one's for hotshot
 - `Description`: also self-explanatory
 
-{{< block tip >}}
 All three of these values will be shown to users so please don't just put "do the thing" or fill them in with shitposting!
-{{< /block >}}
 
 There is some more metadata you can optionally provide, but that's covered later on.
 

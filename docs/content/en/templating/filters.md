@@ -20,7 +20,7 @@ In short, you want to pipe (i.e. `|`) a value through one or more filters to get
 
 Let's look at a simple example: text. In an earlier example we saw using the special `text:` syntax to use a raw string in a match rather than having to convert it to hex first. You can do this with filters too! To reuse the example: 
 
-```json5
+```json
 {
     "_meta": {
         // removed for brevity
@@ -53,7 +53,7 @@ You'll see that in our `window.after` and `window.before` we could use the origi
 
 One of the other most common uses for Sicario's filters is for converting different numbers to hex automatically. For example, if you wanted to change every plane with a `RollInterpSpeed` statistic of 2 to 2.5, you could use this patch:
 
-```json5
+```json
 {
     "description": "Set RollInterpSpeed",
     "template": "{{ 2 | float }}D5 01 00 00 00 00",
@@ -64,7 +64,7 @@ One of the other most common uses for Sicario's filters is for converting differ
 
 When the patch is run, Sicario will automatically convert 2, to its appropriate hex equivalent _as a floating point value_, and likewise for 2.5. So that patch will effectively "become": 
 
-```json5
+```json
 {
     "description": "Set RollInterpSpeed",
     "template": "00 00 00 40 D5 01 00 00 00 00",
