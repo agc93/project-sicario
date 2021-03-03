@@ -1,0 +1,45 @@
+name: Docs CI Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout recursively
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive  # Fetch Hugo themes
+        fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v2
+      with:
+        hugo-version: '0.81.0'
+        extended: true
+    - run: npm install
+      working-directory: './docs'
+    - name: Build docs
+      run: hugo --minify
+      working-directory: './docs'
+      env:
+        HUGO_ENV: production
+    - name: Upload docs packages
+      uses: actions/upload-artifact@v1
+      with:
+        name: sicario-docs
+        path: docs/public/
+    - name: Deploy to Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/nonexistent' #temporarily disabling
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/public
