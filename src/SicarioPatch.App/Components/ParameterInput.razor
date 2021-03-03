@@ -1,21 +1,23 @@
-﻿<Field Horizontal="true">
-    <FieldLabel Style="margin-right: 1em;">@param.Message.TrimEnd(':') :</FieldLabel>
-    <FieldBody>
-        @if (param.Type == ParameterType.String)
-        {
-            <TextEdit Placeholder="@param.Default" @bind-Value="@Value" />
-        }
-        else if (param.Type == ParameterType.Number)
-        {
-            <NumericEdit TValue="decimal?" Value="@(decimal.TryParse(Value, out var d) ? d : decimal.Parse(param.Default))" ValueChanged="d => Value = d?.ToString() ?? string.Empty"/>
-        } else if (param.Type == ParameterType.Boolean)
-        {
-            <div style="margin-top: 0.5em;">
-                <Check TValue="bool" CheckedChanged="(v) => Value = v.ToString()" Checked="bool.TryParse(Value, out var b) ? b : bool.TryParse(param.Default, out var d) && d" />    
-            </div>
-        }
-    </FieldBody>
-</Field>
+﻿@if (param != null && !string.IsNullOrWhiteSpace(param.Default)) {
+    <Field Horizontal="true">
+        <FieldLabel Style="margin-right: 1em;">@param.Message.TrimEnd(':') :</FieldLabel>
+        <FieldBody>
+            @if (param.Type == ParameterType.String)
+            {
+                <TextEdit Placeholder="@param.Default" @bind-Value="@Value" />
+            }
+            else if (param.Type == ParameterType.Number)
+            {
+                <NumericEdit TValue="decimal?" Value="@(decimal.TryParse(Value, out var d) ? d : decimal.Parse(param.Default))" ValueChanged="d => Value = d?.ToString() ?? string.Empty"/>
+            } else if (param.Type == ParameterType.Boolean)
+            {
+                <div style="margin-top: 0.5em;">
+                    <Check TValue="bool" CheckedChanged="(v) => Value = v.ToString()" Checked="bool.TryParse(Value, out var b) ? b : bool.TryParse(param.Default, out var d) && d" />    
+                </div>
+            }
+        </FieldBody>
+    </Field>
+}
 @code {
 
     [Parameter]

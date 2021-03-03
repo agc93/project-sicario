@@ -1,0 +1,34 @@
+﻿@page "/faq"
+@inject BrandProvider Brand
+<AppIntro />
+
+<DisplayHeading Size="DisplayHeadingSize.Is2"> Frequently Asked Questions</DisplayHeading>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">Why does building take so long?</DisplayHeading>
+<Paragraph>
+    In short, that's because @Brand.ShortName is doing <strong>a lot of work</strong> behind the scenes. Every mod you enable can contain 20+ patches that have to be individually applied to each game file in order. Each of those patches could require searching through whole files for a single word or finding all 200 instances of a particular number in a file. In short, it's hard work. 
+</Paragraph>
+
+<Paragraph>
+    The other thing that will lead to the less-than-ideal build performance is cost: merged mods are built "in the cloud". In reality, that's on a server I'm paying for, and I can't afford to pay for high-end super-powered servers, so we're also a little limited by my cheap server.
+</Paragraph>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">Why does the order matter?</DisplayHeading>
+<Paragraph>
+    The order is super important! Patches are applied in order from top to bottom so its possible for an earlier mod to change a value that a later mod is looking for. How you order these patches allows you to mix and match specific mods (like loadouts for one plane with All Weapons for other planes), but can also lead to unexpected results if they're not ordered right. 
+    My recommendation will be to put specific mods early (like plane-specific loadouts, or patches) then put the larger stuff (like OP Weapons) later so they don't overwrite the more specific changes.
+</Paragraph>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">Why isn't <em>some mod</em> available on @Brand.AppName?</DisplayHeading>
+<Paragraph>
+    @Brand.AppName patches can't reverse engineer existing mods: mods have to be ported to a @Brand.ShortName patch file that can then be uploaded and added to the mod library. Almost all of the patches available now were created by @Brand.OwnerName as ports of existing mods published on Nexus Mods.
+</Paragraph>
+<Paragraph>
+    Additionally, mods can only be ported to @Brand.AppName if the permissions on the original mod allow it, and many don't. Thanks to the authors who have updated their permissions (especially Lavernius and Tyler), a lot of mods can be ported but not all authors allow that. Alternatively, the original authors can upload their mods as @Brand.ShortName patches.
+</Paragraph>
+
+
+
+@code {
+    
+}

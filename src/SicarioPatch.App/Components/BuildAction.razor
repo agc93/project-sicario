@@ -57,6 +57,9 @@
 
     [Parameter]
     public Dictionary<string, string> BuildParameters { get; set; } = new Dictionary<string, string>();
+    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     [Parameter]
     public List<WingmanMod> Mods { get; set; } = new List<WingmanMod>();
@@ -65,9 +68,14 @@
     {
         var timer = new System.Diagnostics.Stopwatch();
         var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters());
-        var req = new PatchRequest(
-            Mods.ToList()
-            ) { PackResult = AutoPack, TemplateInputs = inputParams.ToDictionary(), Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName};
+        var state = await authenticationStateTask;
+        var req = new PatchRequest(Mods.ToList())
+        {
+            PackResult = AutoPack, 
+            TemplateInputs = inputParams.ToDictionary(), 
+            Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName,
+            UserName = state?.User?.Identity?.Name
+        };
         snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
         timer.Start();

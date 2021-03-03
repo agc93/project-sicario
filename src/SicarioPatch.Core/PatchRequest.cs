@@ -37,5 +37,7 @@ namespace SicarioPatch.Core
         public Dictionary<string, string> TemplateInputs { get; set; }
 
         public Dictionary<string, FileInfo> AdditionalFiles { get; set; } = new Dictionary<string, FileInfo>();
+        
+        public string UserName { get; init; }
     }
 }

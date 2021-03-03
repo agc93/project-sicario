@@ -27,7 +27,8 @@ namespace SicarioPatch.Core
             {
                 Inputs = request.TemplateInputs,
                 FileName = result.Name,
-                IncludedPatches = request.Mods.Select(m => m.GetLabel()).ToList()
+                IncludedPatches = request.Mods.Select(m => m.GetLabel()).ToList(),
+                UserName = request.UserName
             });
             return result;
         }

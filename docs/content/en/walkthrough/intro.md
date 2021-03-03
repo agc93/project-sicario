@@ -1,6 +1,42 @@
-﻿### Patch Metadata (`_meta`)
+﻿---
+title: "File Structure"
+weight: 21
+anchor: "howto-basics"
+---
 
-The first thing you'll usually find in a Sicario patch file is the `_meta` object. This simple object just allows you to add a little metadata about your patch mod that will be shown to users. The `displayName` (as you'd guess) is the name that is shown to users. You can also include a `description` key in this object if you'd like (it's not required though).
+### The AoA unlocker mod file
+
+```json
+{
+  "_meta": {
+    "DisplayName": "AoA for All"
+  },
+  "FilePatches": {
+    "ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp": [{
+      "name": "AoA Unlock",
+      "patches": [{
+        "description": "Set CanUseAoA",
+        "template": "00 48 02",
+        "substitution": "01"
+      }]
+    }]
+  }
+}
+```
+
+Now let's step through each part of this file.
+
+### Patch Metadata (<code>_meta</code>)
+
+The first thing you'll usually find in a Sicario patch file is the `_meta` field, which is an object with a few optional properties:
+
+- `DisplayName`: A user-friendly name to show for your mod
+- `Author`: Take a guess what this one's for hotshot
+- `Description`: also self-explanatory
+
+All three of these values will be shown to users so please don't just put "do the thing" or fill them in with shitposting!
+
+There is some more metadata you can optionally provide, but that's covered later on.
 
 ### The File Patches (`FilePatches`)
 
@@ -49,6 +85,8 @@ The two main types of patches currently in use are:
 - `before`: replaces the byte(s) _before_ the template with the value of substitution.
 - `inPlace`: replaces the _entire_ template with the value of the substitution.
 
+> There is also a `valueBefore` type, but it's only useful in niche scenarios
+
 In fact, we could have also shown the AoA patch above with an `inPlace` patch:
 
 ```json
@@ -61,3 +99,5 @@ In fact, we could have also shown the AoA patch above with an `inPlace` patch:
 ```
 
 To translate, this patch just tells Sicario "replace every occurrence of the byte pattern `00 00 48 02` with the byte pattern `01 00 48 02`". These two examples serve essentially the same purpose, so choose the patch type that makes the most sense.
+
+That being said, you should place a preference towards using `inPlace`: users will be shown a warning when including a `before` type patch since they ignore load order and could undo changes from another patch. 

@@ -17,8 +17,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-<!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
-      <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.9" />
+        <!-- <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" /> -->
+      <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.10" />
       <PackageReference Include="MediatR" Version="9.0.0" />
     </ItemGroup>
 
