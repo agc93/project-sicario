@@ -12,6 +12,7 @@ namespace SicarioPatch.App.Infrastructure
         private protected readonly AccessOptions _opts;
         private readonly Func<AccessOptions, List<string>> _selector;
         public const string UserIdClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+        public const string DiscriminatorClaim = "urn:discord:user:discriminator";
 
         protected UserAuthorization(AccessOptions opts)
         {
@@ -30,9 +31,14 @@ namespace SicarioPatch.App.Infrastructure
             return _opts != null
                    && _selector != null
                    && _selector(_opts).Any(u =>
-                       u.ToLower() == principal.Identity?.Name?.ToLower() 
-                       || u.ToLower() == principal.FindFirst(UserIdClaim)?.Value?.ToLower()
-                    );
+                       {
+                           var user = u.ToLower();
+                           return user.All(char.IsDigit)
+                               ? user == principal.FindFirst(UserIdClaim)?.Value?.ToLower()
+                               : user.Contains("#")
+                                    ? user == $"{principal.Identity?.Name?.ToLower()}#{principal.FindFirst(DiscriminatorClaim)?.Value}"
+                                    : user == principal.Identity?.Name?.ToLower();
+                       });
         }
     }
     public class UserRequirement : UserAuthorization, IAuthorizationRequirement

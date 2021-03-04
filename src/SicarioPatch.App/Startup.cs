@@ -103,7 +103,10 @@ namespace SicarioPatch.App
             }
 
             app.UseHttpsRedirection();
-            app.UseDefaultFiles();
+            if (Configuration.GetDocsPath(out var _))
+            {
+                app.UseDefaultFiles();
+            }
             app.UseStaticFiles();
 
             app.UseRouting();

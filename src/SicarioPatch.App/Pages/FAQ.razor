@@ -1,5 +1,7 @@
 ﻿@page "/faq"
+@using Microsoft.Extensions.Configuration
 @inject BrandProvider Brand
+@inject IConfiguration Config
 <AppIntro />
 
 <DisplayHeading Size="DisplayHeadingSize.Is2"> Frequently Asked Questions</DisplayHeading>
@@ -21,14 +23,21 @@
 
 <DisplayHeading Size="DisplayHeadingSize.Is4">Why isn't <em>some mod</em> available on @Brand.AppName?</DisplayHeading>
 <Paragraph>
-    @Brand.AppName patches can't reverse engineer existing mods: mods have to be ported to a @Brand.ShortName patch file that can then be uploaded and added to the mod library. Almost all of the patches available now were created by @Brand.OwnerName as ports of existing mods published on Nexus Mods.
+    @Brand.AppName can't reverse engineer existing mods: mods have to be ported to a @Brand.ShortName patch file that can then be uploaded and added to the mod library. Almost all of the patches available now were created by @Brand.OwnerName as ports of existing mods published on Nexus Mods.
 </Paragraph>
 <Paragraph>
     Additionally, mods can only be ported to @Brand.AppName if the permissions on the original mod allow it, and many don't. Thanks to the authors who have updated their permissions (especially Lavernius and Tyler), a lot of mods can be ported but not all authors allow that. Alternatively, the original authors can upload their mods as @Brand.ShortName patches.
 </Paragraph>
 
+<DisplayHeading Size="DisplayHeadingSize.Is4">Why are some of my selected mods still conflicting?</DisplayHeading>
+<Paragraph>
+    Note that just because edits are built using @Brand.ShortName, that does not mean that all mods will be compatible with each other. For example, if you include two mods that modify weapons for the same plane, more than likely only the first one will be applied. This is a limitation in the modding method being used and isn't something that authors (or @Brand.AppName) can reasonably resolve.
+</Paragraph>
 
-
-@code {
-    
+@if (Config.GetDocsPath(out var docsPath))
+{
+    <DisplayHeading Size="DisplayHeadingSize.Is4">How do I build mods for @Brand.AppName?</DisplayHeading>
+    <Paragraph>
+        You can find a semi-complete library of documentation on the format for @Brand.ShortName patches in the <a href="@docsPath" target="_blank">documentation</a>.
+    </Paragraph>
 }

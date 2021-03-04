@@ -41,6 +41,8 @@ namespace SicarioPatch.Core
         public ParameterType Type { get; set; }
         public string Message { get; set; }
         public string Default { get; set; }
+        public string Range { get; set; }
+        public string Pattern { get; set; }
     }
 
     public enum ParameterType
