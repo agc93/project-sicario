@@ -62,3 +62,9 @@ html, body {
 .row {
     margin-bottom: 2em;
 }
+
+.context-btn {
+    padding: 0; 
+    vertical-align: top;
+    min-width: 2rem;
+}

@@ -3,7 +3,7 @@
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
 @attribute [Authorize(Policy = Policies.IsUser)]
-<h3>Build Merged Mod</h3>
+<h3>Build Merged Mod <Button Class="context-btn" Clicked="() => modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button></h3>
 @if (AvailableMods.Any())
 {
     <Row>
@@ -56,7 +56,20 @@ else
         </Column>
     </Row>  
 }
-
+<Modal @ref="modalRef">
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>How to build a merged mod</ModalTitle>
+            <CloseButton Clicked="() => modalRef.Hide()" />
+        </ModalHeader>
+        <ModalBody>
+            <HowtoGuide Title="" />
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@(() => modalRef.Hide())">Close</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
 
 @code {
     private Dictionary<string, WingmanMod> AvailableMods { get; set; } = new Dictionary<string, WingmanMod>();
@@ -80,6 +93,8 @@ else
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private ModOrder _loadOrder;
+
+    private Modal modalRef;
 
     private bool ReadyToBuild => this.SortedMods.Any();
     /*private FileInfo ResultFile { get; set; }
