@@ -24,5 +24,11 @@ namespace SicarioPatch.Core
             var allPatches = mod.FilePatches.SelectMany(fp => fp.Value).SelectMany(ps => ps.Patches);
             return allPatches;
         }
+        
+        public static float NextFloat(this Random rand, float minValue, float maxValue, int decimalPlaces = 1)
+        {
+            var randNumber = rand.NextDouble() * (maxValue - minValue) + minValue;
+            return Convert.ToSingle(randNumber.ToString("f" + decimalPlaces));
+        }
     }
 }

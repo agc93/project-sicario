@@ -1,9 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Fluid;
+using Fluid.Ast;
 using Fluid.Values;
 using HexPatch;
+using SicarioPatch.Core;
 
 namespace SicarioPatch.Templating
 {
@@ -81,6 +84,58 @@ namespace SicarioPatch.Templating
             return new StringValue(BitConverter.ToString(lengthByte.Concat(strBytes).ToArray()));
         }
 
+        public static FluidValue ToRandom(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        {
+            var minValue = input.ToNumberValue();
+            var maxValue = arguments.At(0).ToNumberValue();
+            var rand = new Random(DateTime.UtcNow.Millisecond);
+            var range = new[] {minValue, maxValue};
+            var finalValue = NumberValue.Zero;
+            if (range.All(r => Math.Abs(r) == r && int.TryParse(r.ToString(), out var _)))
+            {
+                var ints = range.Select(Convert.ToInt32).ToList();
+                var result = rand.Next(ints[0], ints[1]);
+                finalValue = NumberValue.Create(result);
+            } else if (range.All(r => float.TryParse(r.ToString(), out var _)))
+            {
+                var floats = range.Select(Convert.ToSingle).ToList();
+                var result = rand.NextFloat(floats[0], floats[1]);
+                finalValue = NumberValue.Create(Convert.ToDecimal(result));
+            }
+
+            return finalValue;
+        }
+
+        public static FluidParser AddTags(this FluidParser parser)
+        {
+            parser.RegisterIdentifierTag("rand", (identifier, writer, encoder, context) =>
+            {
+                var range = identifier
+                    .Split(':', '-',
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                    .Select(float.Parse)
+                    .ToList();
+                var rand = new Random(Convert.ToInt32(DateTime.UtcNow.Ticks));
+                if (range.All(r => Math.Abs(r) == r && int.TryParse(r.ToString(), out var _)))
+                {
+                    //int range
+                    var ints = range.Select(Convert.ToInt32).ToList();
+                    var output = BitConverter.ToString(BitConverter.GetBytes(rand.Next(ints[0], ints[1])));
+                    writer.Write(output);
+                    return ValueTask.FromResult(Completion.Normal);
+                }
+                else
+                {
+                    var output =
+                        BitConverter.ToString(
+                            BitConverter.GetBytes(Convert.ToSingle(rand.NextFloat(range[1], range[2]))));
+                    writer.Write(output);
+                    return ValueTask.FromResult(Completion.Normal);
+                }
+            });
+            return parser;
+        }
+
         public static TemplateContext AddFilters(this TemplateContext templCtx)
         {
             templCtx.Filters.AddFilter("float", PatchFilters.FromFloat);
@@ -93,6 +148,7 @@ namespace SicarioPatch.Templating
             templCtx.Filters.AddFilter("int16", PatchFilters.FromShort);
             templCtx.Filters.AddFilter("not", PatchFilters.InvertBoolean);
             templCtx.Filters.AddFilter("byte", PatchFilters.FromUInt8);
+            templCtx.Filters.AddFilter("random", PatchFilters.ToRandom);
             return templCtx;
         }
     }

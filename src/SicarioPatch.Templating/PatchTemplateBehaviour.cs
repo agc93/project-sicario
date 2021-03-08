@@ -18,7 +18,7 @@ namespace SicarioPatch.Templating
 
         public PatchTemplateBehaviour()
         {
-            _parser = new FluidParser();
+            _parser = new FluidParser().AddTags();
         }
 
         public PatchTemplateBehaviour(IEnumerable<ITemplateFilterProvider> templates, IEnumerable<ITemplateModelProvider> modelProviders) : this()

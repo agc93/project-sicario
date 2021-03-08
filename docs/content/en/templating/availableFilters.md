@@ -45,3 +45,18 @@ This one is used where the binary includes a string that's prefixed by the strin
     "type": "inPlace"
 }
 ```
+
+## Random Filter
+
+This one is a little trickier to use than the other due to some technical issues we faced. In short, this filter will generate a random number in a specific range.
+
+```json
+{
+    "description": "Replaces 35 HP (so many planes) with random 10-100 value",
+    "template": "{{ 35 | float }}7F 00 00 00 00 00 00 00 73",
+    "substitution": "{{ 10 | random: 100 | float }}7F 00 00 00 00 00 00 00 73",
+    "type": "inPlace"
+}
+```
+
+This will generate a random value between 10 (the input value) and 100 (the first argument) that you can then pass through the `float` filter to get the correct type. 
