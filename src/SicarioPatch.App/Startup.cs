@@ -118,6 +118,7 @@ namespace SicarioPatch.App
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapSchema("/schema");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
