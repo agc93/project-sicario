@@ -36,8 +36,8 @@ Let's look at a simple example: text. In an earlier example we saw using the spe
                         "substitution": "02 00 00 00 1C 01",
                         "type": "inPlace",
                         "window": {
-                            "after": "{{ PW-Mk.I | string }}",
-                            "before": "{{ MG-21 | string }}"
+                            "after": "{{ 'PW-Mk.I' | string }}",
+                            "before": "{{ 'MG-21' | string }}"
                         }
                     }
                 ]
@@ -47,7 +47,7 @@ Let's look at a simple example: text. In an earlier example we saw using the spe
 }
 ```
 
-You'll see that in our `window.after` and `window.before` we could use the original string, run it through the `string` filter and {{< shortName >}} will automatically change those values to their hex equivalents
+You'll see that in our `window.after` and `window.before` we could use the original string, run it through the `string` filter and {{< shortName >}} will automatically change those values to their hex equivalents. Do take note that string values (like MG-21) do need to be quoted when they're used in a template (i.e. `'MG-21` in the example above).
 
 ## Number Conversions
 
