@@ -8,7 +8,7 @@ namespace SicarioPatch.App.Infrastructure
         public static IEndpointConventionBuilder MapSchema(this IEndpointRouteBuilder endpoints, string pattern)
         {
             var pipeline = endpoints.CreateApplicationBuilder()
-                .UseMiddleware<SchemaMiddleware>()
+                // .UseMiddleware<SchemaMiddleware>()
                 .Build();
 
             return endpoints.Map(pattern, pipeline).WithDisplayName("JSON Schema");
