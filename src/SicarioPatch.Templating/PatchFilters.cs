@@ -84,6 +84,13 @@ namespace SicarioPatch.Templating
             return new StringValue(BitConverter.ToString(lengthByte.Concat(strBytes).ToArray()));
         }
 
+        public static FluidValue FromWord(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        {
+            var strBytes = System.Text.Encoding.UTF8.GetBytes(input.ToStringValue());
+            var lengthByte = BitConverter.GetBytes(strBytes.Length + 1);
+            return new StringValue(BitConverter.ToString(lengthByte.Concat(strBytes).ToArray()));
+        }
+
         public static FluidValue ToRandom(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             var minValue = input.ToNumberValue();
@@ -149,6 +156,7 @@ namespace SicarioPatch.Templating
             templCtx.Filters.AddFilter("not", PatchFilters.InvertBoolean);
             templCtx.Filters.AddFilter("byte", PatchFilters.FromUInt8);
             templCtx.Filters.AddFilter("random", PatchFilters.ToRandom);
+            templCtx.Filters.AddFilter("word", PatchFilters.FromWord);
             return templCtx;
         }
     }
