@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Fluid;
 using Fluid.Ast;
@@ -53,6 +55,7 @@ namespace SicarioPatch.Templating
             return resultValue;
         }
 
+        [Obsolete("Templates should be updated to use 'times' instead.", false)]
         public static FluidValue MultiplyValue(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             if (arguments.Count > 2)
@@ -83,6 +86,30 @@ namespace SicarioPatch.Templating
             var lengthByte = BitConverter.GetBytes(strBytes.Length + 1);
             return new StringValue(BitConverter.ToString(lengthByte.Concat(strBytes).ToArray()));
         }
+        
+        public static FluidValue ToStringArray(FluidValue input, FilterArguments arguments, TemplateContext ctx) {
+            var delim = arguments.Count > 0 ? arguments.At(0).ToStringValue() : "16 02 00 00 00 00 00 00 00";
+            var rawInput = input.ToStringValue().Split('|');
+            var arrBytes = new List<byte>();
+            arrBytes.AddRange(BitConverter.GetBytes(Convert.ToInt32(rawInput.Length)));
+            foreach (var itemStr in rawInput)
+            {
+                if (itemStr.All(char.IsDigit) && int.TryParse(itemStr, out var itemInt)) {
+                    arrBytes.AddRange(BitConverter.GetBytes(itemInt));
+                }
+                else {
+                    arrBytes.AddRange(itemStr.ToValueBytes(true));
+                }
+            }
+            var arrLengthByte = BitConverter.GetBytes(Convert.ToInt64(arrBytes.Count)); 
+            //arrBytes already includes the last empty byte since we added it to the last string item
+            var result = new StringBuilder();
+            result.Append(BitConverter.ToString(arrLengthByte));
+            result.Append(delim); //I don't know what the fuck this value is tbh
+            result.Append(BitConverter.ToString(arrBytes.ToArray()));
+
+            return new StringValue(result.ToString());
+        }
 
         public static FluidValue FromWord(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
@@ -111,6 +138,13 @@ namespace SicarioPatch.Templating
             }
 
             return finalValue;
+        }
+
+        public static FluidValue Join(FluidValue input, FilterArguments arguments, TemplateContext context) {
+            var count = arguments.At(0).ToNumberValue();
+            var separator = arguments.Count > 1 ? arguments.At(1).ToStringValue() : string.Empty;
+            var joined = string.Join(separator, Enumerable.Repeat(input.ToStringValue(), (int) count));
+            return new StringValue(joined);
         }
 
         public static FluidParser AddTags(this FluidParser parser)
@@ -157,6 +191,8 @@ namespace SicarioPatch.Templating
             templCtx.Filters.AddFilter("byte", PatchFilters.FromUInt8);
             templCtx.Filters.AddFilter("random", PatchFilters.ToRandom);
             templCtx.Filters.AddFilter("word", PatchFilters.FromWord);
+            templCtx.Filters.AddFilter("array", PatchFilters.ToStringArray);
+            templCtx.Filters.AddFilter("join", PatchFilters.Join);
             return templCtx;
         }
     }

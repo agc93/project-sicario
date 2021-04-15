@@ -81,7 +81,7 @@ namespace SicarioPatch.Templating
                     }).ToList();
                     return finalPatches;
                 });
-                mod.FilePatches = dict;
+                mod.FilePatches = dict.Where(kvp => kvp.Value.Any()).ToDictionary(k => k.Key, v => v.Value);
             }
             return await next();
         }
@@ -126,7 +126,7 @@ namespace SicarioPatch.Templating
                 {
                     if (_parser.TryParse(varTemplate, out var subTemplate))
                     {
-                        validVars.Add(varName, subTemplate.Render(GetInputContext(request)));
+                        validVars.Add(varName, subTemplate.Render(GetInputContext(request, validVars)));
                     }
                 }
             }
