@@ -1,4 +1,5 @@
-﻿using Fluid;
+﻿using System.Threading.Tasks;
+using Fluid;
 using Fluid.Values;
 
 namespace SicarioPatch.Templating
@@ -6,6 +7,6 @@ namespace SicarioPatch.Templating
     public interface ITemplateFilter
     {
         string Name { get; }
-        FluidValue RunFilter(FluidValue input, FilterArguments arguments, TemplateContext ctx);
+        ValueTask<FluidValue> RunFilter(FluidValue input, FilterArguments arguments, TemplateContext ctx);
     }
 }

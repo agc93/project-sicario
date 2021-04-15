@@ -14,39 +14,39 @@ namespace SicarioPatch.Templating
 {
     public static class PatchFilters
     {
-        public static FluidValue FromString(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromString(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(BitConverter.ToString(System.Text.Encoding.UTF8.GetBytes(input.ToStringValue())));
         }
 
-        public static FluidValue FromInt(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromInt(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(
                 BitConverter.ToString(BitConverter.GetBytes(Convert.ToInt32(input.ToNumberValue()))));
         }
 
-        public static FluidValue FromFloat(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromFloat(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(
                 BitConverter.ToString(BitConverter.GetBytes(Convert.ToSingle(input.ToNumberValue()))));
         }
 
-        public static FluidValue FromBool(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromBool(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(BitConverter.ToString(BitConverter.GetBytes(bool.Parse(input.ToStringValue()))));
         }
 
-        public static FluidValue FromShort(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromShort(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(BitConverter.ToString(BitConverter.GetBytes(Convert.ToInt16(input.ToNumberValue()))));
         }
 
-        public static FluidValue FromUInt8(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromUInt8(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             return new StringValue(BitConverter.ToString(new[] {byte.Parse(input.ToStringValue())}));
         }
 
-        public static FluidValue InvertBoolean(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> InvertBoolean(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             var defaultState = arguments.Count > 0 && (bool.TryParse(arguments.At(0).ToStringValue(), out var def) && def);
             var resultValue = new StringValue(bool.TryParse(input.ToStringValue(), out var inputBool)
@@ -56,7 +56,7 @@ namespace SicarioPatch.Templating
         }
 
         [Obsolete("Templates should be updated to use 'times' instead.", false)]
-        public static FluidValue MultiplyValue(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> MultiplyValue(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             if (arguments.Count > 2)
             {
@@ -70,7 +70,7 @@ namespace SicarioPatch.Templating
             return new StringValue((input.ToNumberValue() * arguments.At(0).ToNumberValue()).ToString());
         }
 
-        public static FluidValue AmplifyInput(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> AmplifyInput(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             var threshold = arguments.Count > 1 ? arguments.At(1).ToNumberValue() : 100;
             var inputFactor = input.ToNumberValue();
@@ -79,7 +79,7 @@ namespace SicarioPatch.Templating
             return NumberValue.Create(resultFactor);
         }
 
-        public static FluidValue ToRow(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> ToRow(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             // var strBytes = System.Text.Encoding.UTF8.GetBytes(input.ToStringValue()).Concat(new byte[1] {0x0}).ToArray();
             var strBytes = System.Text.Encoding.UTF8.GetBytes(input.ToStringValue());
@@ -87,7 +87,7 @@ namespace SicarioPatch.Templating
             return new StringValue(BitConverter.ToString(lengthByte.Concat(strBytes).ToArray()));
         }
         
-        public static FluidValue ToStringArray(FluidValue input, FilterArguments arguments, TemplateContext ctx) {
+        public static ValueTask<FluidValue> ToStringArray(FluidValue input, FilterArguments arguments, TemplateContext ctx) {
             var delim = arguments.Count > 0 ? arguments.At(0).ToStringValue() : "16 02 00 00 00 00 00 00 00";
             var rawInput = input.ToStringValue().Split('|');
             var arrBytes = new List<byte>();
@@ -111,14 +111,14 @@ namespace SicarioPatch.Templating
             return new StringValue(result.ToString());
         }
 
-        public static FluidValue FromWord(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> FromWord(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             var strBytes = System.Text.Encoding.UTF8.GetBytes(input.ToStringValue());
             var lengthByte = BitConverter.GetBytes(strBytes.Length + 1);
             return new StringValue(BitConverter.ToString(lengthByte.Concat(strBytes).ToArray()));
         }
 
-        public static FluidValue ToRandom(FluidValue input, FilterArguments arguments, TemplateContext ctx)
+        public static ValueTask<FluidValue> ToRandom(FluidValue input, FilterArguments arguments, TemplateContext ctx)
         {
             var minValue = input.ToNumberValue();
             var maxValue = arguments.At(0).ToNumberValue();
@@ -140,7 +140,7 @@ namespace SicarioPatch.Templating
             return finalValue;
         }
 
-        public static FluidValue Join(FluidValue input, FilterArguments arguments, TemplateContext context) {
+        public static ValueTask<FluidValue> Join(FluidValue input, FilterArguments arguments, TemplateContext context) {
             var count = arguments.At(0).ToNumberValue();
             var separator = arguments.Count > 1 ? arguments.At(1).ToStringValue() : string.Empty;
             var joined = string.Join(separator, Enumerable.Repeat(input.ToStringValue(), (int) count));
@@ -177,23 +177,32 @@ namespace SicarioPatch.Templating
             return parser;
         }
 
-        public static TemplateContext AddFilters(this TemplateContext templCtx)
-        {
-            templCtx.Filters.AddFilter("float", PatchFilters.FromFloat);
-            templCtx.Filters.AddFilter("string", PatchFilters.FromString);
-            templCtx.Filters.AddFilter("int", PatchFilters.FromInt);
-            templCtx.Filters.AddFilter("mult", PatchFilters.MultiplyValue);
-            templCtx.Filters.AddFilter("amp", PatchFilters.AmplifyInput);
-            templCtx.Filters.AddFilter("row", PatchFilters.ToRow);
-            templCtx.Filters.AddFilter("bool", PatchFilters.FromBool);
-            templCtx.Filters.AddFilter("int16", PatchFilters.FromShort);
-            templCtx.Filters.AddFilter("not", PatchFilters.InvertBoolean);
-            templCtx.Filters.AddFilter("byte", PatchFilters.FromUInt8);
-            templCtx.Filters.AddFilter("random", PatchFilters.ToRandom);
-            templCtx.Filters.AddFilter("word", PatchFilters.FromWord);
-            templCtx.Filters.AddFilter("array", PatchFilters.ToStringArray);
-            templCtx.Filters.AddFilter("join", PatchFilters.Join);
-            return templCtx;
+        public static TemplateOptions WithFilters(this TemplateOptions opts,
+            IEnumerable<ITemplateFilter> templateFilters = null) {
+            templateFilters ??= new List<ITemplateFilter>();
+            opts.Filters.WithFilters();
+            foreach (var templateFilter in templateFilters) {
+                opts.Filters.AddFilter(templateFilter.Name, templateFilter.RunFilter);
+            }
+            return opts;
+        }
+
+        private static FilterCollection WithFilters(this FilterCollection filters) {
+            filters.AddFilter("float", PatchFilters.FromFloat);
+            filters.AddFilter("string", PatchFilters.FromString);
+            filters.AddFilter("int", PatchFilters.FromInt);
+            filters.AddFilter("mult", PatchFilters.MultiplyValue);
+            filters.AddFilter("amp", PatchFilters.AmplifyInput);
+            filters.AddFilter("row", PatchFilters.ToRow);
+            filters.AddFilter("bool", PatchFilters.FromBool);
+            filters.AddFilter("int16", PatchFilters.FromShort);
+            filters.AddFilter("not", PatchFilters.InvertBoolean);
+            filters.AddFilter("byte", PatchFilters.FromUInt8);
+            filters.AddFilter("random", PatchFilters.ToRandom);
+            filters.AddFilter("word", PatchFilters.FromWord);
+            filters.AddFilter("array", PatchFilters.ToStringArray);
+            filters.AddFilter("join", PatchFilters.Join);
+            return filters;
         }
     }
 }

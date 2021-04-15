@@ -99,9 +99,11 @@ namespace SicarioPatch.Templating
             }
         }
 
-        private TemplateContext GetContext(object templateInputs, Dictionary<string, string> additionalVars = null)
-        {
-            var templCtx = new TemplateContext(templateInputs).AddFilters();
+        private TemplateContext GetContext(object templateInputs, Dictionary<string, string> additionalVars = null) {
+            var templOpts = TemplateOptions.Default;
+            templOpts.WithFilters(Filters);
+            var templCtx = new TemplateContext(templateInputs,templOpts);
+            
             foreach (var templateModel in Models)
             {
                 templCtx.SetValue(templateModel.Name, templateModel.GetModel());
@@ -109,10 +111,6 @@ namespace SicarioPatch.Templating
             if (additionalVars != null)
             {
                 templCtx.SetValue("vars", additionalVars);
-            }
-            foreach (var filter in Filters)
-            {
-                templCtx.Filters.AddFilter(filter.Name, filter.RunFilter);
             }
             return templCtx;
         }
