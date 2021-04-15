@@ -3,20 +3,20 @@
 Task("Publish-Docker-Image")
 .IsDependentOn("Build-Docker-Image")
 .WithCriteria(() => !string.IsNullOrWhiteSpace(EnvironmentVariable("QUAY_TOKEN")))
-.WithCriteria(() => EnvironmentVariable("GITHUB_REF").StartsWith("refs/tags/v"))
+//.WithCriteria(() => EnvironmentVariable("GITHUB_REF").StartsWith("refs/tags/v"))
 .Does(() => {
     var token = EnvironmentVariable("QUAY_TOKEN");
     DockerLogin(new DockerRegistryLoginSettings{
         Password = token,
-        Username = EnvironmentVariable("QUAY_USER") ?? "modmeta_build"
+        Username = EnvironmentVariable("QUAY_USER") ?? "sicario_build"
     }, "quay.io");
-    DockerPush($"quay.io/modmeta-relay/server:{packageVersion}");
+    DockerPush($"quay.io/project-sicario/server:{packageVersion}");
 });
 
 Task("Publish-NuGet-Packages")
 .IsDependentOn("Build-NuGet-Packages")
 .WithCriteria(() => !string.IsNullOrWhiteSpace(EnvironmentVariable("NUGET_TOKEN")))
-.WithCriteria(() => EnvironmentVariable("GITHUB_REF").StartsWith("refs/tags/v"))
+//.WithCriteria(() => EnvironmentVariable("GITHUB_REF").StartsWith("refs/tags/v"))
 .Does(() => {
     var nupkgDir = $"{artifacts}nuget";
     var nugetToken = EnvironmentVariable("NUGET_TOKEN");
