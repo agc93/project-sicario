@@ -17,11 +17,14 @@ namespace SicarioPatch.App.Infrastructure
         private readonly ModParser _parser;
         private readonly AppInfoProvider _info;
         private readonly BrandProvider _brand;
+        private readonly bool _enableRequestEmbed;
 
         public SignatureFileBehaviour(IConfiguration config, ModParser parser, BrandProvider brand, AppInfoProvider info)
         {
             var section = config.GetSection("SignatureFiles");
+            var requestEmbed = config.GetValue<bool>("RequestEmbed", true);
             _files = section.Exists() ? section.Get<List<string>>() : new List<string>();
+            _enableRequestEmbed = requestEmbed;
             _parser = parser;
             _brand = brand;
             _info = info;
@@ -38,26 +41,25 @@ namespace SicarioPatch.App.Infrastructure
                     extraFiles.Add("_meta/sicario", availableFile);
                 }
             }
-            try
-            {
-                var (appName, appVersion) = _info.GetAppInfo();
-                var metaFile = new
-                    {app = new {owner = _brand.OwnerName, name = appName, version = appVersion}, request = request};
-                var json = JsonSerializer.Serialize(metaFile, _parser.Options);
-                if (!string.IsNullOrWhiteSpace(json))
-                {
-                    await File.WriteAllTextAsync(summaryFile.FullName, json, cancellationToken);
-                    if (summaryFile.Exists)
-                    {
-                        extraFiles.Add("_meta/sicario", summaryFile);
+
+            if (_enableRequestEmbed) {
+                try {
+                    var (appName, appVersion) = _info.GetAppInfo();
+                    var metaFile = new
+                        {app = new {owner = _brand.OwnerName, name = appName, version = appVersion}, request = request};
+                    var json = JsonSerializer.Serialize(metaFile, _parser.Options);
+                    if (!string.IsNullOrWhiteSpace(json)) {
+                        await File.WriteAllTextAsync(summaryFile.FullName, json, cancellationToken);
+                        if (summaryFile.Exists) {
+                            extraFiles.Add("_meta/sicario", summaryFile);
+                        }
                     }
                 }
+                catch {
+                    //ignored
+                }
             }
-            catch
-            {
-                //ignored
-            }
-            
+
 
             request.AdditionalFiles = extraFiles;
             var result = await next();
