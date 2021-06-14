@@ -1,6 +1,6 @@
 ﻿---
 title: "Template Variables"
-linkTitle: "Variables"
+linkTitle: "Using Variables"
 weight: 33
 ---
 
