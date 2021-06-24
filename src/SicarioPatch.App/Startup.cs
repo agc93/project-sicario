@@ -61,6 +61,7 @@ namespace SicarioPatch.App
                 .AddSingleton<IAppInfoProvider, AppInfoProvider>()
                 .AddSingleton<AppInfoProvider>()
                 .AddSingleton<IScriptService, PythonScriptDownloadService>()
+                .AddAssetServices()
                 ;
             if (Configuration.GetSection("Discord") is var discordOpts && discordOpts.Exists())
             {

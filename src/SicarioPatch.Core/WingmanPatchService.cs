@@ -7,17 +7,30 @@ using BuildEngine;
 using HexPatch;
 using HexPatch.Build;
 using Microsoft.Extensions.Logging;
+using SicarioPatch.Assets;
 
 namespace SicarioPatch.Core
 {
     public class WingmanPatchService : ModPatchService<WingmanMod>
     {
+        private readonly AssetPatcher _assetPatcher;
         private Dictionary<string, int> OriginalFileSize { get; init; } = new Dictionary<string, int>();
 
-        protected internal WingmanPatchService(FilePatcher patcher, SourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger)
-        {
+        protected internal WingmanPatchService(AssetPatcher aPatcher, FilePatcher patcher, SourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger) {
+            _assetPatcher = aPatcher;
         }
 
+        public async Task<ModPatchService<WingmanMod>> RunAssetPatches() {
+            foreach (var mod in Mods) {
+                foreach (var (targetAsset, assetPatchSets) in mod.AssetPatches) {
+                    var srcPath = Path.Join(_ctx.WorkingDirectory.FullName, targetAsset);
+                    _logger?.LogDebug($"Running asset patches for {Path.GetFileName(targetAsset)}");
+                    var _ = await _assetPatcher.RunPatch(srcPath, assetPatchSets);
+                }
+            }
+
+            return this;
+        }
 
         public override async Task<ModPatchService<WingmanMod>> RunPatches()
         {
@@ -56,13 +69,38 @@ namespace SicarioPatch.Core
                                         Description = "uexp Length",
                                         Template = lengthBytes,
                                         Substitution = correctedBytes,
-                                        Type = SubstitutionType.InPlace
+                                        Type = "inPlace"
                                     }
                                 }
                             };
                             var finalFile = await _patcher.RunPatch(uaFile.FullName, new List<PatchSet>{lPatch});
                         }
                     } 
+                }
+                
+            }
+            return this;
+        }
+        
+        public WingmanPatchService LoadAssetFiles(Func<string, IEnumerable<string>> extraFileSelector = null)
+        {
+            var requiredFiles = this.Mods
+                .SelectMany(em => em.AssetPatches)
+                .GroupBy(fp => fp.Key)
+                .Where(g => g.Any())
+                .Select(g => g.Key)
+                .Distinct()
+                .ToList();
+            foreach (var file in requiredFiles)
+            {
+                var srcFile = _fileService.LocateFile(Path.GetFileName(file));
+                this._ctx.AddFile(Path.GetDirectoryName(file), srcFile);
+                if (extraFileSelector != null) {
+                    var extraFiles = extraFileSelector.Invoke(file) ?? new List<string>();
+                    foreach (var eFile in extraFiles) {
+                        var exFile = _fileService.LocateFile(Path.GetFileName(eFile));
+                        this._ctx.AddFile(Path.GetDirectoryName(eFile), exFile);
+                    }
                 }
             }
             return this;
@@ -78,13 +116,15 @@ namespace SicarioPatch.Core
         {
             private readonly SourceFileService _fileService;
             private readonly FilePatcher _filePatcher;
+            private readonly AssetPatcher _assetPatcher;
             private readonly BuildContextFactory _ctxFactory;
             private readonly ILogger<ModPatchService<WingmanMod>> _tgtLogger;
 
-            public WingmanPatchServiceBuilder(SourceFileService sourceFileService, FilePatcher filePatcher, BuildContextFactory contextFactory, ILogger<ModPatchService<WingmanMod>> logger)
+            public WingmanPatchServiceBuilder(SourceFileService sourceFileService, FilePatcher filePatcher, AssetPatcher assetPatcher, BuildContextFactory contextFactory, ILogger<ModPatchService<WingmanMod>> logger)
             {
                 _fileService = sourceFileService;
                 _filePatcher = filePatcher;
+                _assetPatcher = assetPatcher;
                 _ctxFactory = contextFactory;
                 _tgtLogger = logger;
             }
@@ -93,7 +133,7 @@ namespace SicarioPatch.Core
             {
                 var mods = modCollection.ToList();
                 var ctx = await _ctxFactory.Create(ctxName);
-                return new WingmanPatchService(_filePatcher, _fileService, ctx, mods, _tgtLogger);
+                return new WingmanPatchService(_assetPatcher, _filePatcher, _fileService, ctx, mods, _tgtLogger);
             }
         }
 }

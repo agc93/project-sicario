@@ -37,6 +37,7 @@ namespace SicarioPatch.Core
                 };
             }
             await mpServ.LoadFiles(HexPatch.Build.FileSelectors.SidecarFiles(_sideCars)).RunPatches();
+            await mpServ.LoadAssetFiles(FileSelectors.SidecarFiles(_sideCars)).RunAssetPatches();
             (bool Success, FileInfo Result)? result;
             if (request.PackResult)
             {
