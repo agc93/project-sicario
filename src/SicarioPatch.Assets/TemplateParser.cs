@@ -11,47 +11,29 @@ namespace SicarioPatch.Assets
 {
     public class TemplateParser
     {
+        public static Parser<string> ValueInputParser => Terms.String().Then(ts => ts.ToString()).Or(Terms.Decimal().Then(d => d.ToString()))
+                .Or(Terms.Integer().Then(i => i.ToString()));
         private readonly IEnumerable<IAssetTypeLoader> _loaders;
+        private readonly IEnumerable<ITemplateProvider> _providers;
         private Parser<(IAssetTypeLoader?, List<IAssetParserFragment>)> _parser;
 
-        public TemplateParser(IEnumerable<IAssetTypeLoader> loaders) {
+        public TemplateParser(IEnumerable<IAssetTypeLoader> loaders, IEnumerable<ITemplateProvider> templateProviders) {
             _loaders = loaders;
+            _providers = templateProviders;
         }
         public Parser<(IAssetTypeLoader?, List<IAssetParserFragment>)> GetParser() {
-            var inputValParser = Terms.String().Then(ts => ts.ToString()).Or(Terms.Decimal().Then(d => d.ToString()))
-                .Or(Terms.Integer().Then(i => i.ToString()));
-            
-            var propName = Terms.Identifier().And(ZeroOrOne(Terms.Char('*')));
-            var nameIndexing = Between(Terms.Char('['), ZeroOrOne(Terms.Char('!')).And(Terms.String(StringLiteralQuotes.SingleOrDouble)), Terms.Char(']')).Then(x => new StructFragment {MatchValue = x.Item2.ToString(), InvertMatch = x.Item1 != null});
-            var nameValueIndexing = Between(Terms.Char('{'), Terms.String(StringLiteralQuotes.SingleOrDouble), Terms.Char('}')).Then(x => new StructPropertyFragment {MatchValue = x.ToString()});
-            var flattening = Between(Terms.Char('{'), Terms.Char('*').And(Terms.Char('*')), Terms.Char('}'))
-                .Then(x => new FlattenFragment());
             var any = Between(Terms.Char('['), Terms.Char('*'), Terms.Char(']'))
                 .Then(x => new AnyFragment());
-            var arrayIndexing = Between(Terms.Char('['), Terms.Integer(), Terms.Char(']')).Then(x => new ArrayFragment {MatchValue = (int) x});
-            var arrayValueIndexing = Between(Terms.Char('[').And(Terms.Char('[')), Terms.Integer(),
-                Terms.Char(']').And(Terms.Char(']'))).Then(x => new ArrayPropertyFragment {MatchValue = (int?) x});
-            var enumType = Between(Terms.Char('<'),
-                Terms.Identifier().AndSkip(Terms.Char(':').And(Terms.Char(':'))).And(ZeroOrOne(Terms.Identifier()))
-                    .Then(m => new EnumValueFragment {EnumType = m.Item1.ToString(), EnumValue = m.Item2.ToString()}),
-                Terms.Char('>'));
-                // this needs to parse a syntax like <EnumType::EnumMember> or <EnumType::> and then formulate that into an EnumValueFragment. Maybe <|whatever|> ?
-            var propType = Between(Terms.Char('<'),
-                Terms.Identifier().Then(id => new PropertyValueFragment {PropertyType = id.ToString()}),
-                Terms.Char('>'));
-            var propValue = Between(Terms.Char('<'), Terms.Identifier().AndSkip(Terms.Char('=')).And(inputValParser.Or(Terms.Char('*').Then(c => c.ToString())))
-                .Then(x =>
-                    new PropertyValueFragment
-                        {PropertyType = x.Item1.ToString(), PropertyValue = x.Item2.ToString()}), Terms.Char('>'));
+            var flattening = Between(Terms.Char('{'), Terms.Char('*').And(Terms.Char('*')), Terms.Char('}'))
+                .Then(x => new FlattenFragment());
 
-            var numberPropValue = Between(Terms.Char('<'),
-                Terms.Identifier().AndSkip(Terms.Char('=')).And(
-                    Separated(Terms.Char('|'),Terms.Integer().Then(Convert.ToDouble).Or(Terms.Decimal().Then(Convert.ToDouble)))), Terms.Char('>'))
-                .Then(result => new NumberCollectionValueFragment(result.Item1.ToString()) {AllowedValues = result.Item2});
-
+            
+            var propName = Terms.Identifier().And(ZeroOrOne(Terms.Char('*')));
             var directProp = Terms.Identifier().And(ZeroOrOne(Terms.Char('*'))).Then(x => new RawPropertyFragment());
 
-            var opts = nameIndexing
+            var defaultOpts = any
+                .Or<AnyFragment, FlattenFragment, IAssetParserFragment>(flattening);
+            /*var opts = nameIndexing
                 .Or<StructFragment, AnyFragment, IAssetParserFragment>(any)
                 .Or<IAssetParserFragment, StructPropertyFragment, IAssetParserFragment>(nameValueIndexing)
                 .Or<IAssetParserFragment, ArrayPropertyFragment, IAssetParserFragment>(arrayValueIndexing)
@@ -59,8 +41,11 @@ namespace SicarioPatch.Assets
                 .Or<IAssetParserFragment, NumberCollectionValueFragment, IAssetParserFragment>(numberPropValue)
                 .Or<IAssetParserFragment, EnumValueFragment, IAssetParserFragment>(enumType)
                 .Or<IAssetParserFragment, PropertyValueFragment, IAssetParserFragment>(propValue)
-                .Or<IAssetParserFragment, PropertyValueFragment, IAssetParserFragment>(propType);
-            var all = Separated(Terms.Text("."), opts);
+                .Or<IAssetParserFragment, PropertyValueFragment, IAssetParserFragment>(propType);*/
+
+            var fragments = _providers.SelectMany(p => p.GetParsers()).Aggregate(defaultOpts, (frag, opt) => opt.Or(frag));
+            
+            var all = Separated(Terms.Text("."), fragments);
             var combined = Terms.Identifier().Then(x => _loaders.FirstOrDefault(l => string.Equals(l.Name, x.ToString(), StringComparison.OrdinalIgnoreCase))).AndSkip(Terms.Char(':')).And(all);
             return combined;
         }

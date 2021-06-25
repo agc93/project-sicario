@@ -25,11 +25,13 @@ namespace SicarioPatch.Assets
         private readonly IEnumerable<IAssetParserFragment> _fragments;
         private readonly IEnumerable<IAssetTypeLoader> _typeLoaders;
         private readonly IEnumerable<IAssetPatchType> _patchTypes;
+        private readonly IEnumerable<ITemplateProvider> _templates;
 
-        public AssetPatcher(IEnumerable<IAssetParserFragment> fragments, IEnumerable<IAssetTypeLoader> typeLoaders, IEnumerable<IAssetPatchType> patchTypes) {
+        public AssetPatcher(IEnumerable<IAssetParserFragment> fragments, IEnumerable<IAssetTypeLoader> typeLoaders, IEnumerable<IAssetPatchType> patchTypes, IEnumerable<ITemplateProvider> templates) {
             _fragments = fragments;
             _typeLoaders = typeLoaders;
             _patchTypes = patchTypes;
+            _templates = templates;
         }
 
         public async Task<FileInfo> RunPatch(string sourcePath, IEnumerable<AssetPatchSet> sets) {
@@ -39,7 +41,7 @@ namespace SicarioPatch.Assets
                 var y = new AssetWriter(fi.FullName, null);
                 var newData = new List<PropertyData>();
                 foreach (var assetPatch in set.Patches) {
-                    var parser = new TemplateParser(_typeLoaders);
+                    var parser = new TemplateParser(_typeLoaders, _templates);
                     var (loader, fragments) = parser.ParseTemplate(assetPatch.Template);
                     var data = loader.LoadData(y.data);
                     var matchedData = fragments.Aggregate(data, (datas, fragment) => fragment.Match(datas));

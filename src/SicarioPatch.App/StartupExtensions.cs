@@ -81,19 +81,5 @@ namespace SicarioPatch.App
             services.AddSingleton<ITemplateModelProvider, IniModelProvider>();
             return services;
         }
-
-        public static IServiceCollection AddAssetServices(this IServiceCollection services) {
-            services.AddSingleton<AssetPatcher>();
-            services.AddSingleton<IAssetPatchType, PropertyValuePatchType>();
-            services.AddSingleton<IAssetPatchType, ArrayPropertyPatchType>();
-            services.AddSingleton<IAssetPatchType, DuplicatePropertyPatchType>();
-            services.AddSingleton<IAssetPatchType, DuplicateItemPatchType>();
-            services.AddSingleton<IAssetTypeLoader, DataTableTypeLoader>();
-            services.AddSingleton<IAssetParserFragment, StructPropertyFragment>();
-            services.AddSingleton<IAssetParserFragment, ArrayPropertyFragment>();
-            services.AddSingleton<IAssetParserFragment, ArrayFragment>();
-            services.AddSingleton<IAssetParserFragment, StructFragment>();
-            return services;
-        }
     }
 }
