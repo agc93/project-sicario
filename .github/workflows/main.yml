@@ -24,6 +24,7 @@ jobs:
       - uses: actions/checkout@master
         with:
           fetch-depth: 0
+          submodules: recursive
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.x'
@@ -35,7 +36,6 @@ jobs:
         uses: cake-build/cake-action@v1
         with:
           target: Release
-          cake-bootstrap: true
         env:
           QUAY_TOKEN: ${{secrets.QUAY_TOKEN}}
           QUAY_USER: project-sicario+github
