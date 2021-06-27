@@ -12,7 +12,7 @@ namespace SicarioPatch.Assets.Templates
                         Parsers.ZeroOrOne(Parsers.Terms.Char('!')).And(Parsers.Terms.String(StringLiteralQuotes.SingleOrDouble)),
                         Parsers.Terms.Char(']'))
                     .Then<IAssetParserFragment>(x => new StructFragment {
-                        MatchValue = x.Item2.ToString(), InvertMatch = !string.IsNullOrWhiteSpace(x.Item1.ToString())
+                        MatchValue = x.Item2.ToString(), InvertMatch = x.Item1 == '!'
                     }),
                 Parsers.Between(Parsers.Terms.Char('{'), Parsers.Terms.String(StringLiteralQuotes.SingleOrDouble), Parsers.Terms.Char('}'))
                     .Then<IAssetParserFragment>(x => new StructPropertyFragment {MatchValue = x.ToString()})
