@@ -4,22 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using SicarioPatch.Assets.Fragments;
 using UAssetAPI;
-using UAssetAPI.PropertyTypes;
 
 namespace SicarioPatch.Assets
 {
-    public class AssetPatchSet {
-        public string Name {get;set;}
-        public List<AssetPatch> Patches {get;set;}
-    }
-    public class AssetPatch
-    {
-        public int Version { get; set; } = 1;
-        public string Description {get;set;}
-        public string Template {get;set;}
-        public string Value {get;set;}
-        public string Type {get;set;} = string.Empty;
-    }
     public class AssetPatcher
     {
         private readonly IEnumerable<IAssetParserFragment> _fragments;
@@ -39,17 +26,19 @@ namespace SicarioPatch.Assets
             var fi = new FileInfo(sourcePath);
             foreach (var set in sets) {
                 var y = new AssetWriter(fi.FullName, null);
-                var newData = new List<PropertyData>();
-                foreach (var assetPatch in set.Patches) {
+                var matchedPatches = set.Patches.ToDictionary(k => k, assetPatch =>
+                {
                     var parser = new TemplateParser(_typeLoaders, _templates);
                     var (loader, fragments) = parser.ParseTemplate(assetPatch.Template);
                     var data = loader.LoadData(y.data);
                     var matchedData = fragments.Aggregate(data, (datas, fragment) => fragment.Match(datas));
                     var patchType = _patchTypes.FirstOrDefault(pt => pt.Type == assetPatch.Type);
-                    // y.data.AddHeaderReference("EUFB");
-                    var newRecords = patchType?.RunPatch(matchedData, assetPatch.Value);
+                    return new PatchRunContext {Loader = loader, MatchedData = matchedData, PatchType = patchType}.RunMatch();
+                }).Where(p => p.Value.IsValid);
+                foreach (var (patch, ctx) in matchedPatches) {
+                    var newRecords = ctx.PatchType?.RunPatch(ctx.MatchedData, patch.Value);
                     if (newRecords != null) {
-                        y = loader.AddData(y, newRecords);
+                        y = ctx.Loader.AddData(y, newRecords);
                     }
                 }
                 y.Write(fi.FullName);
