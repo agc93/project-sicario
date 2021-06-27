@@ -2,8 +2,24 @@
 @inject BrandProvider Brand
 <AppIntro />
 
+<Divider />
 
-<DisplayHeading Size="DisplayHeadingSize.Is4">About datatable mods</DisplayHeading>
+<DisplayHeading Size="DisplayHeadingSize.Is3">What's new in @Brand.AppName?</DisplayHeading>
+
+<Paragraph>
+    🦀 🦀 🦀 <span style="font-weight: bold;"><em>Hex patches are gone </em></span> 🦀🦀🦀 <em>(but not really)</em>
+</Paragraph>
+<Paragraph>
+    The latest version of @Brand.AppName is actually a massive change under the covers: we now support directly parsing and editing the UE4 asset files themselves! This means that rather than relying on the (kind of dodgy if we're being honest) hex editing methods of old, you can directly edit the properties of the cooked datatable files and @Brand.ShortName will handle the rest. This should also make patches more resilient to game updates since they will only break if the properties you're changing are renamed/moved rather than the current method that breaks if <em>anything</em> in the file changes. 
+</Paragraph>
+<Paragraph>
+    For now, though, hex patches are still available and supported but note that mixing hex patches and asset patches can lead to some kind of strange behaviour.
+</Paragraph>
+
+<Divider />
+
+
+<DisplayHeading Size="DisplayHeadingSize.Is3">About datatable mods</DisplayHeading>
 <Paragraph>
     In general, a datatable mod is any mod that modifies the structures that Project Wingman uses to store a lot of variables and records used in the game. In particular, most mods that change aircraft statistics, capabilities or weapons are usually datatable mods, which are frequently incompatible with each other because of how the game loads mods.
 </Paragraph>
@@ -15,3 +31,5 @@
 <Paragraph>
     Note that just because edits are built using @Brand.ShortName, that does not mean that all mods will be compatible with each other. For example, if you include two mods that modify weapons for the same plane, more than likely only the first one will be applied. This is a limitation in the modding method being used and isn't something that authors (or @Brand.AppName) can reasonably resolve.
 </Paragraph>
+
+<Divider />

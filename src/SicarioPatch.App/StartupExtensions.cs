@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
+using SicarioPatch.Assets;
+using SicarioPatch.Assets.Fragments;
+using SicarioPatch.Assets.TypeLoaders;
 using SicarioPatch.Core;
 using SicarioPatch.Templating;
 

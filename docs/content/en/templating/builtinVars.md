@@ -4,6 +4,8 @@ linkTitle: "Common Variables"
 weight: 34
 ---
 
+> Obviously this is only relevant for mods using the old-style hex patches. Asset patches don't need any of this and can use the property names directly.
+
 This is a little more niche and mostly just used to save time while _building_ patches, but {{< shortName >}} also supports a handful of the most commonly used blueprint "delimiters" available as vars in your patches.
 
 The variables are generally available as `BlueprintName.PropertyName` so, for example, `DB_Aircraft.MaxSpeed` or `DWeaponDB.ReloadTime`.

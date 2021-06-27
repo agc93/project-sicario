@@ -79,14 +79,22 @@
         snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
         timer.Start();
-        var buildResult = await Mediator.Send(req);
-        ResultFile = buildResult;
-        if (timer.Elapsed.TotalSeconds > 1)
-        {
-            snackbarStack?.Push("Merged file successfully built!", SnackbarColor.Success);
+        try {
+            var buildResult = await Mediator.Send(req);
+            ResultFile = buildResult;
+            if (timer.Elapsed.TotalSeconds > 1) {
+                snackbarStack?.Push("Merged file successfully built!", SnackbarColor.Success);
+            }
+
         }
-        timer.Stop();
-        IsBuilding = false;
+        catch (Exception e) {
+            snackbarStack?.Push("Error while building merged file!", SnackbarColor.Danger);
+            snackbarStack?.Push($"Error: {e.Message}");
+        }
+        finally {
+            timer.Stop();
+            IsBuilding = false;
+        }
     }
 
     private IEnumerable<PatchParameter> GetAllParameters()

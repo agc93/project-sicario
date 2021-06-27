@@ -1,6 +1,6 @@
 ﻿---
 title: "Example Mod"
-weight: 22
+weight: 27
 ---
 
 So now you've seen one basic example, but just to expand on that, here's another very simple {{< shortName >}} patch to _unlock all currently locked modifiers_:

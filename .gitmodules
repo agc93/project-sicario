@@ -1,3 +1,6 @@
 [submodule "docs/themes/docsy"]
 	path = docs/themes/docsy
 	url = https://github.com/google/docsy.git
+[submodule "lib/UAssetAPI"]
+	path = lib/UAssetAPI
+	url = https://github.com/agc93/UAssetAPI.git

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using HexPatch;
+using SicarioPatch.Assets;
 
 namespace SicarioPatch.Core
 {
@@ -18,6 +19,10 @@ namespace SicarioPatch.Core
 
         [JsonPropertyName("_vars")]
         public Dictionary<string, string> Variables { get; set; } = new Dictionary<string, string>();
+
+        [JsonPropertyName("assetPatches")]
+        public Dictionary<string, List<AssetPatchSet>> AssetPatches { get; set; } =
+            new Dictionary<string, List<AssetPatchSet>>();
     }
 
     public class SicarioMetadata
@@ -30,6 +35,8 @@ namespace SicarioPatch.Core
         
         [JsonPropertyName("preview")]
         public bool Unstable { get; set; }
+        [JsonPropertyName("overwrites")]
+        public bool CanOverwrite { get; set; }
 
         [JsonPropertyName("enableSteps")]
         public Dictionary<string, string> StepsEnabled { get; set; } = new Dictionary<string, string>();

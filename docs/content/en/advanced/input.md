@@ -56,15 +56,13 @@ We can then use the value from this input in a patch with a template, the specia
             "name": "Stat Changes",
             "patches": [
                 {
-                    "description": "Set RollInterpSpeed",
-                    "template": "00 00 48 43 3C 02",
-                    "substitution": "{{ inputs.customRollRate | float}} 3C 02",
-                    "type": "inPlace"
+                    "description": "Set RollSpeed for all aircraft",
+                    "template": "datatable:{'BaseStats*'}.{'RollSpeed*'}",
+                    "value": "FloatProperty:{{inputs.customRollRate}}",
+                    "type": "propertyValue"
                 }
             ]
         }
     ]
 }
 ```
-
-> You will almost always want to chain inputs with [filters](/templating/filters) (like the above example) so that users don't have to enter raw hex.
