@@ -38,42 +38,31 @@ For the sakes of this document, let's look at this complete mod file:
             "MaxMultiLock": "{{ inputs.horneyMultilock }}"
         }
     },
-    "filePatches": {
+    "assetPatches": {
         "ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp": [
             {
                 "name": "Loadout",
-                "patches": [
-                    {
-                        "description": "Add weapons to first slot",
-                        "template": "{{ \"0,saa,mlaa\" | row }}",
-                        "substitution": "{{ \"0,saa,mlaa,stdm\" | row }}",
-                        "type": "inPlace",
-                        "window": {
-                            "after": "text:F/E-18",
-                            "maxMatches": 1
-                        }
-                    }
-                ]
+                "patches": [{
+                    "description": "Add weapons to first spw slot",
+                    "template": "datatable:['F-18E'].[0].{'HardpointCompatibilityList*'}.[[1]].<StrProperty='0,saa,mlaa'>",
+                    "value": "StrProperty:'0,saa,mlaa,stdm'",
+                    "type": "propertyValue"
+                }]
             }
         ],
         "ProjectWingman/Content/ProjectWingman/Blueprints/Data/Weapons/DWeaponDB.uexp": [
             {
                 "name": "MaxMultiLock",
-                "patches": [
-                    {
-                        "description": "Ups the STDM max projectiles to 10",
-                        "template": "{{ 2 | int }}{{ DWeaponDB.MaxProjectile }}",
-                        "substitution": "{{ 10 | int }}{{ DWeaponDB.MaxProjectile }}",
-                        "type": "inPlace",
-                        "window": {
-                            "after": "text:STDM",
-                            "before": "text:stdm2"
-                        }
-                    }
-                ]
+                "patches": [{
+                    "description": "Ups the STDM max projectiles to 10",
+                    "template": "datatable:['MSSL'].{'MaxProjectile*'}.<IntProperty:'2'>",
+                    "value": "IntProperty:10",
+                    "type": "propertyValue"
+                }]
             }
         ]
-    }
+    },
+    "filePatches":{}
 }
 ```
 

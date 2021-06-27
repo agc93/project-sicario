@@ -1,7 +1,6 @@
 ﻿---
 title: "Windowing matches"
-weight: 23
-anchor: "howto-windows"
+weight: 28
 ---
 
 Now while that will work fine for simple things, sometimes you might not want to change **every** appearance of a key with its substitution. This is where the special `window` object on the patch becomes important.

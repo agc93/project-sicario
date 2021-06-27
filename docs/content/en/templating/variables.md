@@ -16,9 +16,9 @@ To define your variables, you can add a top-level key called `_vars` to your fil
     // removed for brevity
   },
   "_vars": {
-    "pilotCount": "00 00 00 1С 01"
+    "weaponList": "'0,saa,mlaa'"
   },
-  "filePatches": {
+  "assetPatches": {
     //removed for brevity
   }
 }
@@ -29,21 +29,19 @@ Then, your patches can retrieve that value using `vars.variableNameHere` in a te
 ```json
 {
   "_vars": {
-    "pilotCount": "00 00 00 1С 01"
+    "weaponList": "'0,saa,mlaa'"
   },
   "filePatches": {
     "ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp": [
       {
-        "name": "Prez Unlock",
-        "patches": [
-          {
-            "description": "Set Pilot count to 2",
-            "template": "00 {{ vars.pilotCount }}",
-            "substitution": "02 {{ vars.pilotCount }}",
-            "type": "inPlace"
-          }
-        ]
-      }
+          "name": "WeaponsChanges",
+          "patches": [{
+              "description": "Give FC16 the chosen weapons",
+              "template": "datatable:['F-16C'].{'HardpointCompatibilityList*'}.[[1]]",
+              "value": "StrProperty:{{ vars.weaponList }}",
+              "type": "propertyValue"
+          }]
+      },
     ]
   }
 }

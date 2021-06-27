@@ -1,7 +1,6 @@
 ﻿---
 title: "File Structure"
-weight: 21
-anchor: "howto-basics"
+weight: 26
 ---
 
 ### The AoA unlocker mod file

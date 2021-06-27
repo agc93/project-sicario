@@ -51,3 +51,7 @@ Marking a mod as private means it will only be visible to the uploader, not to o
 ```
 
 Marking a mod as preview effectively flags it as potentially incomplete or unstable. These mods (whether public or private) will be hidden by default, but can be enabled from the build view.
+
+#### Overwrites (`overwrites`)
+
+This is a convenience flag that Sicario uses internally, and that it will show to the user to warn them if a patch might overwrite other mods. I'd urge patch authors to set this flag if their mod changes properties without checking current values.
