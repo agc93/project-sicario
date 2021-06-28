@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GameFinder.StoreHandlers.GOG" Version="1.5.3" />
+    <PackageReference Include="GameFinder.StoreHandlers.Steam" Version="1.5.3" />
+    <PackageReference Include="LiteDB" Version="5.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+    <PackageReference Include="UnPak.Core" Version="0.0.0-preview.0.9" />
+  </ItemGroup>
+
+</Project>
