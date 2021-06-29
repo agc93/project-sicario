@@ -21,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IAssetPatchType, ArrayPropertyPatchType>();
             services.AddSingleton<IAssetPatchType, DuplicatePropertyPatchType>();
             services.AddSingleton<IAssetPatchType, DuplicateItemPatchType>();
+            services.AddSingleton<IAssetPatchType, TextPropertyValuePatchType>();
             return services;
         }
 
