@@ -39,6 +39,7 @@ namespace SicarioPatch.Core
         public bool CanOverwrite { get; set; }
 
         [JsonPropertyName("enableSteps")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Dictionary<string, string> StepsEnabled { get; set; } = new Dictionary<string, string>();
     }
 
@@ -48,8 +49,10 @@ namespace SicarioPatch.Core
         public ParameterType Type { get; set; }
         public string Message { get; set; }
         public string Default { get; set; }
-        public string Range { get; set; }
-        public string Pattern { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Range { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Pattern { get; set; }
     }
 
     public enum ParameterType

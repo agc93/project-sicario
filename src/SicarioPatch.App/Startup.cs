@@ -83,6 +83,7 @@ namespace SicarioPatch.App
                 })
                 .AddMaterialProviders()
                 .AddMaterialIcons();
+            services.AddControllers();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             
@@ -118,6 +119,7 @@ namespace SicarioPatch.App
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 // endpoints.MapSchema("/schema");
                 endpoints.MapFallbackToPage("/_Host");

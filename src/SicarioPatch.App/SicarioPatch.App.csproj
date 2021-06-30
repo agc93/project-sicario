@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ardalis.ApiEndpoints" Version="3.1.0" />
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="5.0.0" />
     <PackageReference Include="Blazorise.Icons.Material" Version="0.9.2.5" />
     <PackageReference Include="Blazorise.Material" Version="0.9.2.5" />
