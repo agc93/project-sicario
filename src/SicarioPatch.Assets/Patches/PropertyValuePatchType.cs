@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Parlot;
 using Parlot.Fluent;
+using SicarioPatch.Assets.TypeLoaders;
 using UAssetAPI.PropertyTypes;
 
-namespace SicarioPatch.Assets
+namespace SicarioPatch.Assets.Patches
 {
     public class PropertyValuePatchType : AssetPatchType<(string ValueType, string Value)>
     {
         public override string Type => "propertyValue";
 
-        protected override IEnumerable<PropertyData> RunPatch(IEnumerable<PropertyData> propData, (string ValueType, string Value) parsedValue) {
+        protected override IEnumerable<AssetInstruction>? RunPatch(IEnumerable<PropertyData> propData,
+            (string ValueType, string Value) parsedValue) {
             foreach (var propertyData in propData) {
                 switch (parsedValue.ValueType) {
                     case "IntProperty":
@@ -22,7 +23,7 @@ namespace SicarioPatch.Assets
                         break;
                     case "FloatProperty":
                         if (propertyData.Type == "FloatProperty" && propertyData is FloatPropertyData floatProp) {
-                            floatProp.Value = float.Parse(parsedValue.Value);
+                            floatProp.Value = Convert.ToSingle(parsedValue.Value);
                         }
                         break;
                     case "BoolProperty":
@@ -48,7 +49,7 @@ namespace SicarioPatch.Assets
                 }
             }
 
-            return new List<PropertyData>();
+            return new List<AssetInstruction>();
         }
 
         protected override Parser<(string ValueType, string Value)> ValueParser => Parsers.Terms.Identifier().AndSkip(Parsers.Terms.Char(':'))

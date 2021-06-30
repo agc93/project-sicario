@@ -38,7 +38,7 @@ namespace SicarioPatch.Assets
                 foreach (var (patch, ctx) in matchedPatches) {
                     var newRecords = ctx.PatchType?.RunPatch(ctx.MatchedData, patch.Value);
                     if (newRecords != null) {
-                        y = ctx.Loader.AddData(y, newRecords);
+                        y = ctx.Loader.RunInstructions(y, newRecords);
                     }
                 }
                 y.Write(fi.FullName);

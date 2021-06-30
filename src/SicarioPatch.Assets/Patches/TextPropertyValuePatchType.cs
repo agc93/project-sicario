@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Parlot;
 using Parlot.Fluent;
+using SicarioPatch.Assets.TypeLoaders;
 using UAssetAPI.PropertyTypes;
 
-namespace SicarioPatch.Assets
+namespace SicarioPatch.Assets.Patches
 {
     public class TextPropertyValuePatchType : AssetPatchType<KeyValuePair<string, string>>
     {
         public override string Type => "textProperty";
-        protected override IEnumerable<PropertyData>? RunPatch(IEnumerable<PropertyData> propData, KeyValuePair<string, string> parsedValue) {
+        protected override IEnumerable<AssetInstruction>? RunPatch(IEnumerable<PropertyData> propData,
+            KeyValuePair<string, string> parsedValue) {
             foreach (var textPropertyData in propData.Where(pd => pd.Type == "TextProperty" && pd is TextPropertyData).Cast<TextPropertyData>()) {
                 textPropertyData.Value[^2] = parsedValue.Key;
                 textPropertyData.Value[^1] = parsedValue.Value;
             }
 
-            return new List<PropertyData>();
+            return new List<AssetInstruction>();
         }
 
         protected override Parser<KeyValuePair<string, string>> ValueParser => Parsers.Terms.Identifier()

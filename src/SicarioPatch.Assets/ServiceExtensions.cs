@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SicarioPatch.Assets;
+using SicarioPatch.Assets.Patches;
 using SicarioPatch.Assets.Templates;
 using SicarioPatch.Assets.TypeLoaders;
 

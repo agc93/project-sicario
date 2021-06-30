@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Parlot.Fluent;
+using SicarioPatch.Assets.TypeLoaders;
 using UAssetAPI.PropertyTypes;
 
-namespace SicarioPatch.Assets
+namespace SicarioPatch.Assets.Patches
 {
     public class ArrayPropertyPatchType : AssetPatchType<(string ItemValueType, List<string> Value)>
     {
         public override string Type => "arrayPropertyValue";
-        protected override IEnumerable<PropertyData>? RunPatch(IEnumerable<PropertyData> propData, (string ItemValueType, List<string> Value) parsedValue) {
+        protected override IEnumerable<AssetInstruction>? RunPatch(IEnumerable<PropertyData> propData,
+            (string ItemValueType, List<string> Value) parsedValue) {
             foreach (var propertyData in propData) {
                 switch (parsedValue.ItemValueType) {
                     case "StrProperty":
@@ -46,7 +48,7 @@ namespace SicarioPatch.Assets
             }
 
             // return propData;
-            return new List<PropertyData>();
+            return new List<AssetInstruction>();
         }
 
         protected override Parser<(string ItemValueType, List<string> Value)> ValueParser =>  
