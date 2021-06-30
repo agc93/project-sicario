@@ -41,6 +41,12 @@ namespace SicarioPatch.Assets.Patches
                             textProp.Value[^1] = parsedValue.Value;
                         }
                         break;
+                    case "NameProperty":
+                        if (propertyData.Type == "NameProperty" && propertyData is NamePropertyData nameProp) {
+                            nameProp.Asset.AddHeaderReference(parsedValue.Value);
+                            nameProp.Value = parsedValue.Value;
+                        }
+                        break;
                     case "ByteProperty":
                         if (propertyData.Type == "ByteProperty" && propertyData is BytePropertyData byteProp) {
                             byteProp.Value = byteProp.Asset.SearchHeaderReference(parsedValue.Value);

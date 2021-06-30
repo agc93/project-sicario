@@ -37,11 +37,16 @@ namespace SicarioPatch.Assets.Patches
                     case "NameProperty":
                         if (propertyData.Type == "ArrayProperty" && propertyData is ArrayPropertyData
                             {ArrayType: "NameProperty"} nameArrayProp) {
-                            nameArrayProp.Value = parsedValue.Value.Select(v => new NamePropertyData(nameArrayProp.Name, nameArrayProp.Asset) {
-                                Value = v,
-                                Type = "NameProperty",
-                                
+                            nameArrayProp.Value = parsedValue.Value.Select(v =>
+                            {
+                                var valData = new NamePropertyData(nameArrayProp.Name, nameArrayProp.Asset) {
+                                    Value = v,
+                                    Type = "NameProperty",
+                                };
+                                nameArrayProp.Asset.AddHeaderReference(v);
+                                return valData;
                             }).ToArray();
+                            
                         }
                         break;
                 }
