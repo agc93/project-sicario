@@ -5,29 +5,6 @@ using UAssetAPI.PropertyTypes;
 
 namespace SicarioPatch.Assets.Fragments
 {
-    public class EnumValueFragment : IAssetParserFragment
-    {
-        public string EnumType { get; init; }
-        public string EnumValue { get; init; }
-        public string EnumString => $"{EnumType}::{EnumValue}";
-
-        public IEnumerable<PropertyData> Match(IEnumerable<PropertyData> initialInput) {
-            if (string.IsNullOrWhiteSpace(EnumType)) {
-                throw new InvalidOperationException("Invalid parse: no enum definition!");
-            }
-
-            foreach (var propertyData in initialInput.Where(pd => pd.Type == "ByteProperty" && pd is BytePropertyData).Cast<BytePropertyData>()) {
-                if (propertyData.EnumType == propertyData.Asset.SearchHeaderReference(EnumType)) {
-                    if (string.IsNullOrWhiteSpace(EnumValue)) {
-                        yield return propertyData;
-                    }
-                    else if (propertyData.Value == propertyData.Asset.SearchHeaderReference(EnumString)) {
-                        yield return propertyData;
-                    }
-                }
-            }
-        }
-    }
     public class PropertyValueFragment : IAssetParserFragment
     {
         public string PropertyType { get; init; }
@@ -41,20 +18,41 @@ namespace SicarioPatch.Assets.Fragments
                 if (string.IsNullOrWhiteSpace(PropertyValue)) {
                     yield return propertyData;
                 }
-                else if (PropertyType == "ByteProperty" && propertyData is BytePropertyData bpData) {
-                    if (propertyData.Asset.SearchHeaderReference(PropertyValue) == bpData.Value) {
-                        yield return propertyData;
+                else switch (PropertyType) {
+                    case "ArrayProperty" when propertyData is ArrayPropertyData apData:
+                    {
+                        if (int.TryParse(PropertyValue, out var arrayCount) && apData.Value.Length == arrayCount) {
+                            yield return propertyData;
+                        }
+                        else {
+                            yield break;
+                        }
+
+                        break;
                     }
-                    else {
-                        yield break;
+                    case "ByteProperty" when propertyData is BytePropertyData bpData:
+                    {
+                        if (propertyData.Asset.SearchHeaderReference(PropertyValue) == bpData.Value) {
+                            yield return propertyData;
+                        }
+                        else {
+                            yield break;
+                        }
+
+                        break;
                     }
-                }
-                else if (PropertyValue == "*" && !string.IsNullOrWhiteSpace(propertyData.RawValue.ToString()) &&
-                         propertyData.RawValue.ToString() != "0") {
-                    yield return propertyData;
-                }
-                else if (PropertyValue == propertyData.RawValue.ToString()) {
-                    yield return propertyData;
+                    default:
+                    {
+                        if (PropertyValue == "*" && !string.IsNullOrWhiteSpace(propertyData.RawValue.ToString()) &&
+                            propertyData.RawValue.ToString() != "0") {
+                            yield return propertyData;
+                        }
+                        else if (string.Equals(PropertyValue, propertyData.RawValue.ToString(), StringComparison.CurrentCultureIgnoreCase)) {
+                            yield return propertyData;
+                        }
+
+                        break;
+                    }
                 }
             }
         }

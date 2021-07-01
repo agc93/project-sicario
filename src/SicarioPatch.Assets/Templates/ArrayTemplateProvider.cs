@@ -11,7 +11,9 @@ namespace SicarioPatch.Assets.Templates
             var arrayIndexing = Parsers.Between(Parsers.Terms.Char('['), Parsers.Terms.Integer(), Parsers.Terms.Char(']')).Then<IAssetParserFragment>(x => new ArrayFragment {MatchValue = (int) x});
             var arrayValueIndexing = Parsers.Between(Parsers.Terms.Char('[').And(Parsers.Terms.Char('[')), Parsers.Terms.Integer(),
                 Parsers.Terms.Char(']').And(Parsers.Terms.Char(']'))).Then<IAssetParserFragment>(x => new ArrayPropertyFragment {MatchValue = (int?) x});
-            return new List<Parser<IAssetParserFragment>> {arrayIndexing, arrayValueIndexing};
+            var arrayFlatten = Parsers.Between(Parsers.Terms.Char('[').And(Parsers.Terms.Char('[')), Parsers.Terms.Char('*'),
+                Parsers.Terms.Char(']').And(Parsers.Terms.Char(']'))).Then<IAssetParserFragment>(x => new ArrayFlattenFragment());
+            return new List<Parser<IAssetParserFragment>> {arrayIndexing, arrayValueIndexing, arrayFlatten};
         }
     }
 }
