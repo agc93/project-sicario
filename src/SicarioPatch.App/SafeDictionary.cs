@@ -14,7 +14,8 @@ namespace SicarioPatch.App
         {
             get
             {
-                if (!this.ContainsKey(key))
+                if (key == null) return _defaultValue ?? default(TValue);
+                if (!ContainsKey(key))
                 {
                     this[key] = _defaultValue ?? default(TValue);
                 }

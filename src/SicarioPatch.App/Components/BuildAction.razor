@@ -67,7 +67,7 @@
     private async Task OnStartBuild()
     {
         var timer = new System.Diagnostics.Stopwatch();
-        var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters());
+        var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters().WhereValid());
         var state = await authenticationStateTask;
         var req = new PatchRequest(Mods.ToList())
         {

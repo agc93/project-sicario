@@ -6,6 +6,9 @@ namespace SicarioPatch.App
 {
     public static class CoreExtensions
     {
+        public static IEnumerable<PatchParameter> WhereValid(this IEnumerable<PatchParameter> parameters) {
+            return parameters.Where(p => !string.IsNullOrWhiteSpace(p?.Id));
+        } 
         public static IDictionary<string, string> FallbackToDefaults(this IDictionary<string, string> dict,
             IEnumerable<PatchParameter> parameters)
         {

@@ -35,15 +35,15 @@
                                 </BarLink>
                             </BarItem>
                         </AuthorizeView>
-                        @* This is so not ready for production *@
-                        @*<AuthorizeView>
+                        @* This is so not ready for production, but we're doing it anyway *@
+                        <AuthorizeView Policy="@Policies.IsUploader">
                             <BarItem>
                                 <BarLink To="test">
-                                    <BarIcon IconName="MaterialIcons.Settings" />
-                                    Test Patch
+                                    <BarIcon IconName="MaterialIcons.Build" />
+                                    Test
                                 </BarLink>
                             </BarItem>
-                        </AuthorizeView>*@
+                        </AuthorizeView>
                     </BarStart>
                     <BarEnd>
                         <BarItem>

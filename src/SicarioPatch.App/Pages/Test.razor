@@ -8,7 +8,7 @@
 <div class="test-container">
     <div class="test-header-row">
         <DisplayHeading Size="DisplayHeadingSize.Is4">Test Patch File</DisplayHeading>
-        <div class="container action-container">
+        <div class="container action-container" style="margin-right: unset;">
             <Alert Color="Color.Secondary" Visible="true">
                 You can drop your patch file in the editor to the left. If your mod is valid, you will see the mod details and be able to download the patched files below.
             </Alert>
@@ -30,48 +30,39 @@
                 </div>
             }
             @if (ParsedMod != null) {
-                <Card Class="test-body-details-item">
-                    <CardBody>
-                        <ModInfo Mod="@ParsedMod" ReadOnly="true"/>
-                    </CardBody>
-                </Card>
+                @if (ParsedMod.Parameters.Any()) {
+                    <div class="test-body-details-item">
+                        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                            <Items>
+                                <Tab Name="params">Parameters</Tab>
+                                <Tab Name="modinfo">Mod Info</Tab>
+                            </Items>
+                            <Content>
+                                <TabPanel Name="params">
+                                    <ParameterList Mods="@BuildSet" InputParameters="@Parameters"/>
+                                </TabPanel>
+                                <TabPanel Name="modinfo">
+                                    <ModInfo Mod="@ParsedMod" ReadOnly="true"/>
+                                </TabPanel>
+                            </Content>
+                        </Tabs>
+                        
+                    </div>
+                }
+                else {
+                    <Card Class="test-body-details-item">
+                        <CardBody>
+                            <ModInfo Mod="@ParsedMod" ReadOnly="true"/>
+                        </CardBody>
+                    </Card>
+                }
 
                 <Card Class="test-body-details-item">
-                    <div class="container action-container">
-                        <Text Color="TextColor.Muted">Ready to build your mod!</Text>
-                        <Button class="action-btn" Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
-                        @if (ResultFile is {Exists: true }) {
-                            <FileDownload ResultFile="ResultFile" DeleteAfter="true">
-                                Download Merged File
-                            </FileDownload>
-                        }
-                    </div>
+                    <BuildAction Mods="@BuildSet" BuildParameters="@Parameters" />
                 </Card>
             }
         </div>
     </div>
-
-    @*<Row Style="height: 50vh;">
-        <Column ColumnSize="ColumnSize.Is8" Style="display: inline-flex; flex-direction: column; justify-content: space-evenly">
-            $1$ <MemoEdit Rows="16" @bind-Text="@RawModFile" TextChanged="OnTextChanged" /> #1#
-            
-        </Column>
-        <Column ColumnSize="ColumnSize.Is4" Style="display: inline-flex; flex-direction: column; justify-content: space-evenly">
-            
-            
-        </Column>
-    </Row>
-    <Row>
-        @if (ParsedMod != null) {
-            <Column ColumnSize="ColumnSize.Is6">
-                
-            </Column>
-            <Column ColumnSize="ColumnSize.Is6">
-
-                
-            </Column>
-        }
-    </Row>*@
 </div>
 
 @code {
@@ -88,6 +79,9 @@
     private System.Timers.Timer aTimer;
     private bool IsLoading { get; set; }
 
+    private List<WingmanMod> BuildSet => ParsedMod == null ? new List<WingmanMod>() : new List<WingmanMod> {ParsedMod};
+    private SafeDictionary<string, string> Parameters { get; set; } = new(string.Empty);
+
     private StandaloneEditorConstructionOptions GetEditorOptions(MonacoEditor editor) {
         return new StandaloneEditorConstructionOptions {
             AutomaticLayout = true,
@@ -96,19 +90,19 @@
             Theme = "vs-dark"
         };
     }
+    
+    string selectedTab = "params";
+
+    private void OnSelectedTabChanged( string name )
+    {
+        selectedTab = name;
+    }
 
 
     protected override async Task OnInitializedAsync() {
         aTimer = new Timer(750);
         aTimer.Elapsed += (source, evt) => OnLoadEditor();
         aTimer.AutoReset = false;
-    }
-
-    private async Task OnStartBuild() {
-        var req = new PatchRequest(new Dictionary<string, WingmanMod> {["TestPatch.dtm"] = ParsedMod});
-        var buildResult = await Mediator.Send(req);
-        ResultFile = buildResult;
-    // IsBuilding = false;
     }
 
     private async Task TryLoadMod() {

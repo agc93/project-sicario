@@ -13,7 +13,7 @@
                             @* <Heading Size="HeadingSize.Is6">@paramMod.GetLabel()</Heading> *@
                         </CollapseHeader>
                         <CollapseBody>
-                            @foreach (var param in paramMod.Parameters)
+                            @foreach (var param in paramMod.Parameters.WhereValid())
                             {
                                 <ParameterInput @bind-Value="@InputParameters[param.Id]" Parameter="@param"/>
                             }

@@ -29,7 +29,7 @@
 }
 
 .test-body-details-item, ::deep .test-body-details-item {
-    margin: 2.5vh 2.5vw;
+    margin: 2.5vh 0;
     max-width: 40vw;
 }
 

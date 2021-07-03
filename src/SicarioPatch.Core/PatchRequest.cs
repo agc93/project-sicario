@@ -9,12 +9,6 @@ namespace SicarioPatch.Core
 {
     public class PatchRequest : IRequest<FileInfo>
     {
-        public PatchRequest(Dictionary<string, WingmanMod> mods)
-        {
-            Mods = RebuildModList(mods.Values.ToList());
-            Id = Guid.NewGuid().ToString("N");
-        }
-
         public PatchRequest(IEnumerable<WingmanMod> mods)
         {
             Mods = RebuildModList(mods.ToList());
