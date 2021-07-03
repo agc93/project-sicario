@@ -1,4 +1,42 @@
-﻿.test-editor {
-    height: 50vh;
-    min-height: 40vh;
+﻿.test-editor, ::deep .test-editor {
+    height: 80vh;
+    width: 60vw;
+    margin: 2.5vh;
+}
+
+.test-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 95vh;
+}
+
+.test-header-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    height: 10vh;
+}
+
+.test-body-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+.test-body-details-item, ::deep .test-body-details-item {
+    margin: 2.5vh 2.5vw;
+    max-width: 40vw;
+}
+
+.test-body-details {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 2.5vh 0;
+    align-items: stretch;
 }
