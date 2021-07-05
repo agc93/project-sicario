@@ -23,6 +23,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IAssetPatchType, DuplicatePropertyPatchType>();
             services.AddSingleton<IAssetPatchType, DuplicateItemPatchType>();
             services.AddSingleton<IAssetPatchType, TextPropertyValuePatchType>();
+            services.AddSingleton<IAssetPatchType, ObjectRefPatchType>();
+            services.AddSingleton<IAssetPatchType, DuplicateArrayItemPatchType>();
             return services;
         }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Parlot.Fluent;
 using SicarioPatch.Assets.TypeLoaders;
@@ -48,6 +47,6 @@ namespace SicarioPatch.Assets.Patches
             Parsers.Terms.String()
                 .AndSkip(Parsers.Terms.Char('>'))
                 .And(Parsers.Terms.String())
-                .Then<(string SourceName, string TargetName)>(x => (SourceName: x.Item1.ToString(), TargetName: x.Item2.ToString()) );
+                .Then(x => (SourceName: x.Item1.ToString(), TargetName: x.Item2.ToString()) );
     }
 }
