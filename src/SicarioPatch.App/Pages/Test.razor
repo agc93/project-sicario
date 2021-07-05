@@ -4,7 +4,7 @@
 @inject ModParser ModParser;
 @inject IMediator Mediator
 @using BlazorMonaco
-@attribute [Authorize(Policy = Policies.IsUploader)]
+@attribute [Authorize(Policy = Policies.IsUser)]
 <div class="test-container">
     <div class="test-header-row">
         <DisplayHeading Size="DisplayHeadingSize.Is4">Test Patch File</DisplayHeading>
