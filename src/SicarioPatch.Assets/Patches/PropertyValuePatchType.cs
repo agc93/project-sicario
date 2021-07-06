@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Parlot.Fluent;
 using SicarioPatch.Assets.TypeLoaders;
+using UAssetAPI;
 using UAssetAPI.PropertyTypes;
 
 namespace SicarioPatch.Assets.Patches
@@ -49,7 +50,17 @@ namespace SicarioPatch.Assets.Patches
                         break;
                     case "ByteProperty":
                         if (propertyData.Type == "ByteProperty" && propertyData is BytePropertyData byteProp) {
-                            byteProp.Value = byteProp.Asset.SearchHeaderReference(parsedValue.Value);
+                            var headerRef = 0;
+                            try {
+                                headerRef = byteProp.Asset.SearchHeaderReference(parsedValue.Value);
+                            }
+                            catch (HeaderOutOfRangeException e) {
+                                headerRef = byteProp.Asset.AddHeaderReference(parsedValue.Value);
+                            }
+
+                            if (headerRef != 0) {
+                                byteProp.Value = headerRef;
+                            }
                         }
                         break;
                 }
