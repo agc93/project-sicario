@@ -29,7 +29,7 @@ namespace SicarioPatch.Assets.Patches
         protected override Parser<(string? Namespace, string Key, string Value)> ValueParser => Parsers.ZeroOrOne(Parsers.Terms.Identifier()).And(Parsers.Terms.Identifier()
             .Or(Parsers.Terms.String(StringLiteralQuotes.Single)).Or(Parsers.Terms.Char('*')
                 .Then(c => new TextSpan(Guid.NewGuid().ToString("N").ToUpper())))
-            .AndSkip(Parsers.Terms.Char(':')).And(Parsers.Terms.String(StringLiteralQuotes.Single))).Then(res =>
+            .AndSkip(Parsers.Terms.Char(':')).And(Parsers.Terms.String())).Then(res =>
                 (res.Item1.ToString(), res.Item2.Item1.ToString(), res.Item2.Item2.ToString()));
     }
 }
