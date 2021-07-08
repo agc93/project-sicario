@@ -56,7 +56,7 @@ In the example above, we have just one key in the object: `ProjectWingman/Conten
 
 #### Patch Sets
 
-Patch Sets are a purely logical organizational idea: they're just a way of organizing patches together. For example, if your mod is changing multiple stats for multiple planes, you might include each plane as a separate patch set. A patch set is just an object with `name` and an array of `patches`:
+Patch Sets are mostly a logical organizational idea: they're a way of organizing patches together. For example, if your mod is changing multiple stats for multiple planes, you might include each plane as a separate patch set. A patch set is just an object with `name` and an array of `patches`:
 
 ```json
 {
@@ -65,7 +65,11 @@ Patch Sets are a purely logical organizational idea: they're just a way of organ
 }
 ```
 
-On it's own a patch set doesn't do anything, that's up to the actual _patches_ in the set.
+On it's own a patch set doesn't do anything, that's up to the actual _patches_ in the set. 
+
+##### Patch Set Grouping
+
+There is one important thing to note with patch sets: all the patches in a set are matched together. That means if one patch requires a previous change, or matches based on a value changed by a previous patch, they need to be in separate patch sets. For example, if you change the name of something and then want a later patch to find the property based on that new name, it needs to be in its own set. 
 
 #### Patches
 
@@ -94,5 +98,6 @@ The two main types of patches currently in use are:
 |:--:|:----|
 |`propertyValue`|This is by far the most common/useful and for good reason: it's the most useful and versatile type. It sets the value of matching properties to the given value.|
 |`arrayPropertyValue`|Sibling type to `propertyValue` that creates/inserts an array value to the given properties using a simple array syntax|
+|`textProperty`|Specialized patch type for working UE4's TextProperty fields more effectively.
 
 Both of these types use a common convention for the `value` field: `DataType:value`. This ensures that the properties are set with the correct data types the game uses. Note that other patch types might not use the same convention.
