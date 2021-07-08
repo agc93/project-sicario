@@ -28,8 +28,4 @@
     <Content Remove="Pages\Login.razor" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components" />
-  </ItemGroup>
-
 </Project>
