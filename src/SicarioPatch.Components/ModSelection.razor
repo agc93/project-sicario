@@ -51,9 +51,9 @@
     [Parameter]
     public IEnumerable<WingmanMod> AvailableMods { get; set; } = new List<WingmanMod>();
 
-    private IEnumerable<WingmanMod> IncludedMods => AvailableMods.Where(m => _includeUnstable || !(m.ModInfo?.Unstable ?? false));
+    private IEnumerable<WingmanMod> IncludedMods => AvailableMods.Where(m => _includeUnstable || !(m.ModInfo?.Unstable ?? false)).GroupBy(m => m.ModInfo?.Unstable ?? false).SelectMany(mg => mg.ToList());
     
-    private SafeDictionary<string, bool> GroupAccordion { get; set; } = new SafeDictionary<string, bool>(false);
+    private SafeDictionary<string, bool> GroupAccordion { get; set; } = new(false);
     
     [Parameter]
     public EventCallback<WingmanMod> OnModEnabled { get; set; }

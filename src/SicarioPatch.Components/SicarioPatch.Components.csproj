@@ -24,12 +24,12 @@
       <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
+    <!--<ItemGroup>
       <Content Include="FadeTooltip.razor.css" />
       <Content Include="FileDownload.razor.css" />
       <Content Include="LoadingSpinner.razor.css" />
       <Content Include="ModSelection.razor.css" />
       <Content Include="UserMods.razor.css" />
-    </ItemGroup>
+    </ItemGroup>-->
 
 </Project>

@@ -1,9 +1,0 @@
-﻿.actions,
-::deep .actions{
-    margin-left: 1em;
-}
-
-.actions-card,
-::deep .actions-card {
-    max-width: 400px;
-}
