@@ -1,5 +1,7 @@
 ﻿@using System.IO
 @using System.Text.Json
+@using Blazorise
+@using HexPatch
 @inject ModParser ModParser
 @if (string.IsNullOrWhiteSpace(RawModFile))
 {
@@ -58,12 +60,12 @@ else if (ParsedMod != null)
                 jsonMod.Metadata ??= new SetMetadata();
                 ParsedMod = jsonMod;
                 FileName = fileName;
-                snackbarStack?.Push("Successfully loaded mod!", SnackbarColor.Success);
+                snackbarStack?.PushAsync("Successfully loaded mod!", SnackbarColor.Success);
             }
         }
         catch (Exception e)
         {
-            snackbarStack?.Push($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
+            snackbarStack?.PushAsync($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
             Console.WriteLine(e);
             // throw;
             RawModFile = null;

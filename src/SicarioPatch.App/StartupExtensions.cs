@@ -9,6 +9,7 @@ using SicarioPatch.App.Shared;
 using SicarioPatch.Assets;
 using SicarioPatch.Assets.Fragments;
 using SicarioPatch.Assets.TypeLoaders;
+using SicarioPatch.Components;
 using SicarioPatch.Core;
 using SicarioPatch.Templating;
 
@@ -42,7 +43,7 @@ namespace SicarioPatch.App
                 }
 
                 return new BrandProvider();
-            });
+            }).AddSingleton<IBrandProvider, BrandProvider>();
             return services;
         }
 

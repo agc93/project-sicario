@@ -1,8 +1,5 @@
-﻿@inject BrandProvider Info
+﻿@inject IBrandProvider Info
 @using System.Security.Principal
-@using Microsoft.AspNetCore.Hosting
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration Configuration
 @if (_requireAcceptance)
 {
     @if (_acceptTerms)
@@ -24,12 +21,18 @@ else
 }
 
 @code {
-    private bool _requireAcceptance => !_skipTerms && GetUsers().Any(u => u != _user?.Name);
+    private bool _requireAcceptance => !SkipTerms && GetUsers().Any(u => u != _user?.Name);
     private bool _acceptTerms { get; set; }
+
+    [Parameter]
+    public bool SkipTerms { get; set; } = false;
+    
     [Parameter]
     public IEnumerable<WingmanMod> Mods { get; set; } = new List<WingmanMod>();    
+    
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
     [Parameter]
     public RenderFragment ChildContent { get; set; }
     
@@ -40,7 +43,6 @@ else
         {
             _user = state.User.Identity;
         }
-        _skipTerms = Configuration.GetValue<bool>("SkipTerms");
     }
 
     private IEnumerable<string> GetUsers()

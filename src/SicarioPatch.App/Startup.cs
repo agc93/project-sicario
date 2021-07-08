@@ -113,7 +113,7 @@ namespace SicarioPatch.App
 
             app.UseRouting();
 
-            app.ApplicationServices.UseMaterialProviders().UseMaterialIcons();
+            // app.ApplicationServices.UseMaterialProviders().UseMaterialIcons();
             app.UseAuthentication();
             app.UseAuthorization();
 

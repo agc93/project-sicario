@@ -76,20 +76,20 @@
             Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName,
             UserName = state?.User?.Identity?.Name
         };
-        snackbarStack?.Push("Queued mod build!", SnackbarColor.Success);
+        snackbarStack?.PushAsync("Queued mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
         timer.Start();
         try {
             var buildResult = await Mediator.Send(req);
             ResultFile = buildResult;
             if (timer.Elapsed.TotalSeconds > 1) {
-                snackbarStack?.Push("Merged file successfully built!", SnackbarColor.Success);
+                snackbarStack?.PushAsync("Merged file successfully built!", SnackbarColor.Success);
             }
 
         }
         catch (Exception e) {
-            snackbarStack?.Push("Error while building merged file!", SnackbarColor.Danger);
-            snackbarStack?.Push($"Error: {e.Message}");
+            snackbarStack?.PushAsync("Error while building merged file!", SnackbarColor.Danger);
+            snackbarStack?.PushAsync($"Error: {e.Message}", SnackbarColor.Danger);
         }
         finally {
             timer.Stop();

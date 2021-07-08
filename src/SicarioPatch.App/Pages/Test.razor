@@ -117,7 +117,7 @@
             }
         }
         catch (Exception e) {
-            snackbarStack?.Push($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
+            snackbarStack?.PushAsync($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
             ParsedMod = null;
             LastError = e.Message;
         }

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SicarioPatch.Assets", "Sica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SicarioPatch.Integration", "SicarioPatch.Integration\SicarioPatch.Integration.csproj", "{1CA13E28-7DAE-426E-AB97-C5DCD53D1413}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SicarioPatch.Components", "SicarioPatch.Components\SicarioPatch.Components.csproj", "{49681411-0561-4B99-BB13-708D0F666C18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,5 +88,17 @@ Global
 		{1CA13E28-7DAE-426E-AB97-C5DCD53D1413}.Release|x64.Build.0 = Release|Any CPU
 		{1CA13E28-7DAE-426E-AB97-C5DCD53D1413}.Release|x86.ActiveCfg = Release|Any CPU
 		{1CA13E28-7DAE-426E-AB97-C5DCD53D1413}.Release|x86.Build.0 = Release|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Debug|x64.Build.0 = Debug|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Debug|x86.Build.0 = Debug|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Release|x64.ActiveCfg = Release|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Release|x64.Build.0 = Release|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Release|x86.ActiveCfg = Release|Any CPU
+		{49681411-0561-4B99-BB13-708D0F666C18}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

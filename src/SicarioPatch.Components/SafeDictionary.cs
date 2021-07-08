@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace SicarioPatch.App
+namespace SicarioPatch.Components
 {
     public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {

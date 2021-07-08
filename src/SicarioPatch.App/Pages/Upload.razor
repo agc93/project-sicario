@@ -59,22 +59,22 @@
                 var result = await Mediator.Send(req);
                 if (!string.IsNullOrWhiteSpace(result))
                 {
-                    snackbarStack?.Push($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
+                    snackbarStack?.PushAsync($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
                 }
                 else
                 {
-                    snackbarStack?.Push("Error during upload! Please contact agc93 to fix your upload", SnackbarColor.Warning);
+                    snackbarStack?.PushAsync($"Error during upload! Please contact {Brand.OwnerName} to fix your upload", SnackbarColor.Warning);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                snackbarStack?.Push($"Error encountered during upload!{Environment.NewLine}{e.ToString()}");
+                snackbarStack?.PushAsync($"Error encountered during upload!{Environment.NewLine}{e.ToString()}", SnackbarColor.Danger);
             }
         }
         else
         {
-            snackbarStack?.Push("Failed to determine user information!", SnackbarColor.Danger);
+            snackbarStack?.PushAsync("Failed to determine user information!", SnackbarColor.Danger);
         }
         
     }
@@ -83,7 +83,7 @@
     {
         var req = new ModDeleteRequest{FileName = Path.GetFileName(fileName)};
         var result = await Mediator.Send(req);
-        snackbarStack?.Push(
+        snackbarStack?.PushAsync(
             result ? $"Successfully deleted '{fileName}'" : "Failed to delete mod file",
             result ? SnackbarColor.Success : SnackbarColor.Danger);
     }
