@@ -43,5 +43,30 @@ namespace SicarioPatch.Core
             byteLength = strBytes.Length + 1;
             return BitConverter.ToString(lengthByte.Concat(strBytes).ToArray());
         }
+        
+        public static IEnumerable<PatchParameter> WhereValid(this IEnumerable<PatchParameter> parameters) {
+            return parameters.Where(p => !string.IsNullOrWhiteSpace(p?.Id));
+        } 
+        public static IDictionary<string, string> FallbackToDefaults(this IDictionary<string, string> dict,
+            IEnumerable<PatchParameter> parameters)
+        {
+            var patchParameters = parameters as PatchParameter[] ?? parameters.ToArray();
+            if (dict.Any() && patchParameters.Any())
+            {
+                return dict.Select(kv =>
+                {
+                    if (string.IsNullOrWhiteSpace(kv.Value))
+                    {
+                        return (patchParameters.FirstOrDefault(p => p.Id == kv.Key) is var matchingParam &&
+                                matchingParam != null)
+                            ? new KeyValuePair<string, string>(kv.Key, matchingParam.Default)
+                            : kv;
+                    }
+
+                    return kv;
+                }).ToDictionary(k => k.Key, v => v.Value);
+            }
+            return dict;
+        }
     }
 }

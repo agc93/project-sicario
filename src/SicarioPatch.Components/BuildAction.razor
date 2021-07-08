@@ -1,0 +1,104 @@
+﻿@using System.IO
+@inject IMediator Mediator
+@inject IJSRuntime JsRuntime
+
+<Card>
+    <CardHeader><Text Color="TextColor.Muted">Ready to build your mod!</Text></CardHeader>
+    <AcceptTerms Mods="Mods">
+        <CardBody>
+            <div class="action-container">
+                @if (IsBuilding)
+                {
+                    <LoadingSpinner >
+                        <Alert Color="Color.Primary" Visible="true">
+                            Currently building your merged file!
+                        </Alert>
+                    </LoadingSpinner>
+                }
+                else
+                {
+                    <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
+                    <div class="form-group" style="margin-top: 0.5em; width: 85%">
+                        <label>Enter an (optional) file name</label>
+                        <input @bind="FileName" type="text" class="form-control" >
+                    </div>
+                    @*<Field Style="margin-top: 0.5em; width: 85%;">
+                        <FieldLabel>Enter an (optional) file name</FieldLabel>
+                        <TextEdit @bind-Text="@FileName" />
+                    </Field>*@
+                }
+            </div>
+        </CardBody>
+        <CardFooter>
+            @if (!IsBuilding && (ResultFile == null || !ResultFile.Exists))
+            {
+                <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+            }
+            @if (ResultFile != null && ResultFile.Exists)
+            {
+                <FileDownload ResultFile="ResultFile" DeleteAfter="true">
+                    Download Merged File
+                </FileDownload>
+                <Button Clicked="@(() => ResultFile.Delete())" Color="Color.Danger"><Icon Name="Blazorise.Icons.Material.MaterialIcons.Refresh" /></Button>
+            }
+        </CardFooter>
+    </AcceptTerms>
+</Card>
+
+@code {
+    
+    private bool AutoPack {get;set;} = true;
+    private bool IsBuilding { get; set; }
+    private FileInfo ResultFile { get; set; }
+    private string FileName { get; set; } = string.Empty;
+    
+    [CascadingParameter(Name = "SnackbarStack")] 
+    SnackbarStack snackbarStack { get; set; }
+
+    [Parameter]
+    public Dictionary<string, string> BuildParameters { get; set; } = new Dictionary<string, string>();
+    
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    public List<WingmanMod> Mods { get; set; } = new List<WingmanMod>();
+
+    private async Task OnStartBuild()
+    {
+        var timer = new System.Diagnostics.Stopwatch();
+        var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters().WhereValid());
+        var state = await authenticationStateTask;
+        var req = new PatchRequest(Mods.ToList())
+        {
+            PackResult = AutoPack, 
+            TemplateInputs = inputParams.ToDictionary(), 
+            Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName,
+            UserName = state?.User?.Identity?.Name
+        };
+        snackbarStack?.PushAsync("Queued mod build!", SnackbarColor.Success);
+        this.IsBuilding = true;
+        timer.Start();
+        try {
+            var buildResult = await Mediator.Send(req);
+            ResultFile = buildResult;
+            if (timer.Elapsed.TotalSeconds > 1) {
+                snackbarStack?.PushAsync("Merged file successfully built!", SnackbarColor.Success);
+            }
+
+        }
+        catch (Exception e) {
+            snackbarStack?.PushAsync("Error while building merged file!", SnackbarColor.Danger);
+            snackbarStack?.PushAsync($"Error: {e.Message}", SnackbarColor.Danger);
+        }
+        finally {
+            timer.Stop();
+            IsBuilding = false;
+        }
+    }
+
+    private IEnumerable<PatchParameter> GetAllParameters()
+    {
+        return Mods.SelectMany(m => m.Parameters);
+    }
+}

@@ -1,0 +1,56 @@
+﻿@using System.Linq
+@if (Mods.Any(m => m.Parameters.Any<PatchParameter>()))
+{
+    <Card Style="max-height: inherit; box-sizing: border-box;">
+        <CardBody>
+            <Accordion>
+                @foreach (var paramReqd in Mods.Where(m => m.Parameters.Any()))
+                {
+                    var paramMod = paramReqd;
+                    <Collapse Visible="true">
+                        <CollapseHeader>
+                            <Text Weight="TextWeight.Bold">@paramMod.GetLabel()</Text>
+                            @* <Heading Size="HeadingSize.Is6">@paramMod.GetLabel()</Heading> *@
+                        </CollapseHeader>
+                        <CollapseBody>
+                            @foreach (var param in paramMod.Parameters.WhereValid())
+                            {
+                                <ParameterInput @bind-Value="@InputParameters[param.Id]" Parameter="@param"/>
+                            }
+                        </CollapseBody>
+                    </Collapse>
+                }
+            </Accordion>
+        </CardBody>
+    </Card>
+}
+@code {
+    [Parameter]
+    public EventCallback<List<WingmanMod>> ModsChanged { get; set; }
+    
+    [Parameter]
+    public List<WingmanMod> Mods
+    {
+        get => _mods;
+        set
+        {
+            if (_mods == value) return;
+            _mods = value;
+            ModsChanged.InvokeAsync(value);
+        }
+    }
+    
+    [Parameter]
+    public SafeDictionary<string, string> InputParameters
+    {
+        get => _inputParameters;
+        set
+        {
+            if (_inputParameters == value) return;
+            _inputParameters = value;
+        }
+    }
+    
+    private SafeDictionary<string, string> _inputParameters { get; set; } = new SafeDictionary<string, string>(string.Empty);
+    private List<WingmanMod> _mods { get; set; } = new List<WingmanMod>();
+}

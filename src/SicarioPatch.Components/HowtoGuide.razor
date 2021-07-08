@@ -1,0 +1,35 @@
+﻿@inject IBrandProvider Brand
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <DisplayHeading Size="DisplayHeadingSize.Is4">@Title</DisplayHeading>
+}
+
+<Heading Size="HeadingSize.Is5">Choose your mods</Heading>
+<Paragraph>
+    First, choose the mods you want to include in your merged mod from the list of available mods. You can click on each group to expand it and see what mods are available in that group. As you enable mods, you should see them appear in the build order lower on the screen.
+</Paragraph>
+
+<Heading Size="HeadingSize.Is5">Enter any inputs required</Heading>
+<Paragraph>
+    <strong>If you've selected mods that need them</strong> you will see a list of inputs that you may want to adjust. These will often allow you to fine-tune the changes your selected mods might be making. You will only see these inputs <em>if</em> you have selected mods that require them.
+</Paragraph>
+
+<Heading Size="HeadingSize.Is5">Check the build order</Heading>
+<Paragraph>
+    The build order is the list of enabled mods you will see under the main selection list. This shows the mods that will be applied, in the order they will be applied. If necessary, you can adjust the order the mods are applied by using the arrow buttons. This is particularly useful if two mods are modifying the same thing and you want to tweak which changes are included.
+</Paragraph>
+
+<Heading Size="HeadingSize.Is5">Start the build!</Heading>
+<Paragraph>
+    Once you're comfortable with your selections and inputs, it's time to start the build. If applicable, you may need to accept some basic terms before you can build a mod with @Brand.ShortName. Finally, you can (optionally) enter in a file name to the box to change the name of the final merged file. If you are going to install this mod for use with the game, make sure the checkbox to automatically pack is <strong>checked</strong>. Click Start Build and wait for the build to complete.
+</Paragraph>
+<Paragraph>
+    Once the build is complete (this can take a while!), you can click the Download Merged File button to retrieve your final merged mod file, ready for use.
+</Paragraph>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; } = "How to build a merged mod";
+
+}

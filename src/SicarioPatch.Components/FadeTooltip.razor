@@ -1,0 +1,41 @@
+﻿@if (string.IsNullOrWhiteSpace(Text))
+{
+    @ChildContent
+}
+else
+{
+    @if (Direction == TooltipDirection.Right)
+    {
+        <div class="fade-tooltip">
+            <span class="right">
+                @Text
+                <i></i>
+            </span>
+            @ChildContent
+        </div>
+    } else if (Direction == TooltipDirection.Down)
+    {
+        <div class="fade-tooltip">
+            <span class="bottom">
+                @Text
+                <i></i>
+            </span>
+            @ChildContent
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public string Text { get; set; }
+
+    [Parameter]
+    public TooltipDirection Direction { get; set; } = TooltipDirection.Right;
+
+    public enum TooltipDirection
+    {
+        Right,
+        Down
+    }
+        
+}

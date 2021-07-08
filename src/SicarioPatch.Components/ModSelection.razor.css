@@ -1,0 +1,3 @@
+﻿.tooltip.show, ::deep .tooltip.show {
+    opacity: 1;
+}
