@@ -53,7 +53,7 @@ namespace SicarioPatch.App
             
             services
                 .AddSingleton<WingmanPatchServiceBuilder>()
-                .AddSingleton<SourceFileService>()
+                .AddSingleton<ISourceFileService, SourceFileService>()
                 .AddSingleton<FilePatcher>()
                 .AddSingleton<ModFileLoader<WingmanMod>>()
                 .AddSingleton<WingmanModLoader>()

@@ -10,7 +10,12 @@
     <PackageReference Include="GameFinder.StoreHandlers.Steam" Version="1.5.3" />
     <PackageReference Include="LiteDB" Version="5.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-    <PackageReference Include="UnPak.Core" Version="0.0.0-preview.0.9" />
+    <PackageReference Include="UnPak.Core" Version="0.0.0-preview.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
+<!--    <ProjectReference Include="..\..\..\UnPak\src\UnPak.Core\UnPak.Core.csproj" />-->
   </ItemGroup>
 
 </Project>

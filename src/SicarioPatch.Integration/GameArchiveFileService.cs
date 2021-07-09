@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HexPatch.Build;
 using LiteDB;
 using UnPak.Core;
 
 namespace SicarioPatch.Integration
 {
-    public class GameArchiveFileService : IDisposable
+    public class GameArchiveFileService : ISourceFileService, IDisposable
     {
         private readonly PakFileProvider _pakFileProvider;
         private readonly LiteDatabase _db;
         private readonly ILiteCollection<UnpackedFile> _files;
         private readonly IEnumerable<IGameSource> _gameSources;
         public string? WorkingPath { get; init; }
-        private DirectoryInfo WorkingDirectory => new(WorkingPath ?? Environment.CurrentDirectory);
+        private DirectoryInfo WorkingDirectory => new(WorkingPath ?? _gameSources.GetGamePath() ?? Environment.CurrentDirectory);
 
         public FileInfo? LocateFile(string fileName) {
             var srcHash = GetCurrentSourceHash();
@@ -41,12 +42,13 @@ namespace SicarioPatch.Integration
         private FileInfo? UnpackFile(string filePath, out string? hash) {
             try {
                 var gamePak = GetGamePakPath();
-                if (!string.IsNullOrWhiteSpace(gamePak)) {
-                    var fs = new FileStream(gamePak, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                if (!string.IsNullOrWhiteSpace(gamePak?.FullName)) {
+                    var fs = new FileStream(gamePak.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     var reader = _pakFileProvider.GetReader(fs);
                     var pakFile = reader.ReadFile();
                     var outputFile = pakFile.FirstOrDefault(r =>
-                        r.FileName.ToLower().TrimStart('/') == filePath.ToLower().TrimStart('/'));
+                        r.FileName.ToLower().TrimStart('/') == filePath.ToLower().TrimStart('/')) ?? pakFile.FirstOrDefault(r =>
+                        Path.GetFileName(r.FileName).ToLower().TrimStart('/') == filePath.ToLower().TrimStart('/'));
                     var unpacked = outputFile?.Unpack(fs, WorkingDirectory);
                     hash = pakFile.FileFooter.IndexHash;
                     return unpacked;
@@ -59,12 +61,11 @@ namespace SicarioPatch.Integration
             return null;
         }
 
-        private string? GetGamePakPath() {
+        private FileInfo? GetGamePakPath() {
             var pakPath = _gameSources.Select(gs => gs.GetGamePakPath())
                 .FirstOrDefault(gp => !string.IsNullOrWhiteSpace(gp));
-            if (pakPath != null && Directory.Exists(pakPath) &&
-                Directory.GetFiles(pakPath, "ProjectWingman-WindowsNoEditor.pak").FirstOrDefault() is { } gamePak) {
-                return gamePak;
+            if (pakPath != null && File.Exists(pakPath)) {
+                return new FileInfo(pakPath);
             }
 
             return null;
@@ -72,8 +73,8 @@ namespace SicarioPatch.Integration
 
         private string? GetCurrentSourceHash() {
             var gamePak = GetGamePakPath();
-            if (!string.IsNullOrWhiteSpace(gamePak)) {
-                var reader = _pakFileProvider.GetReader(new FileInfo(gamePak));
+            if (!string.IsNullOrWhiteSpace(gamePak?.FullName)) {
+                var reader = _pakFileProvider.GetReader(gamePak);
                 var footer = reader.ReadFooter();
                 return footer?.IndexHash;
             }

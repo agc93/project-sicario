@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace SicarioPatch.Loader
 {
     class Program
     {
-        static void Main(string[] args) {
-            Console.WriteLine("Hello World!");
+        static Task Main(string[] args) {
+            return Startup.GetApp().RunAsync(args);
         }
     }
 }

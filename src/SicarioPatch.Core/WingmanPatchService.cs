@@ -16,7 +16,7 @@ namespace SicarioPatch.Core
         private readonly AssetPatcher _assetPatcher;
         private Dictionary<string, int> OriginalFileSize { get; init; } = new Dictionary<string, int>();
 
-        protected internal WingmanPatchService(AssetPatcher aPatcher, FilePatcher patcher, SourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger) {
+        protected internal WingmanPatchService(AssetPatcher aPatcher, FilePatcher patcher, ISourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger) {
             _assetPatcher = aPatcher;
         }
 
@@ -37,7 +37,8 @@ namespace SicarioPatch.Core
             foreach (var mod in Mods)
             {
                 var modifiedFiles = new List<FileInfo>();
-                _logger?.LogInformation($"Running patches for {mod.GetLabel()}");
+                // _logger?.LogInformation($"Running patches for {mod.GetLabel(mod.Id)}");
+                _logger?.LogInformation($"Running patches for {mod.Id}");
                 foreach (var (targetFile, patchSets) in mod.FilePatches)
                 {
                     var srcPath = Path.Join(_ctx.WorkingDirectory.FullName, targetFile);
@@ -114,13 +115,13 @@ namespace SicarioPatch.Core
         /// </summary>
         public class WingmanPatchServiceBuilder
         {
-            private readonly SourceFileService _fileService;
+            private readonly ISourceFileService _fileService;
             private readonly FilePatcher _filePatcher;
             private readonly AssetPatcher _assetPatcher;
             private readonly BuildContextFactory _ctxFactory;
             private readonly ILogger<ModPatchService<WingmanMod>> _tgtLogger;
 
-            public WingmanPatchServiceBuilder(SourceFileService sourceFileService, FilePatcher filePatcher, AssetPatcher assetPatcher, BuildContextFactory contextFactory, ILogger<ModPatchService<WingmanMod>> logger)
+            public WingmanPatchServiceBuilder(ISourceFileService sourceFileService, FilePatcher filePatcher, AssetPatcher assetPatcher, BuildContextFactory contextFactory, ILogger<ModPatchService<WingmanMod>> logger)
             {
                 _fileService = sourceFileService;
                 _filePatcher = filePatcher;
