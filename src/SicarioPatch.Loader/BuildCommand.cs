@@ -78,6 +78,13 @@ namespace SicarioPatch.Loader
             var mergedInputs = existingMods
                 .Select(m => m.TemplateInputs)
                 .Aggregate(new Dictionary<string, string>(), (total, next) => next.MergeLeft(total));
+
+            var embeddedPresets = _mergeLoader.LoadPresetsFromMods().ToList();
+            var embeddedInputs = embeddedPresets
+                .Select(m => m.ModParameters)
+                .Aggregate(mergedInputs,
+                    (total, next) => total.MergeLeft(next)
+                );
             
             var presetPaths = presetSearchPaths
                     .Where(Directory.Exists)
@@ -86,7 +93,7 @@ namespace SicarioPatch.Loader
 
             var mergedPresetInputs = presets
                 .Select(p => p.ModParameters)
-                .Aggregate(mergedInputs,
+                .Aggregate(embeddedInputs,
                 (total, next) => total.MergeLeft(next)
                 );
 
@@ -96,6 +103,7 @@ namespace SicarioPatch.Loader
             var slotLoader = _slotLoader.GetSlotMod();
 
             var allMods = existingMods.SelectMany(m => m.Mods).ToList();
+            allMods.AddRange(embeddedPresets.SelectMany(p => p.Mods));
             allMods.AddRange(presets.SelectMany(p => p.Mods));
             allMods.Add(slotLoader);
 

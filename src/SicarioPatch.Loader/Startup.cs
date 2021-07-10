@@ -69,9 +69,9 @@ namespace SicarioPatch.Loader
             return services.AddLogging(logging => {
                 var level = GetLogLevel();
                 logging.SetMinimumLevel(LogLevel.Trace);
-                // logging.AddInlineSpectreConsole(c => {
-                //     c.LogLevel = level;
-                // });
+                logging.AddInlineSpectreConsole(c => {
+                    c.LogLevel = level;
+                });
                 // AddFileLogging(logging, level);
             });
         }

@@ -7,7 +7,6 @@ namespace SicarioPatch.Core
 {
     public class PresetFileLoader
     {
-        
         public IEnumerable<WingmanPreset> LoadFromFiles(IEnumerable<string> filePaths)
         {
             var fileMods = new List<WingmanPreset>();

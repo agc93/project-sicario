@@ -44,7 +44,7 @@ namespace SicarioPatch.Integration
                     Patches = assetPaths.Select(p => new AssetPatch {
                         Type = "objectRef",
                         Template = $"datatable:['{aircraft}'].{{'SkinLibraryLegacy*'}}",
-                        Value = $"'{Path.GetFileNameWithoutExtension(p)}':'/Game/Content/{(p.TrimPathTo("Assets"))}'"
+                        Value = $"'{Path.GetFileNameWithoutExtension(p)}':'/Game/{Path.ChangeExtension(p.TrimPathTo("Assets"), null)}'"
                     }).ToList()
                 };
             }
