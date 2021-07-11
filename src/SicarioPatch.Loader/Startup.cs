@@ -94,7 +94,7 @@ namespace SicarioPatch.Loader
         internal static LogLevel GetLogLevel() {
             var envVar = System.Environment.GetEnvironmentVariable("SICARIO_DEBUG");
             if (System.IO.File.Exists(System.IO.Path.Combine(Environment.CurrentDirectory, "sicario-debug.txt"))) envVar = "trace";
-            if (System.IO.File.Exists(System.IO.Path.Combine(new System.IO.FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).Directory.FullName, "acmi-debug.txt"))) envVar = "trace";
+            if (System.IO.File.Exists(System.IO.Path.Combine(AppContext.BaseDirectory, "sicario-debug.txt"))) envVar = "trace";
             return string.IsNullOrWhiteSpace(envVar)
                 ? LogLevel.Information
                 :  envVar.ToLower() == "trace"

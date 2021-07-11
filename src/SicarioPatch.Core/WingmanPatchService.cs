@@ -37,8 +37,8 @@ namespace SicarioPatch.Core
             foreach (var mod in Mods)
             {
                 var modifiedFiles = new List<FileInfo>();
-                // _logger?.LogInformation($"Running patches for {mod.GetLabel(mod.Id)}");
-                _logger?.LogInformation($"Running patches for {mod.Id}");
+                _logger?.LogInformation($"Running patches for {mod.GetLabel(mod.Id ?? "Unknown mod")}");
+                // _logger?.LogInformation($"Running patches for {mod.Id}");
                 foreach (var (targetFile, patchSets) in mod.FilePatches)
                 {
                     var srcPath = Path.Join(_ctx.WorkingDirectory.FullName, targetFile);

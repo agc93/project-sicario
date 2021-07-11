@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SicarioPatch.Core;
 using SicarioPatch.Integration;
 using Spectre.Console;
@@ -21,6 +22,7 @@ namespace SicarioPatch.Loader
         private readonly MergeLoader _mergeLoader;
         private readonly IConfiguration _config;
         private readonly Integration.GameFinder _gameFinder;
+        private readonly ILogger<BuildCommand> _logger;
 #pragma warning disable 8618
         public class Settings : CommandSettings
         {
@@ -39,7 +41,9 @@ namespace SicarioPatch.Loader
         }
 #pragma warning restore 8618
 
-        public BuildCommand(IAnsiConsole console, SkinSlotLoader slotLoader, IMediator mediator, PresetFileLoader presetLoader, MergeLoader mergeLoader, IConfiguration config, Integration.GameFinder gameFinder) {
+        public BuildCommand(IAnsiConsole console, SkinSlotLoader slotLoader, IMediator mediator,
+            PresetFileLoader presetLoader, MergeLoader mergeLoader, IConfiguration config,
+            Integration.GameFinder gameFinder, ILogger<BuildCommand> logger) {
             _console = console;
             _slotLoader = slotLoader;
             _mediator = mediator;
@@ -47,6 +51,7 @@ namespace SicarioPatch.Loader
             _mergeLoader = mergeLoader;
             _config = config;
             _gameFinder = gameFinder;
+            _logger = logger;
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
@@ -74,10 +79,14 @@ namespace SicarioPatch.Loader
                 Path.Join(paksRoot, "~mods")
             };
             
+            _logger.LogDebug($"Searching {presetSearchPaths.Count} paths for loose presets");
+            
             var existingMods = _mergeLoader.GetSicarioMods().ToList();
             var mergedInputs = existingMods
                 .Select(m => m.TemplateInputs)
                 .Aggregate(new Dictionary<string, string>(), (total, next) => next.MergeLeft(total));
+            
+            _console.MarkupLine($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
 
             var embeddedPresets = _mergeLoader.LoadPresetsFromMods().ToList();
             var embeddedInputs = embeddedPresets
@@ -86,10 +95,14 @@ namespace SicarioPatch.Loader
                     (total, next) => total.MergeLeft(next)
                 );
             
+            _console.MarkupLine($"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]");
+            
             var presetPaths = presetSearchPaths
                     .Where(Directory.Exists)
                     .SelectMany(d => Directory.EnumerateFiles(d, "*.dtp", SearchOption.AllDirectories));
             var presets = _presetLoader.LoadFromFiles(presetPaths).ToList();
+            
+            _console.MarkupLine($"[dodgerblue2]Loaded [bold]{presets.Count}[/] loose presets from file.[/]");
 
             var mergedPresetInputs = presets
                 .Select(p => p.ModParameters)
@@ -97,23 +110,28 @@ namespace SicarioPatch.Loader
                 (total, next) => total.MergeLeft(next)
                 );
 
-            
+            _console.MarkupLine($"Final mod will be built with [dodgerblue2]{mergedPresetInputs.Keys.Count}[/] parameters");
 
 
             var slotLoader = _slotLoader.GetSlotMod();
+            
+            _console.MarkupLine($"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]");
 
             var allMods = existingMods.SelectMany(m => m.Mods).ToList();
             allMods.AddRange(embeddedPresets.SelectMany(p => p.Mods));
             allMods.AddRange(presets.SelectMany(p => p.Mods));
             allMods.Add(slotLoader);
+            
+            _console.MarkupLine($"[bold darkblue]Queuing mod build with {allMods.Count} mods[/]");
 
             var req = new PatchRequest(allMods) {
                 PackResult = true,
                 TemplateInputs = mergedPresetInputs,
-                Name = "SicarioMaster",
+                Name = "SicarioMerge",
                 UserName = $"loader:{Environment.MachineName}"
             };
             var resp = await _mediator.Send(req);
+            _console.MarkupLine($"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
             var targetPath = Path.Join(paksRoot, "~sicario");
             if (!Directory.Exists(targetPath)) {
                 Directory.CreateDirectory(targetPath);
@@ -125,6 +143,7 @@ namespace SicarioPatch.Loader
                 }
             }
             resp.MoveTo(Path.Join(targetPath, resp.Name));
+            _console.MarkupLine($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
             return 0;
         }
     }

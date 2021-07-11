@@ -4,6 +4,8 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <ApplicationIcon>Resources/icon.ico</ApplicationIcon>
+        <AssemblyName>ProjectSicario</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,5 +22,18 @@
       <ProjectReference Include="..\SicarioPatch.Integration\SicarioPatch.Integration.csproj" />
       <ProjectReference Include="..\SicarioPatch.Templating\SicarioPatch.Templating.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Resources\icon.ico" />
+    </ItemGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <TrimMode>Link</TrimMode>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishSingleFile>true</PublishSingleFile>
+        <DebugType>Embedded</DebugType>
+        <SelfContained>true</SelfContained>
+    </PropertyGroup>
 
 </Project>
