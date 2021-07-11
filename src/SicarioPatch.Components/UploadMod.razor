@@ -55,7 +55,7 @@ else if (ParsedMod != null)
         try
         {
             
-            if (ModParser.ParseMod(RawModFile) is var jsonMod && jsonMod?.FilePatches != null && jsonMod.FilePatches.Any())
+            if (await Task.Run(() => ModParser.ParseMod(RawModFile)) is { } jsonMod && ModParser.IsValid(jsonMod))
             {
                 jsonMod.Metadata ??= new SetMetadata();
                 ParsedMod = jsonMod;

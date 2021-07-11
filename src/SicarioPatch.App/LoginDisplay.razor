@@ -15,10 +15,10 @@
 </AuthorizeView>
 
 @code{
-    private async Task BeginSignOut()
+    private Task BeginSignOut()
     {
-        
         Navigation.NavigateTo("/Logout");
+        return Task.CompletedTask;
     }
 
     private void BeginSignIn() {

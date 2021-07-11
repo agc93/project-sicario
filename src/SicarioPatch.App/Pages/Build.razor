@@ -1,9 +1,9 @@
 ﻿@page "/build"
-@using System.IO
+@inject IConfiguration _configuration
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
 @attribute [Authorize(Policy = Policies.IsUser)]
-<h3>Build Merged Mod <Button Class="context-btn" Clicked="() => modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button></h3>
+<h3>Build Merged Mod <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button></h3>
 @if (AvailableMods.Any())
 {
     <Row>
@@ -39,7 +39,7 @@
         {
 
             <Column ColumnSize="ColumnSize.Is4.Is2.WithOffset.OnFullHD.Is4.OnWidescreen.Is12.OnTablet">
-                <BuildAction BuildParameters="@InputParameters" Mods="@SortedMods" />
+                <BuildAction SkipTerms="@_skipTerms" BuildParameters="@InputParameters" Mods="@SortedMods" />
             </Column>
         }
     </Row>
@@ -56,50 +56,40 @@ else
         </Column>
     </Row>  
 }
-<Modal @ref="modalRef">
+<Modal @ref="_modalRef">
     <ModalContent IsCentered="true">
         <ModalHeader>
             <ModalTitle>How to build a merged mod</ModalTitle>
-            <CloseButton Clicked="() => modalRef.Hide()" />
+            <CloseButton Clicked="() => _modalRef.Hide()" />
         </ModalHeader>
         <ModalBody>
             <HowtoGuide Title="" />
         </ModalBody>
         <ModalFooter>
-            <Button Color="Color.Secondary" Clicked="@(() => modalRef.Hide())">Close</Button>
+            <Button Color="Color.Secondary" Clicked="@(() => _modalRef.Hide())">Close</Button>
         </ModalFooter>
     </ModalContent>
 </Modal>
 
 @code {
     private Dictionary<string, WingmanMod> AvailableMods { get; set; } = new Dictionary<string, WingmanMod>();
-    // private Dictionary<string, int> ModPriority { get; set; } = new Dictionary<string, int>();
-    /*private List<KeyValuePair<string, int>> SortedMods
-    {
-        get
-        {
-            return ModPriority.OrderBy(d => d.Value).ToList();
-        }
-    }*/
 
     private List<WingmanMod> SortedMods { get; set; } = new List<WingmanMod>();
 
     private SafeDictionary<string, string> InputParameters { get; set; } = new SafeDictionary<string, string>(string.Empty);
     
     [CascadingParameter(Name = "SnackbarStack")] 
-    SnackbarStack snackbarStack { get; set; }
+    SnackbarStack SnackbarStack { get; set; }
     
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private ModOrder _loadOrder;
 
-    private Modal modalRef;
+    private Modal _modalRef;
+    private bool _skipTerms;
 
     private bool ReadyToBuild => this.SortedMods.Any();
-    /*private FileInfo ResultFile { get; set; }
-    private bool AutoPack {get;set;} = true;
-    private bool IsBuilding { get; set; }*/
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,9 +102,10 @@ else
         {
             AvailableMods = await Mediator.Send(new ModsRequest());            
         }
-        
+        _skipTerms = _configuration.GetValue<bool>("SkipTerms");
+
     }
-    
-    public int GetEnabledFileCount => SortedMods.ToFileCount();
+
+    private int GetEnabledFileCount => SortedMods.ToFileCount();
 
 }

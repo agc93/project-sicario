@@ -4,7 +4,7 @@
 
 <Card>
     <CardHeader><Text Color="TextColor.Muted">Ready to build your mod!</Text></CardHeader>
-    <AcceptTerms Mods="Mods">
+    <AcceptTerms Mods="Mods" SkipTerms="@SkipTerms">
         <CardBody>
             <div class="action-container">
                 @if (IsBuilding)
@@ -63,6 +63,9 @@
 
     [Parameter]
     public List<WingmanMod> Mods { get; set; } = new List<WingmanMod>();
+    
+    [Parameter]
+    public bool SkipTerms { get; set; }
 
     private async Task OnStartBuild()
     {

@@ -12,10 +12,9 @@
     public AuthenticationState State { get; set; }
 
     private string _message;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        // var user = State.User;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
         if (State?.User?.Identity != null && State.User.Identity.IsAuthenticated)
         {
             _message = $"Your account ({State.User.Identity.Name}) is not permitted to view this page. Contact the server administrator or login as a different user.";
@@ -24,6 +23,5 @@
         {
             _message = "You should login first to confirm if your account has access to view this page!";            
         }
-        
     }
 }
