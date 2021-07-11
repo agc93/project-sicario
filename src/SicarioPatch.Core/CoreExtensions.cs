@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using HexPatch;
 
@@ -67,6 +68,10 @@ namespace SicarioPatch.Core
                 }).ToDictionary(k => k.Key, v => v.Value);
             }
             return dict;
+        }
+
+        public static string GetParentDirectoryPath(this FileInfo fi) {
+            return fi.Directory?.FullName ?? Path.GetDirectoryName(fi.FullName);
         }
     }
 }

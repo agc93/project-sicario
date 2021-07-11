@@ -9,7 +9,6 @@ namespace SicarioPatch.Integration
     public class GameFinder : IGameSource
     {
         public string? LocateGamePath() {
-            AStoreGame game;
             var steam = new SteamHandler();
             if (steam.TryGetByID(895870, out var steamGame) && !string.IsNullOrWhiteSpace(steamGame?.Path)) {
                 return steamGame.Path;

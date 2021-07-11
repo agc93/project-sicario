@@ -27,8 +27,8 @@ namespace SicarioPatch.Integration
                     var reader = _pakFileProvider.GetReader(fs);
                     var pakFile = reader.ReadFile();
                     var addSkins = pakFile.Records.Select(a => a.GetVirtualPath(pakFile)).Where(r =>
-                        r != null && r.StartsWith("ProjectWingman/Content/Assets/Skins")).Cast<string>();
-                    return addSkins.GroupBy(a => new FileInfo(a).Directory.Name).ToDictionary(g => g.Key, g => g.ToList());
+                        r.StartsWith("ProjectWingman/Content/Assets/Skins"));
+                    return addSkins.GroupBy(a => new FileInfo(a).Directory?.Name ?? string.Empty).ToDictionary(g => g.Key, g => g.ToList());
                 }
             }
 

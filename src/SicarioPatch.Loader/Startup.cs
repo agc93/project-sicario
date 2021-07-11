@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using BuildEngine;
 using BuildEngine.Scripts;
 using HexPatch;
@@ -24,7 +25,13 @@ namespace SicarioPatch.Loader
             services.AddSingleton<Integration.GameFinder>()
                 .AddSingleton<IGameSource, ConfigurationGameSource>()
                 .AddSingleton<SkinSlotLoader>()
-                .AddSingleton<GameArchiveFileService>()
+                .AddSingleton<GameArchiveFileService>(p =>
+                {
+                    var unpackRoot = Path.Combine(Path.GetTempPath(), "ProjectWingman-Unpacked");
+                    unpackRoot.EnsureDirectoryExists();
+                    return new GameArchiveFileService(p.GetRequiredService<PakFileProvider>(),
+                        p.GetServices<IGameSource>(), unpackRoot);
+                })
                 .AddSingleton<PresetFileLoader>()
                 .AddSingleton<MergeLoader>()
                 .AddCoreServices()
@@ -79,15 +86,15 @@ namespace SicarioPatch.Loader
         internal static IServiceCollection AddCoreServices(this IServiceCollection services) {
             return services
                 .AddSingleton<WingmanPatchServiceBuilder>()
-                .AddSingleton<ISourceFileService, GameArchiveFileService>()
+                .AddSingleton<ISourceFileService>(p => p.GetRequiredService<GameArchiveFileService>())
                 .AddSingleton<ModParser>()
                 .AddSingleton<FilePatcher>()
                 // .AddSingleton<ModFileLoader<WingmanMod>>()
                 // .AddSingleton<WingmanModLoader>()
-                .AddSingleton<BuildContextFactory>()
+                .AddSingleton<DirectoryBuildContextFactory>()
                 .AddSingleton<IAppInfoProvider, AppInfoProvider>()
                 .AddSingleton<AppInfoProvider>()
-                .AddSingleton<IScriptService, PythonScriptDownloadService>()
+                .AddSingleton<IModBuilder, UnPakBuilder>()
                 .AddAssetServices();
         }
         

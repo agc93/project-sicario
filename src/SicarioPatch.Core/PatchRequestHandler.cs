@@ -43,9 +43,7 @@ namespace SicarioPatch.Core
             (bool Success, FileInfo Result)? result;
             if (request.PackResult)
             {
-                result = mpServ.RunBuild(ctx =>
-                    new FileInfo(
-                        Path.Combine(ctx.BuildScript.WorkingDirectory, $"merged-{DateTime.UtcNow.Ticks}_P.pak")));
+                result = await mpServ.RunBuild($"merged-{DateTime.UtcNow.Ticks}_P.pak");
             }
             else
             {

@@ -3,17 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using SicarioPatch.Core;
 using UnPak.Core;
 
 namespace SicarioPatch.Integration
 {
-    public class EmbeddedRequest
-    {
-        [JsonPropertyName("request")]
-        public PatchRequest Request { get; set; }
-    }
     /// <summary>
     /// Rebuilds pre-existing Sicario-packed mods using their embedded request files
     /// </summary>
@@ -33,7 +27,7 @@ namespace SicarioPatch.Integration
             var pakPath = _gameSources.Select(gs => gs.GetGamePakPath())
                     .FirstOrDefault(gp => !string.IsNullOrWhiteSpace(gp));
             if (pakPath != null) {
-                var pakRootPath = new FileInfo(pakPath).Directory.FullName;
+                var pakRootPath = new FileInfo(pakPath).GetParentDirectoryPath();
                 var allPaks = Directory.EnumerateFiles(pakRootPath, "*.pak", SearchOption.AllDirectories);
                 return allPaks.Where(p => Path.GetFileNameWithoutExtension(p) != "ProjectWingman-WindowsNoEditor")
                     .Where(p => new FileInfo(p).Directory?.Name != "~sicario").Select(p => new FileInfo(p));
@@ -49,6 +43,7 @@ namespace SicarioPatch.Integration
                 try {
                     var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
                     var file = reader.ReadFile();
+                    if (file?.FileStream == null) continue;
                     var requestFile =
                         file.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("_meta/sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".json");
                     if (requestFile == null) continue;
@@ -75,8 +70,8 @@ namespace SicarioPatch.Integration
                     var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
                     var file = reader.ReadFile();
                     var requestFile =
-                        file.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
-                    if (requestFile == null) continue;
+                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
+                    if (requestFile == null || file == null) continue;
                     var outSt = requestFile.Unpack(file.FileStream);
                     var request = new StreamReader(outSt).ReadToEnd();
                     var embed = JsonSerializer.Deserialize<WingmanPreset>(request, _parser.Options);

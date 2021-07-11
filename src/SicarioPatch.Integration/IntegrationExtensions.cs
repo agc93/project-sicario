@@ -18,7 +18,7 @@ namespace SicarioPatch.Integration
             return pakPath;
         }
 
-        public static string? GetVirtualPath(this Record r, PakFile pakFile) {
+        public static string GetVirtualPath(this Record r, PakFile pakFile) {
             return Path.Join(pakFile.MountPoint, r.FileName)
                 .Replace(string.Join("/", new[] {"..", "..", ".."}), string.Empty).TrimStart('/');
         }

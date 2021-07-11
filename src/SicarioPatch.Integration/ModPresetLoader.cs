@@ -49,7 +49,7 @@ namespace SicarioPatch.Integration
             var pakPath = _gameSources.Select(gs => gs.GetGamePakPath())
                 .FirstOrDefault(gp => !string.IsNullOrWhiteSpace(gp));
             if (pakPath != null) {
-                var pakRootPath = new FileInfo(pakPath).Directory.FullName;
+                var pakRootPath = new FileInfo(pakPath).GetParentDirectoryPath();
                 var allPaks = Directory.EnumerateFiles(pakRootPath, "*.pak", SearchOption.AllDirectories);
                 return allPaks.Where(p => Path.GetFileNameWithoutExtension(p) != "ProjectWingman-WindowsNoEditor")
                     .Where(p => new FileInfo(p).Directory?.Name != "~sicario").Select(p => new FileInfo(p));

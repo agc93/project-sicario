@@ -14,14 +14,13 @@ namespace SicarioPatch.Integration
         private readonly LiteDatabase _db;
         private readonly ILiteCollection<UnpackedFile> _files;
         private readonly IEnumerable<IGameSource> _gameSources;
-        public string? WorkingPath { get; init; }
-        private DirectoryInfo WorkingDirectory => new(WorkingPath ?? _gameSources.GetGamePath() ?? Environment.CurrentDirectory);
+        private DirectoryInfo WorkingDirectory { get; init; }
 
         public FileInfo? LocateFile(string fileName) {
             var srcHash = GetCurrentSourceHash();
             var localFile = _files.FindOne(f => f.AssetPath == fileName);
             if (localFile != null && !string.IsNullOrWhiteSpace(localFile.SourceIndexHash) &&
-                localFile.SourceIndexHash == srcHash) {
+                localFile.SourceIndexHash == srcHash && !string.IsNullOrWhiteSpace(localFile.OutputPath)) {
                 return new FileInfo(Path.Combine(WorkingDirectory.FullName,
                     localFile.OutputPath));
             }
@@ -82,9 +81,14 @@ namespace SicarioPatch.Integration
             return null;
         }
 
-        public GameArchiveFileService(PakFileProvider pakFileProvider, IEnumerable<IGameSource> gameSources) {
+        public GameArchiveFileService(PakFileProvider pakFileProvider, IEnumerable<IGameSource> gameSources) : this(pakFileProvider, gameSources, null) {
+            
+        }
+
+        public GameArchiveFileService(PakFileProvider pakFileProvider, IEnumerable<IGameSource> gameSources, string? workingPath) {
             _pakFileProvider = pakFileProvider;
-            var dbPath = Path.Join(WorkingPath, "srcFiles.db");
+            WorkingDirectory = new DirectoryInfo(workingPath ?? Path.Join(_gameSources?.GetGamePath() ?? Environment.CurrentDirectory, "ProjectWingman-Unpacked"));
+            var dbPath = Path.Join(WorkingDirectory.FullName, "srcFiles.db");
             _db = new LiteDatabase(dbPath);
             _files = _db.GetCollection<UnpackedFile>("unpacked");
             _files.EnsureIndex(uf => uf.AssetPath);
