@@ -12,7 +12,7 @@ namespace SicarioPatch.Core
     {
         public PatchRequest(IEnumerable<WingmanMod> mods)
         {
-            Mods = RebuildModList(mods.ToList());
+            Mods = mods.ToList().RebuildModList();
             Id = Guid.NewGuid().ToString("N");
         }
 
@@ -20,14 +20,7 @@ namespace SicarioPatch.Core
         public PatchRequest() {
             
         }
-        
-        //this is a horrible hack but otherwise the build process mutates the original mod selection
-        private static List<WingmanMod> RebuildModList(List<WingmanMod> sourceList)
-        {
-            var json = JsonSerializer.Serialize(sourceList);
-            return JsonSerializer.Deserialize<List<WingmanMod>>(json);
-        }
-        
+
         public string Id { get; }
 
         [JsonInclude]

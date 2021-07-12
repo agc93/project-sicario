@@ -38,6 +38,8 @@ namespace SicarioPatch.Loader
             
             [CommandOption("--no-clean")]
             public FlagValue<bool> SkipTargetClean { get; init; }
+            [CommandOption("--outputPath")]
+            public FlagValue<string> OutputPath { get; set; }
         }
 #pragma warning restore 8618
 
@@ -131,19 +133,47 @@ namespace SicarioPatch.Loader
                 UserName = $"loader:{Environment.MachineName}"
             };
             var resp = await _mediator.Send(req);
-            _console.MarkupLine($"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
-            var targetPath = Path.Join(paksRoot, "~sicario");
-            if (!Directory.Exists(targetPath)) {
-                Directory.CreateDirectory(targetPath);
+            if (!settings.OutputPath.IsSet) {
+                _console.MarkupLine(
+                    $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
+                var targetPath = Path.Join(paksRoot, "~sicario");
+                if (!Directory.Exists(targetPath)) {
+                    Directory.CreateDirectory(targetPath);
+                }
+
+                if (Directory.GetFiles(targetPath).Any() &&
+                    !(settings.SkipTargetClean.IsSet && settings.SkipTargetClean.Value)) {
+                    foreach (var file in Directory.GetFiles(targetPath)) {
+                        File.Delete(file);
+                    }
+                }
+
+                resp.MoveTo(Path.Join(targetPath, resp.Name));
+                _console.MarkupLine($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
+            }
+            else {
+                var targetPath = settings.OutputPath.Value;
+                _console.MarkupLine(
+                    $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
+                if (!Directory.Exists(targetPath)) {
+                    Directory.CreateDirectory(targetPath);
+                }
+
+                if (Directory.GetFiles(targetPath).Any() &&
+                    !(settings.SkipTargetClean.IsSet && settings.SkipTargetClean.Value)) {
+                    foreach (var file in Directory.GetFiles(targetPath)) {
+                        File.Delete(file);
+                    }
+                }
+
+                resp.MoveTo(Path.Join(targetPath, resp.Name));
+                _console.MarkupLine($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
             }
 
-            if (Directory.GetFiles(targetPath).Any() && !(settings.SkipTargetClean.IsSet && settings.SkipTargetClean.Value)) {
-                foreach (var file in Directory.GetFiles(targetPath)) {
-                    File.Delete(file);
-                }
+            if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
+                //run game here
             }
-            resp.MoveTo(Path.Join(targetPath, resp.Name));
-            _console.MarkupLine($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
+
             return 0;
         }
     }
