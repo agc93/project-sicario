@@ -1,6 +1,7 @@
 ﻿@using System.IO
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
+@inject IBrandProvider Brand
 
 <Card>
     <CardHeader><Text Color="TextColor.Muted">Ready to build your mod!</Text></CardHeader>
@@ -22,19 +23,17 @@
                         <label>Enter an (optional) file name</label>
                         <input @bind="FileName" type="text" class="form-control" >
                     </div>
-                    @*<Field Style="margin-top: 0.5em; width: 85%;">
-                        <FieldLabel>Enter an (optional) file name</FieldLabel>
-                        <TextEdit @bind-Text="@FileName" />
-                    </Field>*@
                 }
             </div>
         </CardBody>
         <CardFooter>
-            @if (!IsBuilding && (ResultFile == null || !ResultFile.Exists))
+            @if (!IsBuilding && (ResultFile is not {Exists: true }))
             {
                 <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                <Button Clicked="@OnPresetBuild" Color="Color.Secondary">Save Preset</Button>
+                <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button>
             }
-            @if (ResultFile != null && ResultFile.Exists)
+            @if (ResultFile is {Exists: true })
             {
                 <FileDownload ResultFile="ResultFile" DeleteAfter="true">
                     Download Merged File
@@ -44,6 +43,21 @@
         </CardFooter>
     </AcceptTerms>
 </Card>
+
+<Modal @ref="_modalRef">
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>Merged Mod or Preset?</ModalTitle>
+            <CloseButton Clicked="() => _modalRef.Hide()" />
+        </ModalHeader>
+        <ModalBody>
+            <PresetGuide IncludeIntro="false" />
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@(() => _modalRef.Hide())">Close</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
 
 @code {
     
@@ -66,6 +80,9 @@
     
     [Parameter]
     public bool SkipTerms { get; set; }
+
+    [Parameter]
+    public bool EnablePresets { get; set; } = true;
 
     private async Task OnStartBuild()
     {
@@ -100,8 +117,32 @@
         }
     }
 
+    private async Task OnPresetBuild() {
+        var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters().WhereValid());
+        var req = new PresetFileRequest(Mods.ToList())
+        {
+            TemplateInputs = inputParams.ToDictionary(),
+            PresetName = string.IsNullOrWhiteSpace(FileName) ? null : FileName
+        };
+        snackbarStack?.PushAsync("Queued preset build!", SnackbarColor.Success);
+        this.IsBuilding = true;
+        try {
+            var buildResult = await Mediator.Send(req);
+            ResultFile = buildResult;
+        }
+        catch (Exception e) {
+            snackbarStack?.PushAsync("Error while building preset file!", SnackbarColor.Danger);
+            snackbarStack?.PushAsync($"Error: {e.Message}", SnackbarColor.Danger);
+        }
+        finally {
+            IsBuilding = false;
+        }
+    }
+
     private IEnumerable<PatchParameter> GetAllParameters()
     {
         return Mods.SelectMany(m => m.Parameters);
     }
+
+    private Modal _modalRef;
 }

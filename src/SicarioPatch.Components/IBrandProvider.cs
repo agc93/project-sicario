@@ -5,5 +5,6 @@
         public string AppName { get; }
         public string OwnerName { get; }
         public string ShortName { get; }
+        public string ToolName { get; }
     }
 }

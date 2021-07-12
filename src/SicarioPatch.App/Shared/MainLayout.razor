@@ -27,6 +27,24 @@
                                 </BarLink>
                             </BarItem>
                         </AuthorizeView>
+                        <AuthorizeView Policy="@Policies.IsUser">
+                            <BarItem>
+                                <BarDropdown>
+                                    <BarDropdownToggle>
+                                        <BarIcon IconName="MaterialIcons.MergeType"/>
+                                        Merger
+                                    </BarDropdownToggle>
+                                    <BarDropdownMenu>
+                                        <BarDropdownItem To="/merger">
+                                            About the @Brand.ToolName
+                                        </BarDropdownItem>
+                                        <BarDropdownItem To="/merger-start">
+                                            Get started with @Brand.ToolName(NameFormat.Short)
+                                        </BarDropdownItem>
+                                    </BarDropdownMenu>
+                                </BarDropdown>
+                            </BarItem>
+                        </AuthorizeView>
                         <AuthorizeView Policy="@Policies.IsUploader">
                             <BarItem>
                                 <BarLink To="upload">

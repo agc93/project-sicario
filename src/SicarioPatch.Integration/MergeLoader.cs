@@ -44,9 +44,12 @@ namespace SicarioPatch.Integration
                     var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
                     var file = reader.ReadFile();
                     if (file?.FileStream == null) continue;
+                    var presetFile =
+                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
+                    if (presetFile != null) continue; //skip if the file also has a preset
                     var requestFile =
-                        file.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("_meta/sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".json");
-                    if (requestFile == null) continue;
+                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("_meta/sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".json");
+                    if (file?.FileStream == null || requestFile == null) continue;
                     var outSt = requestFile.Unpack(file.FileStream);
                     var request = new StreamReader(outSt).ReadToEnd();
                     var embed = JsonSerializer.Deserialize<EmbeddedRequest>(request, _parser.Options);
