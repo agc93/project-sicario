@@ -136,6 +136,15 @@ namespace SicarioPatch.Loader
             if (!settings.OutputPath.IsSet) {
                 _console.MarkupLine(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
+                var isVortexManaged = CheckForDeploymentManifest(paksRoot);
+                if (isVortexManaged) {
+                    _console.MarkupLine("[orange][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
+                    _console.MarkupLine("We recommend using Vortex's PSM integration to manage your merged mod automatically.");
+                    var toContinue = _console.Prompt(new ConfirmationPrompt("Do you want to continue with this build anyway?"));
+                    if (!toContinue) {
+                        return 204;
+                    }
+                }
                 var targetPath = Path.Join(paksRoot, "~sicario");
                 if (!Directory.Exists(targetPath)) {
                     Directory.CreateDirectory(targetPath);
@@ -175,6 +184,12 @@ namespace SicarioPatch.Loader
             }
 
             return 0;
+        }
+
+        public bool CheckForDeploymentManifest(string paksPath) {
+            var files = new DirectoryInfo(paksPath).EnumerateFiles("vortex.deployment.json",
+                SearchOption.AllDirectories);
+            return files.Any(f => f.Length > 0);
         }
     }
 }

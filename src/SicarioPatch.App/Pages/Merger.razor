@@ -1,0 +1,18 @@
+﻿@page "/merger"
+@inject IBrandProvider Brand
+
+<Jumbotron Background="Background.Secondary" Margin="Margin.Is4.FromBottom">
+    <JumbotronTitle Size="JumbotronTitleSize.Is3">@ToolName</JumbotronTitle>
+    <JumbotronSubtitle>
+        @ToolName (@ShortName) is an <strong>experimental</strong>  new way of running @Brand.AppName: locally on your PC. @ShortName can build a merged mod on your machine from presets, @Brand.ShortName patches, @ShortName-compatible skin mods and even other merged mods, all with less compatibility issues and less downloads required.
+    </JumbotronSubtitle>
+</Jumbotron>
+
+<PresetGuide />
+@code {
+    private string ToolName => $"{Brand.AppName} {Brand.ToolName}";
+
+    private string ShortName => string.Join(string.Empty,
+        ToolName.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0])
+        );
+}
