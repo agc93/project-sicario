@@ -142,33 +142,36 @@ Task("Publish-Runtime")
     }
 });
 
-Task("Build-Linux-Packages")
-	.IsDependentOn("Publish-Runtime")
-	.WithCriteria(IsRunningOnUnix())
-	.Does(() => 
+
+Task("Publish-Merger")
+	.IsDependentOn("Post-Build")
+	.Does(() =>
 {
-	Information("Building packages in new container");
-	CreateDirectory($"{artifacts}/packages/");
-	foreach(var project in projects.SourceProjects.Where(p => p.Name == "ModMetaRelay")) {
-        var runtime = "linux-x64";
-        var sourceDir = MakeAbsolute(Directory($"{artifacts}publish/server/{runtime}"));
-        var packageDir = MakeAbsolute(Directory($"{artifacts}packages/{runtime}"));
-		foreach (var package in GetPackageFormats()) {
-			var runSettings = new DockerContainerRunSettings {
-				Name = $"docker-fpm-{(runtime.Replace(".", "-"))}",
-				Volume = new[] { 
-					$"{sourceDir}:/src:ro", 
-					$"{packageDir}:/out:rw",
-					$"{MakeAbsolute(Directory("./scripts/"))}:/scripts:ro",
-				},
-				Workdir = "/out",
-				Rm = true,
-				//User = "1000"
-			};
-			var opts = "-s dir -a x86_64 --force -m \"Alistair Chapman <alistair@agchapman.com>\" -n modmeta-relay --after-install /scripts/post-install.sh --before-remove /scripts/pre-remove.sh";
-			DockerRun(runSettings, "tenzer/fpm", $"{opts} -v {packageVersion} --iteration {package.Key} {package.Value} /src/=/usr/lib/modmeta-relay/");
-		}
-	}
+	var projectDir = $"{artifacts}merger";
+	CreateDirectory(projectDir);
+    DotNetCorePublish("./src/SicarioPatch.Loader/SicarioPatch.Loader.csproj", new DotNetCorePublishSettings {
+        OutputDirectory = projectDir + "/dotnet-any",
+		Configuration = configuration
+    });
+    var runtimes = new[] {"win-x64"};
+    foreach (var runtime in runtimes) {
+		var runtimeDir = $"{projectDir}/{runtime}";
+		CreateDirectory(runtimeDir);
+		Information("Publishing for {0} runtime", runtime);
+		var settings = new DotNetCorePublishSettings {
+			Runtime = runtime,
+			Configuration = configuration,
+			OutputDirectory = runtimeDir,
+			SelfContained = true,
+			PublishSingleFile = true,
+			PublishTrimmed = true,
+			IncludeNativeLibrariesForSelfExtract = true,
+			ArgumentCustomization = args => args.Append($"/p:Version={packageVersion}").Append("/p:TrimMode=Link")
+		};
+		DotNetCorePublish("./src/SicarioPatch.Loader/SicarioPatch.Loader.csproj", settings);
+		CreateDirectory($"{artifacts}archive");
+		Zip(runtimeDir, $"{artifacts}archive/sicario-merger-{runtime}.zip");
+    }
 });
 
 Task("Build-NuGet-Packages")
@@ -189,7 +192,7 @@ Task("Build-NuGet-Packages")
 
 Task("Build-Docker-Image")
 	.WithCriteria(IsRunningOnUnix())
-	.IsDependentOn("Build-Linux-Packages")
+	.IsDependentOn("Publish-Runtime")
 	.Does(() =>
 {
 	Information("Building Docker image...");
@@ -208,7 +211,8 @@ Task("Default")
     .IsDependentOn("Post-Build");
 
 Task("Publish")
-	.IsDependentOn("Build-Linux-Packages")
+    .IsDependentOn("Publish-Runtime")
+    .IsDependentOn("Publish-Merger")
 	.IsDependentOn("Build-NuGet-Packages")
 	.IsDependentOn("Build-Docker-Image");
 

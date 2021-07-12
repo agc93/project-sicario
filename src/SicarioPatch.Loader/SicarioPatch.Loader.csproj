@@ -6,6 +6,10 @@
         <Nullable>enable</Nullable>
         <ApplicationIcon>Resources/icon.ico</ApplicationIcon>
         <AssemblyName>ProjectSicario</AssemblyName>
+        <IsPackable>false</IsPackable>
+        <IsPublishable>true</IsPublishable>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <DebugType>Embedded</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,13 +32,7 @@
     </ItemGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <InvariantGlobalization>true</InvariantGlobalization>
-        <TrimMode>Link</TrimMode>
-        <PublishTrimmed>true</PublishTrimmed>
-        <PublishSingleFile>true</PublishSingleFile>
-        <DebugType>Embedded</DebugType>
-        <SelfContained>true</SelfContained>
-        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        
     </PropertyGroup>
 
 </Project>
