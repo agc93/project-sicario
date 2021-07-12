@@ -60,7 +60,7 @@ namespace SicarioPatch.Loader
             if (string.IsNullOrWhiteSpace(settings.InstallPath)) {
                 var install = _gameFinder.GetGamePath();
                 if (install == null) {
-                    _console.MarkupLine("[bold red]Error![/] [orange]Could not locate game install folder![/]");
+                    _console.MarkupLine("[bold red]Error![/] [orange3]Could not locate game install folder![/]");
                     return 412;
                 }
                 settings.InstallPath = install;
@@ -138,7 +138,7 @@ namespace SicarioPatch.Loader
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
                 var isVortexManaged = CheckForDeploymentManifest(paksRoot);
                 if (isVortexManaged) {
-                    _console.MarkupLine("[orange][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
+                    _console.MarkupLine("[orange3][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
                     _console.MarkupLine("We recommend using Vortex's PSM integration to manage your merged mod automatically.");
                     var toContinue = _console.Prompt(new ConfirmationPrompt("Do you want to continue with this build anyway?"));
                     if (!toContinue) {
