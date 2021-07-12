@@ -98,6 +98,7 @@ The two main types of patches currently in use are:
 |:--:|:----|
 |`propertyValue`|This is by far the most common/useful and for good reason: it's the most useful and versatile type. It sets the value of matching properties to the given value.|
 |`arrayPropertyValue`|Sibling type to `propertyValue` that creates/inserts an array value to the given properties using a simple array syntax|
+|`modifyPropertyValue`|Modifies a numeric value _based on it's existing value_.|
 |`textProperty`|Specialized patch type for working UE4's TextProperty fields more effectively.
 
-Both of these types use a common convention for the `value` field: `DataType:value`. This ensures that the properties are set with the correct data types the game uses. Note that other patch types might not use the same convention.
+Most of these types use a common convention for the `value` field: `DataType:value`. This ensures that the properties are set with the correct data types the game uses. Note that other patch types might not use the same convention.
