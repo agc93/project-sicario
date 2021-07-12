@@ -52,6 +52,6 @@ namespace SicarioPatch.Assets.Patches
             .Or(Parsers.Terms.Char('*').SkipAnd(NumberParser).Then<Func<decimal, decimal>>(res => arg => arg * res));
 
         private Parser<decimal> NumberParser =>
-            Parsers.Terms.Integer().Then(Convert.ToDecimal).Or(Parsers.Terms.Decimal());
+            Parsers.Terms.Decimal().Or(Parsers.Terms.Integer().Then(Convert.ToDecimal));
     }
 }
