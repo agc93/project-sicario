@@ -18,7 +18,14 @@
                 }
                 else
                 {
-                    <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
+                    @if (RequireAuth) {
+                        <AuthorizeView>
+                            <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
+                        </AuthorizeView>
+                    }
+                    else {
+                        <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
+                    }
                     <div class="form-group" style="margin-top: 0.5em; width: 85%">
                         <label>Enter an (optional) file name</label>
                         <input @bind="FileName" type="text" class="form-control" >
@@ -29,7 +36,15 @@
         <CardFooter>
             @if (!IsBuilding && (ResultFile is not {Exists: true }))
             {
-                <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                @if (RequireAuth) {
+                    <AuthorizeView>
+                        <Authorized><Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button></Authorized>
+                        <NotAuthorized><Button Disabled="@true" Color="Color.Dark">Start Build</Button></NotAuthorized>
+                    </AuthorizeView>
+                    }
+                else {
+                    <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                }
                 <Button Clicked="@OnPresetBuild" Color="Color.Secondary">Save Preset</Button>
                 <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button>
             }
@@ -83,6 +98,9 @@
 
     [Parameter]
     public bool EnablePresets { get; set; } = true;
+
+    [Parameter]
+    public bool RequireAuth { get; set; } = false;
 
     private async Task OnStartBuild()
     {

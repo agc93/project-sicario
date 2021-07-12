@@ -10,6 +10,7 @@ namespace SicarioPatch.Core
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
             Converters =
             {
                 new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase)

@@ -1,18 +1,20 @@
 ﻿@page "/merger-start"
 @inject IBrandProvider Brand
-<h3>Getting Started with @Brand.ToolName(NameFormat.Long)</h3>
+<h3 style="margin-bottom: 2.5rem;">Getting Started with @Brand.ToolName(NameFormat.Long)</h3>
 
 <DisplayHeading Size="DisplayHeadingSize.Is4">Downloading @_psm</DisplayHeading>
 <Paragraph>
     You can download and install @Brand.ToolName() from either Nexus Mods or GitHub. Both sources have the same file but note that if you install with Vortex, you'll only get notified of updates if you install from Nexus Mods. 
 </Paragraph>
-<Card>
-    <CardTitle>Download @_psm</CardTitle>
-    <CardBody>Use the links below to download the latest version of @Brand.ToolName()</CardBody>
+<Card Style="margin-bottom: 2.5rem; max-width: 50%;">
+    
+    <CardBody><CardTitle>Download @_psm</CardTitle><CardText>Use the links below to download the latest version of @Brand.ToolName()</CardText></CardBody>
+    <CardFooter>
     <CardActions>
-        <Button Color="Color.Primary" To="https://www.nexusmods.com/projectwingman/mods/270" Target="Target.Blank">Nexus Mods</Button>
-        <Button Color="Color.Secondary" To="https://github.com/agc93/project-sicario/releases" Target="Target.Blank">GitHub</Button>
+        <Button Type="ButtonType.Link" Color="Color.Primary" To="https://www.nexusmods.com/projectwingman/mods/270" Target="Target.Blank">Nexus Mods</Button>
+        <Button Type="ButtonType.Link" Color="Color.Secondary" To="https://github.com/agc93/project-sicario/releases" Target="Target.Blank">GitHub</Button>
     </CardActions>
+    </CardFooter>
 </Card>
 
 <DisplayHeading Size="DisplayHeadingSize.Is4">Installing @Brand.ToolName(NameFormat.Short)</DisplayHeading>

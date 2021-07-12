@@ -2,10 +2,23 @@
 @inject IConfiguration _configuration
 @inject IMediator Mediator
 @inject IJSRuntime JsRuntime
-@attribute [Authorize(Policy = Policies.IsUser)]
+@inject IBrandProvider Brand
+@* @attribute [Authorize(Policy = Policies.IsUser)] *@
 <h3>Build Merged Mod <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button></h3>
 @if (AvailableMods.Any())
 {
+    <AuthorizeView>
+        <NotAuthorized>
+            <Alert Color="Color.Warning" Visible="true">
+                <CloseButton />
+                    <Paragraph Style="margin-bottom: 0;">
+                        Only authenticated users can build merged mods! All users can download presets for use with @Brand.ToolName()
+                        <Button Type="ButtonType.Link" style="vertical-align: middle; margin-left: 1.5em; background-color: #714cfe" Color="Color.Dark" To="/Login">Log In with Discord</Button>
+                        <Button Type="ButtonType.Link" style="vertical-align: middle; margin-left: 0.5em;" Color="Color.Secondary" To="/merger">More Info</Button>
+                    </Paragraph>
+            </Alert>
+        </NotAuthorized>
+    </AuthorizeView>
     <Row>
         <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12.OnWidescreen">
             <div class="mod-selection" style="max-height: 60vh;">
@@ -39,7 +52,7 @@
         {
 
             <Column ColumnSize="ColumnSize.Is4.Is2.WithOffset.OnFullHD.Is4.OnWidescreen.Is12.OnTablet">
-                <BuildAction SkipTerms="@_skipTerms" BuildParameters="@InputParameters" Mods="@SortedMods" />
+                <BuildAction SkipTerms="@_skipTerms" BuildParameters="@InputParameters" Mods="@SortedMods" RequireAuth="@true" />
             </Column>
         }
     </Row>
@@ -63,7 +76,8 @@ else
             <CloseButton Clicked="() => _modalRef.Hide()" />
         </ModalHeader>
         <ModalBody>
-            <HowtoGuide Title="" />
+            <Alert Color="Color.Danger" Visible="true">Only signed in users can build merged mods!</Alert>
+            <HowtoGuide Title=""/>
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@(() => _modalRef.Hide())">Close</Button>
@@ -94,8 +108,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         var state = await authenticationStateTask;
-        if (state.User?.Identity?.Name != null)
-        {
+        if (state.User?.Identity?.Name != null) {
             AvailableMods = await Mediator.Send(new ModsRequest {IncludePrivate = true, UserName = state.User.Identity.Name});
         }
         else
