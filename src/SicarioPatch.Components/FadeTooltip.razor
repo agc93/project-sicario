@@ -22,6 +22,15 @@ else
             </span>
             @ChildContent
         </div>
+    } else if (Direction == TooltipDirection.Up)
+    {
+        <div class="fade-tooltip">
+            <span class="top">
+                @Text
+                <i></i>
+            </span>
+            @ChildContent
+        </div>
     }
 }
 
@@ -35,7 +44,8 @@ else
     public enum TooltipDirection
     {
         Right,
-        Down
+        Down,
+        Up
     }
         
 }
