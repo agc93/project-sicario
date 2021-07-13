@@ -157,13 +157,13 @@ namespace SicarioPatch.Loader
                     }
                 }
 
-                resp.MoveTo(Path.Join(targetPath, resp.Name));
+                resp.MoveTo(Path.Join(targetPath, resp.Name), true);
                 _console.MarkupLine($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
             }
             else {
                 var targetPath = settings.OutputPath;
                 _console.MarkupLine(
-                    $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
+                    $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
                 if (!Directory.Exists(targetPath)) {
                     Directory.CreateDirectory(targetPath);
                 }
@@ -175,7 +175,7 @@ namespace SicarioPatch.Loader
                     }
                 }
 
-                resp.MoveTo(Path.Join(targetPath, resp.Name));
+                resp.MoveTo(Path.Join(targetPath, resp.Name), true);
                 _console.MarkupLine($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
             }
 
