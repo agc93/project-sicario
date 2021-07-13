@@ -73,14 +73,12 @@
                                     <BarDropdownItem To="/faq">
                                         FAQ
                                     </BarDropdownItem>
-                                    <AuthorizeView>
                                     @if (Config.GetDocsPath(out var docsPath))
                                     {
                                         <BarDropdownItem To="@docsPath">
                                             Documentation
                                         </BarDropdownItem>
                                     }
-                                    </AuthorizeView>
                                     <BarDropdownItem To="https://www.humblegames.com/games/projectwingman/" Target="Target.Blank">
                                         Project Wingman
                                     </BarDropdownItem>

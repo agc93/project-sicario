@@ -6,6 +6,8 @@ weight: 40
 
 As we covered in the earlier sections, you can provide some very basic metadata on your mod in the special `_meta` object. There's actually a few extra bits of information you can also optionally provide, that will be covered in more detail below.
 
+It is worth noting that most of this information is only relevant to the hosted {{< appName >}} app, not to the merger ({{< toolName >}}). The merger is designed to run without user interaction so if you're only expecting to be supporting {{< toolName >}} users, you can skip most of this.
+
 ### `_meta`
 
 As a refresher, the `_meta` object is a simple object just allows you to add a little metadata about your patch mod that will be shown to users. The `displayName` (as you'd guess) is the name that is shown to users. You can also include a `description` key in this object if you'd like (it's not required though). The `author` field is used to show the author of a patch mod, but note that if you upload your mod to a {{< shortName >}} server, the author field will be overwritten (to prevent impersonation).
@@ -19,6 +21,7 @@ The `_sicario` object is where we put app-specific metadata about your mod. The 
 |`group`|`string`|Used to group multiple mods together in the UI|
 |`private`|`bool`|Only available to the uploader|
 |`preview`|`bool`|Marks a mod as preview/unstable|
+|`overwrites`|`bool`|Marks a mod as ignoring load order|
 
 All of these properties are optional.
 
@@ -54,4 +57,10 @@ Marking a mod as preview effectively flags it as potentially incomplete or unsta
 
 #### Overwrites (`overwrites`)
 
-This is a convenience flag that Sicario uses internally, and that it will show to the user to warn them if a patch might overwrite other mods. I'd urge patch authors to set this flag if their mod changes properties without checking current values.
+```json
+"_sicario": {
+    "overwrites": true
+}
+```
+
+This is a convenience flag that {{< shortName >}} uses internally, and that it will show to the user to warn them if a patch might overwrite other mods. I'd urge patch authors to set this flag if their mod changes properties without checking current values.
