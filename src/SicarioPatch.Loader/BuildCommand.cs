@@ -39,7 +39,7 @@ namespace SicarioPatch.Loader
             [CommandOption("--no-clean")]
             public FlagValue<bool> SkipTargetClean { get; init; }
             [CommandOption("--outputPath")]
-            public FlagValue<string> OutputPath { get; set; }
+            public string? OutputPath { get; set; }
         }
 #pragma warning restore 8618
 
@@ -133,7 +133,7 @@ namespace SicarioPatch.Loader
                 UserName = $"loader:{Environment.MachineName}"
             };
             var resp = await _mediator.Send(req);
-            if (!settings.OutputPath.IsSet) {
+            if (string.IsNullOrWhiteSpace(settings.OutputPath)) {
                 _console.MarkupLine(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
                 var isVortexManaged = CheckForDeploymentManifest(paksRoot);
@@ -161,7 +161,7 @@ namespace SicarioPatch.Loader
                 _console.MarkupLine($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
             }
             else {
-                var targetPath = settings.OutputPath.Value;
+                var targetPath = settings.OutputPath;
                 _console.MarkupLine(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
                 if (!Directory.Exists(targetPath)) {
