@@ -37,7 +37,12 @@ namespace SicarioPatch.Integration
         }
 
         public IEnumerable<PatchRequest> GetSicarioMods() {
-            var allPaks = GetAllMods();
+            return GetSicarioMods(out _);
+        }
+
+        public IEnumerable<PatchRequest> GetSicarioMods(out List<string> inputFiles) {
+            var allPaks = GetAllMods().ToList();
+            inputFiles = allPaks.Select(p => p.FullName).ToList();
             var builtMods = new List<PatchRequest>();
             foreach (var pakFileInfo in allPaks) {
                 try {

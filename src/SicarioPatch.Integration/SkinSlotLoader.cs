@@ -35,8 +35,8 @@ namespace SicarioPatch.Integration
             return new Dictionary<string, List<string>>();
         }
 
-        public IEnumerable<AssetPatchSet> GetSlotPatches() {
-            var skins = GetSkinPaths();
+        public IEnumerable<AssetPatchSet> GetSlotPatches(Dictionary<string, List<string>>? skinPaths = null) {
+            var skins = skinPaths ?? GetSkinPaths();
             foreach (var (aircraft, paths) in skins) {
                 var assetPaths = paths.Where(p => Path.GetExtension(p) == ".uasset").ToList();
                 yield return new AssetPatchSet() {
@@ -50,13 +50,13 @@ namespace SicarioPatch.Integration
             }
         }
 
-        public WingmanMod GetSlotMod() {
+        public WingmanMod GetSlotMod(IEnumerable<AssetPatchSet>? patchSets = null) {
             return new() {
                 Id = "skinSlots",
                 FilePatches = new Dictionary<string, List<PatchSet>>(),
                 AssetPatches = new Dictionary<string, List<AssetPatchSet>> {
                     ["ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp"] =
-                        GetSlotPatches().ToList()
+                        (patchSets ?? GetSlotPatches()).ToList()
                 }
             };
         }

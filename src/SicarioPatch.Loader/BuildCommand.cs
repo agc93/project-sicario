@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +12,7 @@ using SicarioPatch.Core;
 using SicarioPatch.Integration;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using Spectre.Console.Extensions.Logging;
 
 namespace SicarioPatch.Loader
 {
@@ -23,6 +26,8 @@ namespace SicarioPatch.Loader
         private readonly IConfiguration _config;
         private readonly Integration.GameFinder _gameFinder;
         private readonly ILogger<BuildCommand> _logger;
+        private readonly ModParser _parser;
+        private readonly SpectreConsoleLoggerConfiguration _loggerConfiguration;
 #pragma warning disable 8618
         public class Settings : CommandSettings
         {
@@ -40,12 +45,18 @@ namespace SicarioPatch.Loader
             public FlagValue<bool> SkipTargetClean { get; init; }
             [CommandOption("--outputPath")]
             public string? OutputPath { get; set; }
+            
+            [CommandOption("-q|--quiet")]
+            public FlagValue<bool> Quiet { get; set; }
+            
+            [CommandOption("--report")]
+            public string? ReportFile { get; set; }
         }
 #pragma warning restore 8618
 
         public BuildCommand(IAnsiConsole console, SkinSlotLoader slotLoader, IMediator mediator,
             PresetFileLoader presetLoader, MergeLoader mergeLoader, IConfiguration config,
-            Integration.GameFinder gameFinder, ILogger<BuildCommand> logger) {
+            Integration.GameFinder gameFinder, ILogger<BuildCommand> logger, ModParser parser) {
             _console = console;
             _slotLoader = slotLoader;
             _mediator = mediator;
@@ -54,24 +65,32 @@ namespace SicarioPatch.Loader
             _config = config;
             _gameFinder = gameFinder;
             _logger = logger;
+            _parser = parser;
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
+            void LogConsole(string message) {
+                if (settings.Quiet.IsSet && settings.Quiet.Value) {
+                    return;
+                }
+                _console.MarkupLine(message);
+            }
             if (string.IsNullOrWhiteSpace(settings.InstallPath)) {
                 var install = _gameFinder.GetGamePath();
                 if (install == null) {
-                    _console.MarkupLine("[bold red]Error![/] [orange3]Could not locate game install folder![/]");
+                    LogConsole("[bold red]Error![/] [orange3]Could not locate game install folder![/]");
                     return 412;
                 }
                 settings.InstallPath = install;
             }
             
             if (!Directory.Exists(settings.InstallPath)) {
-                _console.MarkupLine($"[red][bold]Install not found![/] The game install directory doesn't exist.[/]");
+                LogConsole($"[red][bold]Install not found![/] The game install directory doesn't exist.[/]");
                 return 404;
             }
 
             var paksRoot = Path.Join(settings.InstallPath, "ProjectWingman", "Content", "Paks");
+            var report = new MergeReport(settings.InstallPath);
 
             _config["GamePath"] = settings.InstallPath;
             _config["GamePakPath"] = Path.Join(paksRoot, "ProjectWingman-WindowsNoEditor.pak");
@@ -82,13 +101,15 @@ namespace SicarioPatch.Loader
             };
             
             _logger.LogDebug($"Searching {presetSearchPaths.Count} paths for loose presets");
-            
-            var existingMods = _mergeLoader.GetSicarioMods().ToList();
+
+            var existingMods = _mergeLoader.GetSicarioMods(out List<string> inputMods).ToList();
             var mergedInputs = existingMods
                 .Select(m => m.TemplateInputs)
                 .Aggregate(new Dictionary<string, string>(), (total, next) => next.MergeLeft(total));
             
-            _console.MarkupLine($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
+            LogConsole($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
+            report.RebuildMods = inputMods;
+            
 
             var embeddedPresets = _mergeLoader.LoadPresetsFromMods().ToList();
             var embeddedInputs = embeddedPresets
@@ -97,14 +118,16 @@ namespace SicarioPatch.Loader
                     (total, next) => total.MergeLeft(next)
                 );
             
-            _console.MarkupLine($"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]");
+            LogConsole($"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]");
             
             var presetPaths = presetSearchPaths
                     .Where(Directory.Exists)
-                    .SelectMany(d => Directory.EnumerateFiles(d, "*.dtp", SearchOption.AllDirectories));
+                    .SelectMany(d => Directory.EnumerateFiles(d, "*.dtp", SearchOption.AllDirectories))
+                    .ToList();
             var presets = _presetLoader.LoadFromFiles(presetPaths).ToList();
             
-            _console.MarkupLine($"[dodgerblue2]Loaded [bold]{presets.Count}[/] loose presets from file.[/]");
+            LogConsole($"[dodgerblue2]Loaded [bold]{presets.Count}[/] loose presets from file.[/]");
+            report.PresetPaths = presetPaths;
 
             var mergedPresetInputs = presets
                 .Select(p => p.ModParameters)
@@ -112,19 +135,22 @@ namespace SicarioPatch.Loader
                 (total, next) => total.MergeLeft(next)
                 );
 
-            _console.MarkupLine($"Final mod will be built with [dodgerblue2]{mergedPresetInputs.Keys.Count}[/] parameters");
+            LogConsole($"Final mod will be built with [dodgerblue2]{mergedPresetInputs.Keys.Count}[/] parameters");
+            report.InputParameters = mergedPresetInputs;
 
-
-            var slotLoader = _slotLoader.GetSlotMod();
+            var skinPaths = _slotLoader.GetSkinPaths();
+            var slotLoader = _slotLoader.GetSlotMod(_slotLoader.GetSlotPatches(skinPaths));
+            report.AdditionalSkins = skinPaths;
             
-            _console.MarkupLine($"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]");
+            LogConsole($"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]");
 
             var allMods = existingMods.SelectMany(m => m.Mods).ToList();
             allMods.AddRange(embeddedPresets.SelectMany(p => p.Mods));
             allMods.AddRange(presets.SelectMany(p => p.Mods));
             allMods.Add(slotLoader);
             
-            _console.MarkupLine($"[bold darkblue]Queuing mod build with {allMods.Count} mods[/]");
+            LogConsole($"[bold darkblue]Queuing mod build with {allMods.Count} mods[/]");
+            
 
             var req = new PatchRequest(allMods) {
                 PackResult = true,
@@ -133,19 +159,20 @@ namespace SicarioPatch.Loader
                 UserName = $"loader:{Environment.MachineName}"
             };
             var resp = await _mediator.Send(req);
+            string targetPath;
             if (string.IsNullOrWhiteSpace(settings.OutputPath)) {
-                _console.MarkupLine(
+                LogConsole(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
                 var isVortexManaged = CheckForDeploymentManifest(paksRoot);
                 if (isVortexManaged) {
-                    _console.MarkupLine("[orange3][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
-                    _console.MarkupLine("We recommend using Vortex's PSM integration to manage your merged mod automatically.");
-                    var toContinue = _console.Prompt(new ConfirmationPrompt("Do you want to continue with this build anyway?"));
+                    LogConsole("[orange3][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
+                    LogConsole("We recommend using Vortex's PSM integration to manage your merged mod automatically.");
+                    var toContinue = (!settings.Quiet.IsSet || !settings.Quiet.Value) && _console.Prompt(new ConfirmationPrompt("Do you want to continue with this build anyway?"));
                     if (!toContinue) {
                         return 204;
                     }
                 }
-                var targetPath = Path.Join(paksRoot, "~sicario");
+                targetPath = Path.Join(paksRoot, "~sicario");
                 if (!Directory.Exists(targetPath)) {
                     Directory.CreateDirectory(targetPath);
                 }
@@ -158,11 +185,11 @@ namespace SicarioPatch.Loader
                 }
 
                 resp.MoveTo(Path.Join(targetPath, resp.Name), true);
-                _console.MarkupLine($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
+                LogConsole($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
             }
             else {
-                var targetPath = settings.OutputPath;
-                _console.MarkupLine(
+                targetPath = settings.OutputPath;
+                LogConsole(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
                 if (!Directory.Exists(targetPath)) {
                     Directory.CreateDirectory(targetPath);
@@ -176,7 +203,19 @@ namespace SicarioPatch.Loader
                 }
 
                 resp.MoveTo(Path.Join(targetPath, resp.Name), true);
-                _console.MarkupLine($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
+                LogConsole($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
+            }
+
+            if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
+                //build report
+                if (!Path.IsPathRooted(settings.ReportFile)) {
+                    settings.ReportFile = Path.Join(targetPath, settings.ReportFile);
+                }
+                var opts = new JsonSerializerOptions(_parser.Options) {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                var json = JsonSerializer.Serialize(report, opts);
+                await File.WriteAllTextAsync(settings.ReportFile, json);
             }
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
@@ -186,7 +225,7 @@ namespace SicarioPatch.Loader
             return 0;
         }
 
-        public bool CheckForDeploymentManifest(string paksPath) {
+        private static bool CheckForDeploymentManifest(string paksPath) {
             var files = new DirectoryInfo(paksPath).EnumerateFiles("vortex.deployment.json",
                 SearchOption.AllDirectories);
             return files.Any(f => f.Length > 0);
