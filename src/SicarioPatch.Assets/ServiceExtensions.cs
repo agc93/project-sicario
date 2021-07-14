@@ -31,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddTypeLoaders(this IServiceCollection services) {
             services.AddSingleton<IAssetTypeLoader, DataTableTypeLoader>();
+            services.AddSingleton<IAssetTypeLoader, RawTypeLoader>();
             return services;
         }
 

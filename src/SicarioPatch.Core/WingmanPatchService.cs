@@ -22,10 +22,18 @@ namespace SicarioPatch.Core
 
         public async Task<ModPatchService<WingmanMod>> RunAssetPatches() {
             foreach (var mod in Mods) {
-                foreach (var (targetAsset, assetPatchSets) in mod.AssetPatches) {
+                foreach (var (targetAssetKey, assetPatchSets) in mod.AssetPatches) {
+                    var targetAsset = targetAssetKey;
+                    string targetAssetName = null;
+                    if (targetAsset.Contains('>')) {
+                        //fancy rewrite incoming
+                        var assetSplit = targetAsset.Split('>');
+                        targetAsset = assetSplit.First();
+                        targetAssetName = assetSplit.Last();
+                    }
                     var srcPath = Path.Join(Context.WorkingDirectory.FullName, targetAsset);
                     _logger?.LogDebug($"Running asset patches for {Path.GetFileName(targetAsset)}");
-                    var _ = await _assetPatcher.RunPatch(srcPath, assetPatchSets);
+                    var _ = await _assetPatcher.RunPatch(srcPath, assetPatchSets, targetAssetName);
                 }
             }
 
@@ -90,6 +98,8 @@ namespace SicarioPatch.Core
                 .GroupBy(fp => fp.Key)
                 .Where(g => g.Any())
                 .Select(g => g.Key)
+                .Select(g => g.Split('>').FirstOrDefault())
+                .Where(g => g != null)
                 .Distinct()
                 .ToList();
             foreach (var file in requiredFiles)
