@@ -68,6 +68,13 @@ namespace SicarioPatch.Loader
             _parser = parser;
         }
 
+        internal record MergePart
+        {
+             internal Dictionary<string, string> Parameters { get; init; } = new();
+             internal IEnumerable<WingmanMod> Mods { get; init; } = new List<WingmanMod>();
+             internal int Priority { get; init; } = 10;
+        }
+
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
             void LogConsole(string message) {
                 if (settings.Quiet.IsSet && settings.Quiet.Value) {
@@ -95,6 +102,10 @@ namespace SicarioPatch.Loader
             _config["GamePath"] = settings.InstallPath;
             _config["GamePakPath"] = Path.Join(paksRoot, "ProjectWingman-WindowsNoEditor.pak");
 
+            var partsList = new List<MergePart>();
+            
+            
+
             var presetSearchPaths = new List<string>(settings.PresetPaths ?? Array.Empty<string>()) {
                 Path.Join(settings.InstallPath, "ProjectWingman", "Content", "Presets"),
                 Path.Join(paksRoot, "~mods")
@@ -102,6 +113,8 @@ namespace SicarioPatch.Loader
             
             _logger.LogDebug($"Searching {presetSearchPaths.Count} paths for loose presets");
 
+            //existing mods
+            
             var existingMods = _mergeLoader.GetSicarioMods(out List<string> inputMods).ToList();
             var mergedInputs = existingMods
                 .Select(m => m.TemplateInputs)
@@ -110,15 +123,30 @@ namespace SicarioPatch.Loader
             LogConsole($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
             report.RebuildMods = inputMods;
             
+            partsList.Add(new MergePart {
+                Mods = existingMods.SelectMany(m => m.Mods),
+                Parameters = mergedInputs,
+                Priority = 3
+            });
+            
+            //embedded presets
 
             var embeddedPresets = _mergeLoader.LoadPresetsFromMods().ToList();
             var embeddedInputs = embeddedPresets
                 .Select(m => m.ModParameters)
-                .Aggregate(mergedInputs,
+                .Aggregate(new Dictionary<string, string>(),
                     (total, next) => total.MergeLeft(next)
                 );
             
             LogConsole($"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]");
+            
+            partsList.Add(new MergePart {
+                Mods = embeddedPresets.SelectMany(ep => ep.Mods),
+                Parameters = mergedInputs,
+                Priority = 2
+            });
+            
+            //loose presets
             
             var presetPaths = presetSearchPaths
                     .Where(Directory.Exists)
@@ -129,20 +157,48 @@ namespace SicarioPatch.Loader
             LogConsole($"[dodgerblue2]Loaded [bold]{presets.Count}[/] loose presets from file.[/]");
             report.PresetPaths = presetPaths;
 
-            var mergedPresetInputs = presets
+            var loosePresetInputs = presets
                 .Select(p => p.ModParameters)
-                .Aggregate(embeddedInputs,
+                .Aggregate(new Dictionary<string, string>(),
                 (total, next) => total.MergeLeft(next)
                 );
-
-            LogConsole($"Final mod will be built with [dodgerblue2]{mergedPresetInputs.Keys.Count}[/] parameters");
-            report.InputParameters = mergedPresetInputs;
-
+            
+            partsList.Add(new MergePart {
+                Mods = presets.SelectMany(p => p.Mods),
+                Parameters = loosePresetInputs,
+                Priority = 1
+            });
+            
+            //skin merge
+            
             var skinPaths = _slotLoader.GetSkinPaths();
             var slotLoader = _slotLoader.GetSlotMod(_slotLoader.GetSlotPatches(skinPaths));
-            report.AdditionalSkins = skinPaths;
-            
+            report.AdditionalSkins = skinPaths
+                .ToDictionary(k => k.Key, v => v.Value.Select(p => Path.ChangeExtension(p, null)).Distinct().ToList())
+                .ToDictionary(k => k.Key, v => v.Value);
             LogConsole($"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]");
+            partsList.Add(new MergePart {
+                Mods = new []{slotLoader},
+            });
+            
+            //final merge
+
+            var inputParameterList = partsList
+                .OrderByDescending(p => p.Priority)
+                .Select(p => p.Parameters)
+                .Aggregate(new Dictionary<string, string>(), 
+                    (total, next) => total.MergeLeft(next)
+                );
+
+            LogConsole($"Final mod will be built with [dodgerblue2]{inputParameterList.Keys.Count}[/] parameters");
+            report.InputParameters = inputParameterList;
+
+            var modList = partsList
+                .OrderBy(p => p.Priority)
+                .SelectMany(p => p.Mods)
+                .ToList();
+
+            
 
             var allMods = existingMods.SelectMany(m => m.Mods).ToList();
             allMods.AddRange(embeddedPresets.SelectMany(p => p.Mods));
@@ -152,9 +208,9 @@ namespace SicarioPatch.Loader
             LogConsole($"[bold darkblue]Queuing mod build with {allMods.Count} mods[/]");
             
 
-            var req = new PatchRequest(allMods) {
+            var req = new PatchRequest(modList) {
                 PackResult = true,
-                TemplateInputs = mergedPresetInputs,
+                TemplateInputs = inputParameterList,
                 Name = "SicarioMerge",
                 UserName = $"loader:{Environment.MachineName}"
             };
