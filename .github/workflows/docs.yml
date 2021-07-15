@@ -39,7 +39,7 @@ jobs:
         path: docs/public/
     - name: Deploy to Pages
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/nonexistent' #temporarily disabling
+      if: github.ref == 'refs/heads/main' #temporarily disabling
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/public

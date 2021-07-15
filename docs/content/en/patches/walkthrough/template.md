@@ -24,7 +24,7 @@ This is the most daunting part to understand, but really isn't as bad as it look
 datatable:{'BaseStats*'}.{'CanUseAoA*'}
 ```
 
-First off, the easy part: the type. The `datatable:` tells Sicario to load the file as a UE4 DataTable and returns every row. Next up is a set of filters separated by `.`s. In our case, both filters are doing the same thing: returning only the struct properties with a name that starts with the string `BaseStats`. Next, the result of that filter (i.e. a bunch of properties named `BaseStats`) are passed into the second filter. That filter just returns any struct properties with a name that starts with `CanUseAoA`. All the properties that match that last filter are passed directly to the patch type to have the value modified.
+First off, the easy part: the type. The `datatable:` tells Sicario to load the file as a UE4 DataTable and returns every row. Next up is a set of filters separated by `.`s. In our case, both filters are doing the same thing: returning only the struct properties with a name that starts with a certain string, first off `BaseStats`. Next, the result of that filter (i.e. a bunch of properties named `BaseStats`) are passed into the second filter. That filter just returns any struct properties with a name that starts with `CanUseAoA`. All the properties that match that last filter are passed directly to the patch type to have the value modified.
 
 #### Example in Action
 
@@ -93,7 +93,7 @@ Now if we step through this one again, you'll see a few new filters, but the sam
 
 > The `[]` vs `[[]]` distinction can be tricky. The easiest summary is that `[[]]` matches the _contents_ of an `ArrayProperty`, but `[]` just matches the first property it sees and returns the whole property
 
-Now that's a lot of filters, the result of which is that of the entire lengthy and complex `DB_Aircraft` datatable, that result returns exactly **one** thing: the _unmodded_ second weapon hardpoint for the FC-15.
+Now that's a lot of filters, the result of which is that out of the entire lengthy and complex `DB_Aircraft` datatable, that result returns exactly **one** thing: the _unmodded_ second weapon hardpoint for the FC-15.
 
 While they can be tricky to make, a well-written template will ensure that you only change the values you want and can even ensure that you don't overwrite modded values, allowing users to merge your patch with others better.
 
@@ -113,3 +113,5 @@ Here's a very brief summary of the available filters for use in templates:
 |`<string=int>`|`<IntProperty=2>`, `<FloatProperty=1.5>`|Matches only incoming properties of the specific type *and* specific value|
 |`<string='string'>`|`<StrProperty='saa,mlaa'>`|Same as above, but for non-numeric types|
 |`<string::string>`|`<S_CannonType::NewEnumerator2>`|Matches only enum properties, with the right enum type and the right enum value|
+
+There's also one special filter: `[*]`. That filter will just match everything and return all the properties it receives. This can be useful if you're trying to match a whole datatable for example.
