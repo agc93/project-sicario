@@ -40,7 +40,7 @@ Most of these types use a common convention for the `value` field: `DataType:val
 
 ##### Special Patch Types
 
-The 4 patch types above will handle the vast majority of Sicario patches reasonably well, but there's two patch types that deserve extra attention: `objectRef` and `duplicateEntry`
+The 4 patch types above will handle the vast majority of {{< shortName >}} patches reasonably well, but there's two patch types that deserve extra attention: `objectRef` and `duplicateEntry`
 
 > Both of these are much more complex to get working right and I'd recommend you start with the simpler changes handled by the regular patch types.
 

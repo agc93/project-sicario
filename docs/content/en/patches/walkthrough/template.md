@@ -4,11 +4,11 @@ title: "Understanding Property Templates"
 weight: 22
 ---
 
-If you oversimplify a UE4 cooked asset file (that's Sicario's job), they are essentially a collection of properties, some of them with their own properties and so forth. The `template` value is essentially a filter to control which properties the `value` is applied to, using a set of simplistic filters. The syntax can seem kinda of daunting but it's not so bad once you understand how it works.
+If you oversimplify a UE4 cooked asset file (that's {{< shortName >}}'s job), they are essentially a collection of properties, some of them with their own properties and so forth. The `template` value is essentially a filter to control which properties the `value` is applied to, using a set of simplistic filters. The syntax can seem kinda of daunting but it's not so bad once you understand how it works.
 
 The basic format is this: a data type at the start, then a set of filters separated by `.`s.
 
-When it runs a patch, Sicario will load the file using the specified type, it will run every property in the file through the chain of filters and then run the actual patch type and value on all the matching properties.
+When it runs a patch, {{< shortName >}} will load the file using the specified type, it will run every property in the file through the chain of filters and then run the actual patch type and value on all the matching properties.
 
 Each filter in the chain is run in order so only properties that match each step will be included in the final result.
 
@@ -24,7 +24,7 @@ This is the most daunting part to understand, but really isn't as bad as it look
 datatable:{'BaseStats*'}.{'CanUseAoA*'}
 ```
 
-First off, the easy part: the type. The `datatable:` tells Sicario to load the file as a UE4 DataTable and returns every row. Next up is a set of filters separated by `.`s. In our case, both filters are doing the same thing: returning only the struct properties with a name that starts with a certain string, first off `BaseStats`. Next, the result of that filter (i.e. a bunch of properties named `BaseStats`) are passed into the second filter. That filter just returns any struct properties with a name that starts with `CanUseAoA`. All the properties that match that last filter are passed directly to the patch type to have the value modified.
+First off, the easy part: the type. The `datatable:` tells {{< shortName >}} to load the file as a UE4 DataTable and returns every row. Next up is a set of filters separated by `.`s. In our case, both filters are doing the same thing: returning only the struct properties with a name that starts with a certain string, first off `BaseStats`. Next, the result of that filter (i.e. a bunch of properties named `BaseStats`) are passed into the second filter. That filter just returns any struct properties with a name that starts with `CanUseAoA`. All the properties that match that last filter are passed directly to the patch type to have the value modified.
 
 #### Example in Action
 
@@ -99,7 +99,7 @@ While they can be tricky to make, a well-written template will ensure that you o
 
 ## Available Filters
 
-> Please note that this list may not be exhaustive: Sicario is designed to support additional filters easily
+> Please note that this list may not be exhaustive: {{< shortName >}} is designed to support additional filters easily
 
 Here's a very brief summary of the available filters for use in templates:
 
