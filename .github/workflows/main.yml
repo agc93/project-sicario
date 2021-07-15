@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
         with:
@@ -46,6 +46,28 @@ jobs:
           name: project-sicario-server
           path: dist/publish/dotnet-any/ # limiting this for now because its huge
       - uses: actions/upload-artifact@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: build_archives
+          path: dist/archive/
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+      - name: Restore Tools
+        run: |
+          dotnet tool restore
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        with:
+          target: Publish-Merger
+      - uses: actions/upload-artifact@v1
         name: Upload Merger
         with:
           name: project-sicario-merger
@@ -53,7 +75,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: build_archives
+          name: merger_archives
           path: dist/archive/
   release:
     if: startsWith(github.ref, 'refs/tags/')

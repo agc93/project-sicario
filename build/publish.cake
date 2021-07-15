@@ -28,6 +28,6 @@ Task("Publish-NuGet-Packages")
 });
 
 Task("Release")
-.IsDependentOn("Publish")
+.IsDependentOn("Publish-Runtime") //note that this doesn't publish the merger!
 .IsDependentOn("Publish-Docker-Image")
 .IsDependentOn("Publish-NuGet-Packages");
