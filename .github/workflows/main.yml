@@ -43,8 +43,13 @@ jobs:
       - uses: actions/upload-artifact@v1
         name: Upload Server
         with:
-          name: project-sicario
-          path: dist/publish/
+          name: project-sicario-server
+          path: dist/publish/dotnet-any/ # limiting this for now because its huge
+      - uses: actions/upload-artifact@v1
+        name: Upload Merger
+        with:
+          name: project-sicario-merger
+          path: dist/merger/win-x64/
       - uses: actions/upload-artifact@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
