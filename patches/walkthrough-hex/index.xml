@@ -1,0 +1,124 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Project Sicario – Building a hex/binary patch</title><link>/patches/walkthrough-hex/</link><description>Recent content in Building a hex/binary patch on Project Sicario</description><generator>Hugo -- gohugo.io</generator><atom:link href="/patches/walkthrough-hex/index.xml" rel="self" type="application/rss+xml"/><item><title>Patches: File Structure</title><link>/patches/walkthrough-hex/intro/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough-hex/intro/</guid><description>
+&lt;h3 id="the-aoa-unlocker-mod-file">The AoA unlocker mod file&lt;/h3>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_meta&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;DisplayName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;AoA for All&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;FilePatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;AoA Unlock&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;00 48 02&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;substitution&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;01&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now let&amp;rsquo;s step through each part of this file.&lt;/p>
+&lt;h3 id="patch-metadata-code_metacode">Patch Metadata (&lt;code>_meta&lt;/code>)&lt;/h3>
+&lt;p>The first thing you&amp;rsquo;ll usually find in a Sicario patch file is the &lt;code>_meta&lt;/code> field, which is an object with a few optional properties:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>DisplayName&lt;/code>: A user-friendly name to show for your mod&lt;/li>
+&lt;li>&lt;code>Author&lt;/code>: Take a guess what this one&amp;rsquo;s for hotshot&lt;/li>
+&lt;li>&lt;code>Description&lt;/code>: also self-explanatory&lt;/li>
+&lt;/ul>
+&lt;p>All three of these values will be shown to users so please don&amp;rsquo;t just put &amp;ldquo;do the thing&amp;rdquo; or fill them in with shitposting!&lt;/p>
+&lt;p>There is some more metadata you can optionally provide, but that&amp;rsquo;s covered later on.&lt;/p>
+&lt;h3 id="the-file-patches-filepatches">The File Patches (&lt;code>FilePatches&lt;/code>)&lt;/h3>
+&lt;p>The &lt;code>FilePatches&lt;/code> object is the main &amp;ldquo;substance&amp;rdquo; of a Sicario patch. It is a dictionary grouping the files to be edited with sets of patches to be applied to that file.&lt;/p>
+&lt;blockquote>
+&lt;p>Note that to support auto-packing you need to include the game file as the full target path for the file you&amp;rsquo;re editing.&lt;/p>
+&lt;/blockquote>
+&lt;p>In the example above, we have just one key in the object: &lt;code>ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp&lt;/code>. This just means that &lt;code>DB_Aircraft.uexp&lt;/code> will be the only file that this patch will be applied to and it will be packed in that specific path. Each file then has an array of &amp;ldquo;patch sets&amp;rdquo;.&lt;/p>
+&lt;h4 id="patch-sets">Patch Sets&lt;/h4>
+&lt;p>Patch Sets are a purely logical organizational idea: they&amp;rsquo;re just a way of organizing patches together. For example, if your mod is changing multiple stats for multiple planes, you might include each plane as a separate patch set. A patch set is just an object with &lt;code>name&lt;/code> and an array of &lt;code>patches&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;AoA Unlock&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>On it&amp;rsquo;s own a patch set doesn&amp;rsquo;t do anything, that&amp;rsquo;s up to the actual &lt;em>patches&lt;/em> in the set.&lt;/p>
+&lt;h4 id="patches">Patches&lt;/h4>
+&lt;p>Now we hit the real meat of a Sicario patch: the actual hex edit to make. Here&amp;rsquo;s the example for enabling AoA for all aircraft:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;00 48 02&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;substitution&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;01&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;before&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>In plain English, this object just tells Sicario &amp;ldquo;replace the byte immediately &lt;strong>before&lt;/strong> &lt;code>00 48 02&lt;/code> with a &lt;code>01&lt;/code>&amp;rdquo;.&lt;/p>
+&lt;h5 id="template-and-substitution">Template and Substitution&lt;/h5>
+&lt;p>These are the actual values Sicario will be (respectively) looking for and inserting into the binary file. When it runs, Project Sicario will load the file into memory, look for &lt;em>any&lt;/em> appearance of the &lt;strong>template&lt;/strong> value and then apply the &lt;strong>substitution&lt;/strong>. How exactly the substitution is applied varies based on the patch &lt;em>type&lt;/em>.&lt;/p>
+&lt;h5 id="types">Types&lt;/h5>
+&lt;p>The two main types of patches currently in use are:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>before&lt;/code>: replaces the byte(s) &lt;em>before&lt;/em> the template with the value of substitution.&lt;/li>
+&lt;li>&lt;code>inPlace&lt;/code>: replaces the &lt;em>entire&lt;/em> template with the value of the substitution.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>There is also a &lt;code>valueBefore&lt;/code> type, but it&amp;rsquo;s only useful in niche scenarios&lt;/p>
+&lt;/blockquote>
+&lt;p>In fact, we could have also shown the AoA patch above with an &lt;code>inPlace&lt;/code> patch:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;00 00 48 02&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;substitution&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;01 00 48 02&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;inPlace&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>To translate, this patch just tells Sicario &amp;ldquo;replace every occurrence of the byte pattern &lt;code>00 00 48 02&lt;/code> with the byte pattern &lt;code>01 00 48 02&lt;/code>&amp;rdquo;. These two examples serve essentially the same purpose, so choose the patch type that makes the most sense.&lt;/p>
+&lt;p>That being said, you should place a preference towards using &lt;code>inPlace&lt;/code>: users will be shown a warning when including a &lt;code>before&lt;/code> type patch since they ignore load order and could undo changes from another patch.&lt;/p></description></item><item><title>Patches: Example Mod</title><link>/patches/walkthrough-hex/example/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough-hex/example/</guid><description>
+&lt;p>So now you&amp;rsquo;ve seen one basic example, but just to expand on that, here&amp;rsquo;s another very simple Sicario patch to &lt;em>unlock all currently locked modifiers&lt;/em>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_meta&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;DisplayName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Unlock disabled modifiers&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;Author&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;agc93&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Unlocks disabled modifiers. Note that these modifiers don&amp;#39;t actually work in-game.&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;FilePatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;ProjectWingman/Content/ProjectWingman/Blueprints/Data/Modifiers/DB_Modifiers.uexp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Unlock modifiers&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;All modifiers available&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;00 00 1E&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;substitution&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;01 00 1E&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;inPlace&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>You&amp;rsquo;ll see that the basic structure is essentially the same, just with different values for the files, as well as the details of the specific patch being applied.&lt;/p></description></item><item><title>Patches: Windowing matches</title><link>/patches/walkthrough-hex/windowing/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough-hex/windowing/</guid><description>
+&lt;p>Now while that will work fine for simple things, sometimes you might not want to change &lt;strong>every&lt;/strong> appearance of a key with its substitution. This is where the special &lt;code>window&lt;/code> object on the patch becomes important.&lt;/p>
+&lt;p>Here&amp;rsquo;s what it looks like in action:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_meta&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#a40000">//&lt;/span> &lt;span style="color:#a40000">removed&lt;/span> &lt;span style="color:#a40000">for&lt;/span> &lt;span style="color:#a40000">brevity&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;FilePatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Prez Unlock&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set Pilot count to 2&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;00 00 00 00 1C 01&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;substitution&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;02 00 00 00 1C 01&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;inPlace&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;window&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;after&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;text:PW-Mk.I&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;before&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;text:MG-21&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>In short, the &lt;code>window&lt;/code> object is a method of narrowing down what values should be replaced in a file. In the example above, we want to replace &lt;code>00 00 00 00 1C 01&lt;/code> with &lt;code>02 00 00 00 1C 01&lt;/code>, but &lt;strong>only&lt;/strong> for the PW Mk.I. To do that, we add a &lt;code>window&lt;/code> object and specify that we only want to match occurrences of &lt;code>00 00 00 00 1C 01&lt;/code> if they come &lt;em>after&lt;/em> an appearance of the text &amp;ldquo;PW-Mk.I&amp;rdquo; &lt;strong>and&lt;/strong> &lt;em>before&lt;/em> an appearance of the text &amp;ldquo;MG-21&amp;rdquo;. This will narrow the search down to only the PW Mk.I&amp;rsquo;s part of the blueprint, ensuring we only change the PilotCount (i.e. &lt;code>00 00 00 1C 01&lt;/code>) for that one plane.&lt;/p>
+&lt;blockquote>
+&lt;p>Sicario will automatically substitute a string value for its binary/hex representation if it starts with the special &lt;code>text:&lt;/code> prefix. So you could add &lt;code>text:F/E-4&lt;/code> and Sicario will automatically change that to &lt;code>46 2F 45 2D 34&lt;/code> for you.&lt;/p>
+&lt;/blockquote>
+&lt;p>Note that you can also omit the &lt;code>before&lt;/code> key and only use an &lt;code>after&lt;/code> to narrow down the search, but the reverse is &lt;em>not&lt;/em> true! If you use a &lt;code>before&lt;/code>, you must have an &lt;code>after&lt;/code> to make a window.&lt;/p></description></item></channel></rss>

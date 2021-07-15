@@ -1,0 +1,290 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Project Sicario – Building an asset patch</title><link>/patches/walkthrough/</link><description>Recent content in Building an asset patch on Project Sicario</description><generator>Hugo -- gohugo.io</generator><atom:link href="/patches/walkthrough/index.xml" rel="self" type="application/rss+xml"/><item><title>Patches: File Structure</title><link>/patches/walkthrough/intro/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough/intro/</guid><description>
+&lt;p>Let&amp;rsquo;s dive into the deep end and use a reasonably simple example of a patch file to illustrate how an asset patch file works. There&amp;rsquo;s a complete example of a reasonably simple mod included below: the AoA Unlocker. This will probably seem like a lot but over the next few pages we&amp;rsquo;ll walk slowly through all the individual parts so you can get an idea of how the patches work and how you can build your own.&lt;/p>
+&lt;h2 id="the-aoa-unlocker-mod-file">The AoA unlocker mod file&lt;/h2>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_meta&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;DisplayName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;AoA for All&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;FilePatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;AssetPatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;AoA Unlock&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA to true&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:{&amp;#39;BaseStats*&amp;#39;}.{&amp;#39;CanUseAoA*&amp;#39;}&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;BoolProperty:true&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;propertyValue&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;blockquote>
+&lt;p>Note that (for now), the &lt;code>FilePatches: {}&lt;/code> object is still &lt;em>&lt;strong>required&lt;/strong>&lt;/em>, even if it&amp;rsquo;s not being used.&lt;/p>
+&lt;/blockquote>
+&lt;p>Now let&amp;rsquo;s step through each part of this file, so you can see what each part does.&lt;/p>
+&lt;h2 id="patch-metadata-code_metacode">Patch Metadata (&lt;code>_meta&lt;/code>)&lt;/h2>
+&lt;p>The first thing you&amp;rsquo;ll usually find in a Sicario patch file is the &lt;code>_meta&lt;/code> field, which is an object with a few optional properties:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>DisplayName&lt;/code>: A user-friendly name to show for your mod&lt;/li>
+&lt;li>&lt;code>Author&lt;/code>: Take a guess what this one&amp;rsquo;s for hotshot&lt;/li>
+&lt;li>&lt;code>Description&lt;/code>: also self-explanatory&lt;/li>
+&lt;/ul>
+&lt;p>All three of these values will be shown to users so please don&amp;rsquo;t just put &amp;ldquo;do the thing&amp;rdquo; or fill them in with shitposting!&lt;/p>
+&lt;p>There is some more metadata you can optionally provide, but that&amp;rsquo;s covered later on.&lt;/p>
+&lt;h2 id="the-asset-patches-assetpatches">The Asset Patches (&lt;code>AssetPatches&lt;/code>)&lt;/h2>
+&lt;p>The &lt;code>AssetPatches&lt;/code> object is the main &amp;ldquo;substance&amp;rdquo; of a Sicario patch. It is a dictionary grouping the files to be edited with sets of patches to be applied to that file.&lt;/p>
+&lt;blockquote>
+&lt;p>Note that to support auto-packing you need to include the game file as the full target path for the file you&amp;rsquo;re editing.&lt;/p>
+&lt;/blockquote>
+&lt;p>In the example above, we have just one key in the object: &lt;code>ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp&lt;/code>. This just means that &lt;code>DB_Aircraft.uexp&lt;/code> will be the only file that this patch will be applied to and it will be packed in that specific path. Each file then has an array of &amp;ldquo;patch sets&amp;rdquo;.&lt;/p>
+&lt;h3 id="patch-sets">Patch Sets&lt;/h3>
+&lt;p>Patch Sets are mostly a logical organizational idea: they&amp;rsquo;re a way of organizing patches together. For example, if your mod is changing multiple stats for multiple planes, you might include each plane as a separate patch set. A patch set is just an object with &lt;code>name&lt;/code> and an array of &lt;code>patches&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;AoA Unlock&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>On it&amp;rsquo;s own a patch set doesn&amp;rsquo;t do much, that&amp;rsquo;s up to the actual &lt;em>patches&lt;/em> in the set.&lt;/p>
+&lt;h4 id="patch-set-grouping">Patch Set Grouping&lt;/h4>
+&lt;p>There is one important thing to note with patch sets: all the patches in a set are &lt;em>matched&lt;/em> together. That means if one patch requires a previous change, or matches based on a value changed by a previous patch, they need to be in separate patch sets. For example, if you change the name of something and then want a later patch to find the property based on that new name, it needs to be in its own set.&lt;/p>
+&lt;p>This will make a bit more sense later on, but just keep it in mind if you&amp;rsquo;re making changes that rely on each other.&lt;/p>
+&lt;blockquote>
+&lt;p>The reason for this is both complex and simple: it was possible for a change from an earlier patch to then match a later patches template which was extremely confusing in practice.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="patches">Patches&lt;/h3>
+&lt;p>Now we hit the real meat of a Sicario patch: the actual edit to make. Here&amp;rsquo;s the example for enabling AoA for all aircraft:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:{&amp;#39;BaseStats*&amp;#39;}.{&amp;#39;CanUseAoA*&amp;#39;}&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;BoolProperty:true&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;propertyValue&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>In plain English, this object just tells Sicario &amp;ldquo;replace the value of any &lt;code>CanUseAoA&lt;/code> properties with &lt;code>true&lt;/code>&amp;rdquo;, but that&amp;rsquo;s probably not immediately obvious. Don&amp;rsquo;t worry, it&amp;rsquo;s not as complicated as it looks!&lt;/p>
+&lt;h4 id="template-and-value">Template and Value&lt;/h4>
+&lt;p>These are the actual values Sicario will be (respectively) looking for and inserting into the file. When it runs, Project Sicario will load the file into memory, parse the file (more on that later), look for &lt;em>any&lt;/em> values that match the &lt;strong>template&lt;/strong> value and then apply the &lt;strong>value&lt;/strong>. How exactly the value is applied varies based on the patch &lt;em>type&lt;/em>.&lt;/p>
+&lt;p>In short, the Template is how Sicario knows which properties to change (and not to change) and is used to isolate out exactly what you want to change. Templates are covered in more detail in the &lt;a href="../template">next&lt;/a> section.&lt;/p>
+&lt;p>The Value of the patch, on the other hand, is how Sicario knows &lt;em>how&lt;/em> you want to change it and is used to apply any number of potential changes based on the patch &lt;em>type&lt;/em>. The patch value (and patch types) are also covered in more detail in a &lt;a href="../patches">later&lt;/a> section.&lt;/p></description></item><item><title>Patches: Understanding Property Templates</title><link>/patches/walkthrough/template/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough/template/</guid><description>
+&lt;p>If you oversimplify a UE4 cooked asset file (that&amp;rsquo;s Sicario&amp;rsquo;s job), they are essentially a collection of properties, some of them with their own properties and so forth. The &lt;code>template&lt;/code> value is essentially a filter to control which properties the &lt;code>value&lt;/code> is applied to, using a set of simplistic filters. The syntax can seem kinda of daunting but it&amp;rsquo;s not so bad once you understand how it works.&lt;/p>
+&lt;p>The basic format is this: a data type at the start, then a set of filters separated by &lt;code>.&lt;/code>s.&lt;/p>
+&lt;p>When it runs a patch, Sicario will load the file using the specified type, it will run every property in the file through the chain of filters and then run the actual patch type and value on all the matching properties.&lt;/p>
+&lt;p>Each filter in the chain is run in order so only properties that match each step will be included in the final result.&lt;/p>
+&lt;h2 id="data-types">Data Types&lt;/h2>
+&lt;p>The first thing in a template is the data type. &lt;strong>As of writing&lt;/strong> there is only one supported data type: data tables, specified with the &lt;code>datatable:&lt;/code> prefix. This loads the file as a UE4 DataTable, returning every row of the table as a named property.&lt;/p>
+&lt;h2 id="filters">Filters&lt;/h2>
+&lt;p>This is the most daunting part to understand, but really isn&amp;rsquo;t as bad as it looks. Let&amp;rsquo;s explore this using our example mod: the AoA unlocker. Here&amp;rsquo;s that mod&amp;rsquo;s template:&lt;/p>
+&lt;pre>&lt;code>datatable:{'BaseStats*'}.{'CanUseAoA*'}
+&lt;/code>&lt;/pre>&lt;p>First off, the easy part: the type. The &lt;code>datatable:&lt;/code> tells Sicario to load the file as a UE4 DataTable and returns every row. Next up is a set of filters separated by &lt;code>.&lt;/code>s. In our case, both filters are doing the same thing: returning only the struct properties with a name that starts with a certain string, first off &lt;code>BaseStats&lt;/code>. Next, the result of that filter (i.e. a bunch of properties named &lt;code>BaseStats&lt;/code>) are passed into the second filter. That filter just returns any struct properties with a name that starts with &lt;code>CanUseAoA&lt;/code>. All the properties that match that last filter are passed directly to the patch type to have the value modified.&lt;/p>
+&lt;h4 id="example-in-action">Example in Action&lt;/h4>
+&lt;p>If you&amp;rsquo;ve ever seen the &lt;code>DB_Aircraft&lt;/code> file that this example patch is modifying, you&amp;rsquo;ll have noticed it looks something like this abridged sample:&lt;/p>
+&lt;pre>&lt;code class="language-jsonc" data-lang="jsonc">&amp;quot;T-21&amp;quot;: {
+&amp;quot;export_type&amp;quot;: &amp;quot;RowStruct&amp;quot;,
+&amp;quot;FamilyID_114_171BFD3F41B21A7C1797CE91CF694311&amp;quot;: &amp;quot;mig21&amp;quot;,
+&amp;quot;ID_101_9607548349D1C4AAC5D972B872BB91E4&amp;quot;: {
+// trimmed
+},
+&amp;quot;CQ_ID_149_53E0A3174FB70B3F9698058FB61388D9&amp;quot;: {
+//trimmed
+},
+&amp;quot;Price_77_50AB72FA43B3127002F5F893321A7AAA&amp;quot;: 0,
+// ...trimmed
+&amp;quot;BoneDetails_46_F00ED91D4FDF91F973A7DAAF8A291DBF&amp;quot;: {
+&amp;quot;PilotCount_2_65D06B7D492533AA2F8E9DA8254C5747&amp;quot;: 1,
+&amp;quot;CondensationPoint_15_187804564BEB3AD239710AB3F72AABDF&amp;quot;: 0,
+// ...trimmed
+},
+&amp;quot;BaseStats_90_4FCD5FE44A06097FD9A455ACA4754B1E&amp;quot;: {
+&amp;quot;RollInterpSpeed_28_C66FD5244EC8FBAE6B5EC9837FB70B1E&amp;quot;: 1.9,
+&amp;quot;PitchInterpSpeed_29_90B4863F4DFF9111D073229AE0C909E9&amp;quot;: 2.1,
+&amp;quot;YawInterpSpeed_30_272A70AB493C5265822667AFA304857C&amp;quot;: 1.5,
+&amp;quot;MaxSpeed_31_58011513426ABC47552EEFA646C7E89A&amp;quot;: 2500.0,
+&amp;quot;Acceleration_34_294F4BA04EA43CF04A560E82B90B7DFA&amp;quot;: 55.0,
+&amp;quot;RollSpeed_39_E8C7F3914C6D3146D2166FAF21971CED&amp;quot;: 170.0,
+&amp;quot;TurnSpeed_40_5254820C48D4E4E50EBD089AB8C2B12E&amp;quot;: 85.0,
+&amp;quot;YawSpeed_37_33AA996848D24FBF807F609931FDC135&amp;quot;: 10.0,
+&amp;quot;InterpSpeed_43_B02AFCF7418D3359B814BB9FA4E8DF9F&amp;quot;: 2.0,
+&amp;quot;GearLiftVar_47_037DE3944066F0D58637388A1488C773&amp;quot;: 25.0,
+&amp;quot;CannonType_50_D23A2D56429DB7C2FD1F3F9BD32989C9&amp;quot;: &amp;quot;S_CannonType::NewEnumerator0&amp;quot;,
+&amp;quot;CanUseAoA_52_927DA6AE426EEE21F9ECD7AF7E857628&amp;quot;: false,
+&amp;quot;VTOL_54_FABB19354B444768DC73E1BF80437EA1&amp;quot;: false
+},
+&amp;quot;UIImage_83_026AA95649B0C45015114AAB80EDFCD4&amp;quot;: [&amp;quot;mg21_icon&amp;quot;, &amp;quot;/Game/Assets/Objects/Aircraft/Mig21/Textures/mg21_icon&amp;quot;],
+&amp;quot;HardpointSlots_122_9A810A7F449CEB12E0CD0C808A4D3162&amp;quot;: [2, 2],
+&amp;quot;HardpointCompatibilityList_130_7BA5148945B4572A862CC0ACFFB7AB21&amp;quot;: [&amp;quot;stdm&amp;quot;, &amp;quot;0,droptank&amp;quot;],
+// ...trimmed
+},
+&amp;quot;TF-4E&amp;quot;: {
+// ...trimmed
+}
+&lt;/code>&lt;/pre>&lt;p>It should be a little clearer now that our &lt;code>{'BaseStats*'}.{'CanUseAoA*'}&lt;/code> template will match and return the &lt;code>BaseStats_90_4FCD5FE44A06097FD9A455ACA4754B1E&lt;/code> property for each aircraft, then the second filter will match and return the &lt;code>CanUseAoA_52_927DA6AE426EEE21F9ECD7AF7E857628&lt;/code> property for each aircraft. Now, just those properties will be run through the patch type to be updated.&lt;/p>
+&lt;h2 id="filter-types">Filter Types&lt;/h2>
+&lt;p>Now, all the examples above were looking for the same thing: struct property types. The template syntax though, is a lot more flexible than that. To see what an &lt;strong>extreme&lt;/strong> example looks like: here is another template.&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-text" data-lang="text">datatable:[&amp;#39;F-15C&amp;#39;].[0].{&amp;#39;HardpointSlots*&amp;#39;}.[[1]].&amp;lt;IntProperty=&amp;#39;2&amp;#39;&amp;gt;
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now if we step through this one again, you&amp;rsquo;ll see a few new filters, but the same basic idea:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>datatable:&lt;/code> : Loads the file as a data table&lt;/li>
+&lt;li>&lt;code>['F-15C']&lt;/code>: Matches any properties with a name of &lt;code>F-15C&lt;/code>&lt;/li>
+&lt;li>&lt;code>[0]&lt;/code>: only returns the &lt;strong>first&lt;/strong> match (arrays are numbered from zero).&lt;/li>
+&lt;li>&lt;code>{'HardpointSlots*'}&lt;/code>: returns properties from any matched structs with a name that starts with &lt;code>HardpointSlots&lt;/code>&lt;/li>
+&lt;li>&lt;code>[[1]]&lt;/code>: Matches the second entry &lt;em>in a matching array property&lt;/em> (rather than just the first match).&lt;/li>
+&lt;li>&lt;code>&amp;lt;IntProperty='2'&amp;gt;&lt;/code>: Only returns matching properties that are of an &lt;code>IntProperty&lt;/code> type &lt;strong>and&lt;/strong> have a value of &lt;code>2&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>The &lt;code>[]&lt;/code> vs &lt;code>[[]]&lt;/code> distinction can be tricky. The easiest summary is that &lt;code>[[]]&lt;/code> matches the &lt;em>contents&lt;/em> of an &lt;code>ArrayProperty&lt;/code>, but &lt;code>[]&lt;/code> just matches the first property it sees and returns the whole property&lt;/p>
+&lt;/blockquote>
+&lt;p>Now that&amp;rsquo;s a lot of filters, the result of which is that out of the entire lengthy and complex &lt;code>DB_Aircraft&lt;/code> datatable, that result returns exactly &lt;strong>one&lt;/strong> thing: the &lt;em>unmodded&lt;/em> second weapon hardpoint for the FC-15.&lt;/p>
+&lt;p>While they can be tricky to make, a well-written template will ensure that you only change the values you want and can even ensure that you don&amp;rsquo;t overwrite modded values, allowing users to merge your patch with others better.&lt;/p>
+&lt;h2 id="available-filters">Available Filters&lt;/h2>
+&lt;blockquote>
+&lt;p>Please note that this list may not be exhaustive: Sicario is designed to support additional filters easily&lt;/p>
+&lt;/blockquote>
+&lt;p>Here&amp;rsquo;s a very brief summary of the available filters for use in templates:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:right">Syntax&lt;/th>
+&lt;th style="text-align:center">Example&lt;/th>
+&lt;th style="text-align:left">Notes&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>[int]&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>[0]&lt;/code>,&lt;code>[2]&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Matches the &lt;code>n&lt;/code>th incoming result. Helpful for filtering duplicates, or Mk.1 planes&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>['string']&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>['F-15C']&lt;/code>, &lt;code>['MSSL']&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Matches an incoming property with the given name. Doesn&amp;rsquo;t care what type it is or what properties it might have.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>[[int]]&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>[[1]]&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Matches the &lt;code>n&lt;/code>th entry of incoming &lt;code>ArrayProperty&lt;/code>s, returning the actual entry, not the array itself.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>{'string'}&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>{'BoneDetails*'}, &lt;/code>{&amp;lsquo;UnitType_2_2706&amp;rsquo;}`&lt;/td>
+&lt;td style="text-align:left">Matches a &lt;em>child&lt;/em> property of a StructProperty by name, optionally with partial matching&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>&amp;lt;string&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>&amp;lt;IntProperty&amp;gt;&lt;/code>, &lt;code>&amp;lt;StructProperty&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Matches only the incoming properties of the specific given type&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>&amp;lt;string=int&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>&amp;lt;IntProperty=2&amp;gt;&lt;/code>, &lt;code>&amp;lt;FloatProperty=1.5&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Matches only incoming properties of the specific type &lt;em>and&lt;/em> specific value&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>&amp;lt;string='string'&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>&amp;lt;StrProperty='saa,mlaa'&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Same as above, but for non-numeric types&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:right">&lt;code>&amp;lt;string::string&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:center">&lt;code>&amp;lt;S_CannonType::NewEnumerator2&amp;gt;&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Matches only enum properties, with the right enum type and the right enum value&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>There&amp;rsquo;s also one special filter: &lt;code>[*]&lt;/code>. That filter will just match everything and return all the properties it receives. This can be useful if you&amp;rsquo;re trying to match a whole datatable for example.&lt;/p></description></item><item><title>Patches: Understanding Patches and Patch Types</title><link>/patches/walkthrough/patches/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough/patches/</guid><description>
+&lt;h3 id="patches">Patches&lt;/h3>
+&lt;p>Now we hit the real meat of a Sicario patch: the actual edit to make. Here&amp;rsquo;s the example for enabling AoA for all aircraft:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:{&amp;#39;BaseStats*&amp;#39;}.{&amp;#39;CanUseAoA*&amp;#39;}&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;BoolProperty:true&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;propertyValue&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>In plain English, this object just tells Sicario &amp;ldquo;replace the value of any &lt;code>CanUseAoA&lt;/code> properties with &lt;code>true&lt;/code>&amp;rdquo;.&lt;/p>
+&lt;h4 id="template-and-value">Template and Value&lt;/h4>
+&lt;p>These are the actual values Sicario will be (respectively) looking for and inserting into the binary file. When it runs, Project Sicario will load the file into memory, parse the file (more on that below), look for &lt;em>any&lt;/em> values that match the &lt;strong>template&lt;/strong> value and then apply the &lt;strong>value&lt;/strong>. How exactly the value is applied varies based on the patch &lt;em>type&lt;/em>.&lt;/p>
+&lt;p>Templates are covered in more detail in the &lt;a href="../template">Property Templates&lt;/a> section.&lt;/p>
+&lt;h4 id="types">Types&lt;/h4>
+&lt;p>The two main types of patches currently in use are:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:center">Type&lt;/th>
+&lt;th style="text-align:left">Notes&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:center">&lt;code>propertyValue&lt;/code>&lt;/td>
+&lt;td style="text-align:left">This is by far the most common/useful and for good reason: it&amp;rsquo;s the most useful and versatile type. It sets the value of matching properties to the given value.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">&lt;code>arrayPropertyValue&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Sibling type to &lt;code>propertyValue&lt;/code> that creates/inserts an array value to the given properties using a simple array syntax&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">&lt;code>modifyPropertyValue&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Modifies a numeric value &lt;em>based on it&amp;rsquo;s existing value&lt;/em>.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:center">&lt;code>textProperty&lt;/code>&lt;/td>
+&lt;td style="text-align:left">Specialized patch type for working UE4&amp;rsquo;s TextProperty fields more effectively.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Most of these types use a common convention for the &lt;code>value&lt;/code> field: &lt;code>DataType:value&lt;/code>. This ensures that the properties are set with the correct data types the game uses. Note that other patch types might not use the same convention.&lt;/p>
+&lt;h5 id="special-patch-types">Special Patch Types&lt;/h5>
+&lt;p>The 4 patch types above will handle the vast majority of Sicario patches reasonably well, but there&amp;rsquo;s two patch types that deserve extra attention: &lt;code>objectRef&lt;/code> and &lt;code>duplicateEntry&lt;/code>&lt;/p>
+&lt;blockquote>
+&lt;p>Both of these are much more complex to get working right and I&amp;rsquo;d recommend you start with the simpler changes handled by the regular patch types.&lt;/p>
+&lt;/blockquote>
+&lt;h6 id="duplicateentry-and-duplicateproperty">&lt;code>duplicateEntry&lt;/code> and &lt;code>duplicateProperty&lt;/code>&lt;/h6>
+&lt;p>This one is pretty powerful as its the most reliable way to &lt;em>add&lt;/em> new properties to an existing object, by duplicating an existing property of an object. Adding a new property just requires matching the parent property, then specifying the source property&amp;rsquo;s name and and the duplicate property&amp;rsquo;s (unique) name.&lt;/p>
+&lt;p>Here&amp;rsquo;s a patch that adds a new weapon based on the STDM:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Clone MSSL&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:[*]&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#39;MSSL&amp;#39;&amp;gt;&amp;#39;MSTM&amp;#39;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;duplicateEntry&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>The template just matches the top-level datatable (i.e. all entries in the table) and the value follows the simple pattern of &lt;code>'SourceName':'TargetName'&lt;/code> so you can specify the row to be duplicated (i.e. the &lt;code>MSSL&lt;/code> row) and what the new row should be named (&lt;code>MSTM&lt;/code>). This will take a copy of the &lt;code>MSSL&lt;/code> property data and add it as a new property to the end of the datatable.&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;code>duplicateProperty&lt;/code> follows the same logic but for duplicating properties on an object rather than the whole object. It&amp;rsquo;s a bit more niche.&lt;/p>
+&lt;/blockquote>
+&lt;p>Note that as covered in the &amp;ldquo;Patch Set Grouping&amp;rdquo; section above, patch sets are &lt;em>matched&lt;/em> together, so if you add a new property then want to match that property in later patches, make sure they&amp;rsquo;re in a separate patch &lt;em>set&lt;/em>.&lt;/p>
+&lt;h6 id="objectref">&lt;code>objectRef&lt;/code>&lt;/h6>
+&lt;p>The &lt;code>objectRef&lt;/code> patch type is used to change what object a property refers to. Internally, UE4 refers to objects using links that seem kind of convoluted on the surface: the property just has a number referring to an entry in the linked class list, which refers to another entry in the linked class list which then refers to an entry in the header list. That&amp;rsquo;s a mess, so the &lt;code>objectRef&lt;/code> patch type will handle updating each of those parts in order.&lt;/p>
+&lt;p>For example, here&amp;rsquo;s a patch that changes what texture the first skin slot on the F-16C uses:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Change the default skin 1&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:[&amp;#39;F-16C&amp;#39;].[0].{&amp;#39;SkinLibraryLegacy*&amp;#39;}.[[0]]&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;&amp;#39;F16Custom_01&amp;#39;:&amp;#39;/Game/Assets/Objects/Aircraft/F16C/Textures/Skin/F16Custom_01&amp;#39;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;objectRef&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>You&amp;rsquo;ll note that the template syntax is the same as always: just use the template that matches the linked property you want to change. The value syntax though is a little different, and can best be summed up as &lt;code>'ObjectName':'ObjectPath'&lt;/code>. Simply specify what object that property should link to and the patch type will handle updating the linked classes and header list.&lt;/p></description></item><item><title>Patches: Example Mod</title><link>/patches/walkthrough/example/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough/example/</guid><description>
+&lt;p>So now you&amp;rsquo;ve seen one basic example, but just to expand on that, here&amp;rsquo;s another very simple Sicario patch to &lt;em>unlock all currently locked modifiers&lt;/em>:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;_meta&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;DisplayName&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Unlock disabled modifiers&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;Author&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;agc93&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Unlocks disabled modifiers. Note that these modifiers don&amp;#39;t actually work in-game.&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;AssetPatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;ProjectWingman/Content/ProjectWingman/Blueprints/Data/Modifiers/DB_Modifiers.uexp&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;name&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Unlock modifiers&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;patches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">[&lt;/span>
+&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;All modifiers available&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:{&amp;#39;Available*&amp;#39;}.&amp;lt;BoolProperty=&amp;#39;false&amp;#39;&amp;gt;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;BoolProperty:true&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;propertyValue&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">]&lt;/span>
+&lt;span style="color:#000;font-weight:bold">},&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;FilePatches&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#000;font-weight:bold">{&lt;/span> &lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>You&amp;rsquo;ll see that the basic structure is essentially the same, just with different values for the files, as well as the details of the specific patch being applied.&lt;/p></description></item></channel></rss>
