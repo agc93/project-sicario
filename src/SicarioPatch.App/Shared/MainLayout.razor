@@ -19,14 +19,28 @@
                 </BarBrand>
                 <BarMenu>
                     <BarStart>
-                        <AuthorizeView Policy="@Policies.IsUser">
-                            <BarItem>
-                                <BarLink To="build">
-                                    <BarIcon IconName="IconName.Code"/>
-                                    Build
-                                </BarLink>
-                            </BarItem>
-                        </AuthorizeView>
+                        <BarItem>
+                            <BarLink To="build">
+                                <BarIcon IconName="IconName.Code"/>
+                                Build
+                            </BarLink>
+                        </BarItem>
+                        <BarItem>
+                            <BarDropdown>
+                                <BarDropdownToggle>
+                                    <BarIcon IconName="MaterialIcons.MergeType"/>
+                                    Merger
+                                </BarDropdownToggle>
+                                <BarDropdownMenu>
+                                    <BarDropdownItem To="/merger">
+                                        About the @Brand.ToolName
+                                    </BarDropdownItem>
+                                    <BarDropdownItem To="/merger-start">
+                                        Get started with @Brand.ToolName(NameFormat.Short)
+                                    </BarDropdownItem>
+                                </BarDropdownMenu>
+                            </BarDropdown>
+                        </BarItem>
                         <AuthorizeView Policy="@Policies.IsUploader">
                             <BarItem>
                                 <BarLink To="upload">
@@ -59,14 +73,12 @@
                                     <BarDropdownItem To="/faq">
                                         FAQ
                                     </BarDropdownItem>
-                                    <AuthorizeView>
                                     @if (Config.GetDocsPath(out var docsPath))
                                     {
                                         <BarDropdownItem To="@docsPath">
                                             Documentation
                                         </BarDropdownItem>
                                     }
-                                    </AuthorizeView>
                                     <BarDropdownItem To="https://www.humblegames.com/games/projectwingman/" Target="Target.Blank">
                                         Project Wingman
                                     </BarDropdownItem>
@@ -104,18 +116,5 @@
 
 @code {
     SnackbarStack _snackbar;
-    
-    
-    // ReSharper disable once ConvertToAutoProperty
-    // ReSharper disable ArrangeAccessorOwnerBody
-    /*[CascadingParameter]
-    private SnackbarStack SnackbarStack
-    {
-    
-        get { return _snackbar;}
-    
-        set { _snackbar = value; }
-    }*/
-    // ReSharper restore ArrangeAccessorOwnerBody
 
 }

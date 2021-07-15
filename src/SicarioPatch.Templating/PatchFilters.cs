@@ -191,7 +191,6 @@ namespace SicarioPatch.Templating
             filters.AddFilter("float", PatchFilters.FromFloat);
             filters.AddFilter("string", PatchFilters.FromString);
             filters.AddFilter("int", PatchFilters.FromInt);
-            filters.AddFilter("mult", PatchFilters.MultiplyValue);
             filters.AddFilter("amp", PatchFilters.AmplifyInput);
             filters.AddFilter("row", PatchFilters.ToRow);
             filters.AddFilter("bool", PatchFilters.FromBool);

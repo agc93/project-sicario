@@ -16,16 +16,24 @@ namespace SicarioPatch.Core
         private readonly AssetPatcher _assetPatcher;
         private Dictionary<string, int> OriginalFileSize { get; init; } = new Dictionary<string, int>();
 
-        protected internal WingmanPatchService(AssetPatcher aPatcher, FilePatcher patcher, SourceFileService fileService, BuildContext context, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, mods, logger) {
+        protected internal WingmanPatchService(AssetPatcher aPatcher, FilePatcher patcher, ISourceFileService fileService, DirectoryBuildContext context, IModBuilder modBuilder, List<WingmanMod> mods, ILogger<ModPatchService<WingmanMod>> logger) : base(patcher, fileService, context, modBuilder, mods, logger) {
             _assetPatcher = aPatcher;
         }
 
         public async Task<ModPatchService<WingmanMod>> RunAssetPatches() {
             foreach (var mod in Mods) {
-                foreach (var (targetAsset, assetPatchSets) in mod.AssetPatches) {
-                    var srcPath = Path.Join(_ctx.WorkingDirectory.FullName, targetAsset);
+                foreach (var (targetAssetKey, assetPatchSets) in mod.AssetPatches) {
+                    var targetAsset = targetAssetKey;
+                    string targetAssetName = null;
+                    if (targetAsset.Contains('>')) {
+                        //fancy rewrite incoming
+                        var assetSplit = targetAsset.Split('>');
+                        targetAsset = assetSplit.First();
+                        targetAssetName = assetSplit.Last();
+                    }
+                    var srcPath = Path.Join(Context.WorkingDirectory.FullName, targetAsset);
                     _logger?.LogDebug($"Running asset patches for {Path.GetFileName(targetAsset)}");
-                    var _ = await _assetPatcher.RunPatch(srcPath, assetPatchSets);
+                    var _ = await _assetPatcher.RunPatch(srcPath, assetPatchSets, targetAssetName);
                 }
             }
 
@@ -37,10 +45,11 @@ namespace SicarioPatch.Core
             foreach (var mod in Mods)
             {
                 var modifiedFiles = new List<FileInfo>();
-                _logger?.LogInformation($"Running patches for {mod.GetLabel()}");
+                _logger?.LogInformation($"Running patches for {mod.GetLabel(mod.Id ?? "Unknown mod")}");
+                // _logger?.LogInformation($"Running patches for {mod.Id}");
                 foreach (var (targetFile, patchSets) in mod.FilePatches)
                 {
-                    var srcPath = Path.Join(_ctx.WorkingDirectory.FullName, targetFile);
+                    var srcPath = Path.Join(Context.WorkingDirectory.FullName, targetFile);
                     OriginalFileSize[srcPath] = (int) new FileInfo(srcPath).Length;
                     _logger?.LogDebug($"Patching {Path.GetFileName(targetFile)}...");
                     var finalFile = await _patcher.RunPatch(srcPath, patchSets);
@@ -89,17 +98,19 @@ namespace SicarioPatch.Core
                 .GroupBy(fp => fp.Key)
                 .Where(g => g.Any())
                 .Select(g => g.Key)
+                .Select(g => g.Split('>').FirstOrDefault())
+                .Where(g => g != null)
                 .Distinct()
                 .ToList();
             foreach (var file in requiredFiles)
             {
                 var srcFile = _fileService.LocateFile(Path.GetFileName(file));
-                this._ctx.AddFile(Path.GetDirectoryName(file), srcFile);
+                this.BuildContext.AddFile(Path.GetDirectoryName(file), srcFile);
                 if (extraFileSelector != null) {
                     var extraFiles = extraFileSelector.Invoke(file) ?? new List<string>();
                     foreach (var eFile in extraFiles) {
                         var exFile = _fileService.LocateFile(Path.GetFileName(eFile));
-                        this._ctx.AddFile(Path.GetDirectoryName(eFile), exFile);
+                        this.BuildContext.AddFile(Path.GetDirectoryName(eFile), exFile);
                     }
                 }
             }
@@ -107,33 +118,35 @@ namespace SicarioPatch.Core
         }
     }
 
-        /// <summary>
+    /// <summary>
         /// This builder exists only as a very shitty wrapper over the ModPatchService to make it more DI-friendly.
         /// Inject a *Builder then use that to create however many services you need.
         /// It's shit. I know.
         /// </summary>
         public class WingmanPatchServiceBuilder
         {
-            private readonly SourceFileService _fileService;
+            private readonly ISourceFileService _fileService;
             private readonly FilePatcher _filePatcher;
             private readonly AssetPatcher _assetPatcher;
-            private readonly BuildContextFactory _ctxFactory;
+            private readonly DirectoryBuildContextFactory _ctxFactory;
+            private readonly IModBuilder _modBuilder;
             private readonly ILogger<ModPatchService<WingmanMod>> _tgtLogger;
 
-            public WingmanPatchServiceBuilder(SourceFileService sourceFileService, FilePatcher filePatcher, AssetPatcher assetPatcher, BuildContextFactory contextFactory, ILogger<ModPatchService<WingmanMod>> logger)
+            public WingmanPatchServiceBuilder(ISourceFileService sourceFileService, FilePatcher filePatcher, AssetPatcher assetPatcher, DirectoryBuildContextFactory contextFactory, IModBuilder modBuilder, ILogger<ModPatchService<WingmanMod>> logger)
             {
                 _fileService = sourceFileService;
                 _filePatcher = filePatcher;
                 _assetPatcher = assetPatcher;
                 _ctxFactory = contextFactory;
+                _modBuilder = modBuilder;
                 _tgtLogger = logger;
             }
 
             public async Task<WingmanPatchService> GetPatchService(IEnumerable<WingmanMod> modCollection, string ctxName = null)
             {
                 var mods = modCollection.ToList();
-                var ctx = await _ctxFactory.Create(ctxName);
-                return new WingmanPatchService(_assetPatcher, _filePatcher, _fileService, ctx, mods, _tgtLogger);
+                var ctx = _ctxFactory.CreateContext(ctxName);
+                return new WingmanPatchService(_assetPatcher, _filePatcher, _fileService, ctx, _modBuilder, mods, _tgtLogger);
             }
         }
 }

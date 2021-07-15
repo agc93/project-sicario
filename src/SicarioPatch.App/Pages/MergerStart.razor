@@ -1,0 +1,46 @@
+﻿@page "/merger-start"
+@inject IBrandProvider Brand
+<h3 style="margin-bottom: 2.5rem;">Getting Started with @Brand.ToolName(NameFormat.Long)</h3>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">Downloading @_psm</DisplayHeading>
+<Paragraph>
+    You can download and install @Brand.ToolName() from either Nexus Mods or GitHub. Both sources have the same file but note that if you install with Vortex, you'll only get notified of updates if you install from Nexus Mods. 
+</Paragraph>
+<Card Style="margin-bottom: 2.5rem; max-width: 50%;">
+    
+    <CardBody><CardTitle>Download @_psm</CardTitle><CardText>Use the links below to download the latest version of @Brand.ToolName()</CardText></CardBody>
+    <CardFooter>
+    <CardActions>
+        <Button Type="ButtonType.Link" Color="Color.Primary" To="https://www.nexusmods.com/projectwingman/mods/270" Target="Target.Blank">Nexus Mods</Button>
+        <Button Type="ButtonType.Link" Color="Color.Secondary" To="https://github.com/agc93/project-sicario/releases" Target="Target.Blank">GitHub</Button>
+    </CardActions>
+    </CardFooter>
+</Card>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">Installing @Brand.ToolName(NameFormat.Short)</DisplayHeading>
+<Heading Size="HeadingSize.Is6">Vortex</Heading>
+<Paragraph>
+    Vortex (with WingVortex 0.2.1+) has integrated support for merging mods with @_psm. Just install @_psm from Nexus Mods like any other mod, enable it and then turn on the @_psm integration in Settings > Interface. Vortex will automatically run @_psm after each deploy and manage your merged mod like any other mod in your mods list.
+</Paragraph>
+<Heading Size="HeadingSize.Is6">Manual Installation</Heading>
+<Paragraph>
+    While its easier to use with Vortex, you can still use @_psm manually as well. Download the archive above then extract the <code>ProjectSicario.exe</code> inside. You can actually have the merger "installed" wherever you like, but we recommend installing it to your game's install folder. Once it's in place, double-click the app file to run with the default options and it should create your merged mod.
+</Paragraph>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">How does it work?</DisplayHeading>
+<Paragraph>
+    At its core, @_psm does the same thing that the regular @Brand.AppName does, but entirely on your PC. So it loads a set of instructions (patches) and then applies them to the vanilla game files (extracted directly from your install) and creates a new mod with the specified changes applied. Since it's local, @_psm can load patches and presets directly from your install as well as re-creating any other @Brand.ShortName-built mods you have installed.
+</Paragraph>
+<Paragraph>
+    After it's built, @_psm will output a single mod file with the combined result of all the merged mods it loaded either to your mod staging folder then deployed to your game folder(for Vortex) or directly to the game folder (for manual users). Either way, you should now be able to launch your game and <em>assuming no other mod overwrites your merged patch</em>, you should be good to go. Note that you can still use non-@_psm-compatible mods, but they can't modify the same game files. 
+</Paragraph>
+
+<DisplayHeading Size="DisplayHeadingSize.Is4">What about skins?</DisplayHeading>
+<Paragraph>
+    Some skins may either require @_psm or provide different downloads of the skin for @Brand.ShortName users. The reason for this is simple: @_psm can dynamically create new skin slots for aircraft during the merge process so that you are no longer limited by the number of skin slots an aircraft has. However, the skins have to be packed correctly to take advantage of this feature, so only @_psm-compatible skins can do this. Other skins will still work, they are just limited to replacing existing skin slots.
+</Paragraph>
+
+@code {
+    // ReSharper disable once InconsistentNaming
+    private string _psm => Brand.ToolName(NameFormat.Short);
+}

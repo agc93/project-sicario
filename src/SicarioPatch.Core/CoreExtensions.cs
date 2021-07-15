@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using HexPatch;
 
 namespace SicarioPatch.Core
@@ -67,6 +69,16 @@ namespace SicarioPatch.Core
                 }).ToDictionary(k => k.Key, v => v.Value);
             }
             return dict;
+        }
+
+        public static string GetParentDirectoryPath(this FileInfo fi) {
+            return fi.Directory?.FullName ?? Path.GetDirectoryName(fi.FullName);
+        }
+
+        //this is a horrible hack but otherwise the build process mutates the original mod selection
+        internal static List<WingmanMod> RebuildModList(this List<WingmanMod> sourceList) {
+            var json = JsonSerializer.Serialize(sourceList);
+            return JsonSerializer.Deserialize<List<WingmanMod>>(json);
         }
     }
 }

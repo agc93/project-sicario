@@ -20,6 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddPatchTypes(this IServiceCollection services) {
             services.AddSingleton<IAssetPatchType, PropertyValuePatchType>();
             services.AddSingleton<IAssetPatchType, ArrayPropertyPatchType>();
+            services.AddSingleton<IAssetPatchType, ModifyPropertyValuePatchType>();
             services.AddSingleton<IAssetPatchType, DuplicatePropertyPatchType>();
             services.AddSingleton<IAssetPatchType, DuplicateItemPatchType>();
             services.AddSingleton<IAssetPatchType, TextPropertyValuePatchType>();
@@ -30,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddTypeLoaders(this IServiceCollection services) {
             services.AddSingleton<IAssetTypeLoader, DataTableTypeLoader>();
+            services.AddSingleton<IAssetTypeLoader, RawTypeLoader>();
             return services;
         }
 

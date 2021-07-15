@@ -53,14 +53,14 @@ namespace SicarioPatch.App
             
             services
                 .AddSingleton<WingmanPatchServiceBuilder>()
-                .AddSingleton<SourceFileService>()
+                .AddSingleton<ISourceFileService, SourceFileService>()
                 .AddSingleton<FilePatcher>()
                 .AddSingleton<ModFileLoader<WingmanMod>>()
                 .AddSingleton<WingmanModLoader>()
-                .AddSingleton<BuildContextFactory>()
+                .AddSingleton<DirectoryBuildContextFactory>()
                 .AddSingleton<IAppInfoProvider, AppInfoProvider>()
                 .AddSingleton<AppInfoProvider>()
-                .AddSingleton<IScriptService, PythonScriptDownloadService>()
+                .AddSingleton<IModBuilder, PythonPackScript>()
                 .AddAssetServices()
                 ;
             if (Configuration.GetSection("Discord") is var discordOpts && discordOpts.Exists())

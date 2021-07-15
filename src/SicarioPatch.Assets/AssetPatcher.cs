@@ -21,7 +21,7 @@ namespace SicarioPatch.Assets
             _templates = templates;
         }
 
-        public async Task<FileInfo> RunPatch(string sourcePath, IEnumerable<AssetPatchSet> sets) {
+        public async Task<FileInfo> RunPatch(string sourcePath, IEnumerable<AssetPatchSet> sets, string targetName = null) {
             sourcePath = Path.ChangeExtension(sourcePath, "uasset");
             var fi = new FileInfo(sourcePath);
             foreach (var set in sets) {
@@ -41,7 +41,8 @@ namespace SicarioPatch.Assets
                         y = ctx.Loader.RunInstructions(y, newRecords);
                     }
                 }
-                y.Write(fi.FullName);
+                var targetAssetPath = targetName == null ? fi.FullName : Path.ChangeExtension(Path.Join(Path.GetDirectoryName(fi.FullName), targetName), "uasset");
+                y.Write(targetAssetPath);
             }
             return fi;
         }

@@ -19,7 +19,8 @@ namespace SicarioPatch.Core
         }
 
         private readonly Dictionary<string, IEnumerable<string>> _sideCars = new Dictionary<string, IEnumerable<string>> {
-            [".uexp"] = new string[] {".uasset"}
+            [".uexp"] = new string[] {".uasset"},
+            [".uasset"] = new [] {".uexp"}
         };
         
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken)
@@ -43,9 +44,7 @@ namespace SicarioPatch.Core
             (bool Success, FileInfo Result)? result;
             if (request.PackResult)
             {
-                result = mpServ.RunBuild(ctx =>
-                    new FileInfo(
-                        Path.Combine(ctx.BuildScript.WorkingDirectory, $"merged-{DateTime.UtcNow.Ticks}_P.pak")));
+                result = await mpServ.RunBuild($"merged-{DateTime.UtcNow.Ticks}_P.pak");
             }
             else
             {

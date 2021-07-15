@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ApplicationIcon>Resources/icon.ico</ApplicationIcon>
+        <AssemblyName>ProjectSicario</AssemblyName>
+        <IsPackable>false</IsPackable>
+        <IsPublishable>true</IsPublishable>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <DebugType>Embedded</DebugType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+      <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.4.0" />
+      <PackageReference Include="Spectre.Console" Version="0.40.0" />
+      <PackageReference Include="Spectre.Console.Extensions.Logging" Version="0.3.0-alpha0011" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
+      <ProjectReference Include="..\SicarioPatch.Integration\SicarioPatch.Integration.csproj" />
+      <ProjectReference Include="..\SicarioPatch.Templating\SicarioPatch.Templating.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Resources\icon.ico" />
+    </ItemGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        
+    </PropertyGroup>
+
+</Project>

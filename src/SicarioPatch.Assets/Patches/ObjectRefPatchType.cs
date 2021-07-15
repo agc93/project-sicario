@@ -20,7 +20,7 @@ namespace SicarioPatch.Assets.Patches
         public override string Type => "objectRef";
         protected override IEnumerable<AssetInstruction>? RunPatch(IEnumerable<PropertyData> propData, ObjectReference parsedValue) {
             foreach (var objectProp in propData.Where(pd => pd is ObjectPropertyData).Cast<ObjectPropertyData>()) {
-                AddObjectRef(parsedValue, objectProp);
+                AddObjectRef(parsedValue, objectProp, objectProp);
             }
 
             foreach (var arrayPropertyData in propData.Where(pd => pd is ArrayPropertyData).Cast<ArrayPropertyData>().Where(apd => apd.ArrayType == "ObjectProperty")) {
@@ -28,13 +28,12 @@ namespace SicarioPatch.Assets.Patches
                 if (inputMatch != null) {
                     // inputMatch.Name = parsedValue.TargetName;
                     var arrayValues = arrayPropertyData.Value.ToList();
-                    arrayValues.Add(inputMatch);
+                    arrayValues.Add(new ObjectPropertyData(parsedValue.Name, inputMatch.Asset));
                     arrayPropertyData.Value = arrayValues.ToArray();
-                }
-
-                var modMatch = arrayPropertyData.Value.Cast<ObjectPropertyData>().LastOrDefault();
-                if (modMatch != null) {
-                    AddObjectRef(parsedValue, modMatch);
+                    var modMatch = arrayPropertyData.Value.Cast<ObjectPropertyData>().LastOrDefault();
+                    if (modMatch != null) {
+                        AddObjectRef(parsedValue, modMatch, inputMatch as ObjectPropertyData);
+                    }
                 }
             }
 
@@ -48,18 +47,33 @@ namespace SicarioPatch.Assets.Patches
                 objectProp.Asset.links[Math.Abs(objectProp.Value.Linkage) - 1].Property;
             var existingPathLinkIndex = objectProp.Asset.SearchForLink(existingPathLinkHeaderRef);
             var existingPathLink = objectProp.Asset.GetLinkAt(existingPathLinkIndex);
+            AddObjectRef(parsedValue, objectProp, existingNameLink, existingPathLink);
+        }
 
+        private static void AddObjectRef(ObjectReference parsedValue, ObjectPropertyData targetProp,
+            ObjectPropertyData sourceProp) {
+            var existingNameLinkIndex = sourceProp.Asset.SearchForLink(sourceProp.Value.Property);
+            var existingNameLink = sourceProp.Asset.GetLinkAt(existingNameLinkIndex);
+            var existingPathLinkHeaderRef =
+                sourceProp.Asset.links[Math.Abs(sourceProp.Value.Linkage) - 1].Property;
+            var existingPathLinkIndex = sourceProp.Asset.SearchForLink(existingPathLinkHeaderRef);
+            var existingPathLink = sourceProp.Asset.GetLinkAt(existingPathLinkIndex);
+            AddObjectRef(parsedValue, targetProp, existingNameLink, existingPathLink);
+        }
+
+        private static void AddObjectRef(ObjectReference parsedValue, ObjectPropertyData objectProp, Link referenceNameLink,
+            Link referencePathLink) {
             var pathLinkRef = objectProp.Asset.AddHeaderReference(parsedValue.Path);
             var pathLinkIndex = objectProp.Asset.SearchForLink((ulong) pathLinkRef);
             var pathLink = pathLinkIndex == default
-                ? new Link(existingPathLink.Base, existingPathLink.Class, 0, (ulong) pathLinkRef)
+                ? new Link(referencePathLink.Base, referencePathLink.Class, 0, (ulong) pathLinkRef)
                 : objectProp.Asset.GetLinkAt(pathLinkIndex);
             pathLinkIndex = objectProp.Asset.AddLink(pathLink);
 
             var nameHeaderRef = objectProp.Asset.AddHeaderReference(parsedValue.Name);
             var nameLinkIndex = objectProp.Asset.SearchForLink((ulong) nameHeaderRef);
             var nameLink = nameLinkIndex == default
-                ? new Link(existingNameLink.Base, existingNameLink.Class, pathLinkIndex, (ulong) nameHeaderRef)
+                ? new Link(referenceNameLink.Base, referenceNameLink.Class, pathLinkIndex, (ulong) nameHeaderRef)
                 : objectProp.Asset.GetLinkAt(nameLinkIndex);
             nameLinkIndex = objectProp.Asset.AddLink(nameLink);
 

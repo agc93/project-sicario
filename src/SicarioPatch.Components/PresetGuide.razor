@@ -1,0 +1,56 @@
+﻿@inject IBrandProvider Brand
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <DisplayHeading Size="DisplayHeadingSize.Is4">@Title</DisplayHeading>
+}
+
+@if (IncludeIntro) {
+    <Heading Size="HeadingSize.Is5">What is @ToolName (@ShortName)?</Heading>
+    <Paragraph>
+        @ToolName (@ShortName) is (to really oversimplify it) the same basic functionality of @Brand.AppName, but running on your own PC. That means it can take the same patches available here (in the form of presets, more on that below) to merge otherwise incompatible mods together into one that the game can load. Since it's on your PC, @ShortName can load files directly from the game's install, and can adapt to @ShortName-compatible mods that you have installed.
+    </Paragraph>
+
+    <Heading Size="HeadingSize.Is5">What can @ShortName do?</Heading>
+    <Paragraph>
+        At a minimum, @ShortName can do everything that the @Brand.AppName you're using now can do, but on your own PC. Running locally means that @ShortName has a few other tricks:
+    </Paragraph>
+    <ul>
+        <li>Automatically add new skin slots to planes based on your installed @ShortName-compatible mods!</li>
+        <li>Merge all your installed mods/presets at once into a single file</li>
+        <li>Automatically includes changes from other @Brand.ShortName-compatible mods you have installed</li>
+    </ul>
+    <Paragraph>
+        Being local to your PC means you can also include any patches you install to your game folder, not just the ones available here.
+    </Paragraph>
+}
+
+<Heading Size="HeadingSize.Is5">What's a @Brand.ShortName preset?</Heading>
+<Paragraph>
+    A preset file is a simple (and small) file that doesn't contain any actual modified game files, but is basically a list of <em>instructions</em> for @ShortName of what values to change in the game files. On it's own a preset doesn't do anything as the game doesn't know how to load them. So instead we use @ToolName (@ShortName) that can load these presets and apply the changes they include to make a mod, just like this app does.
+</Paragraph>
+
+<Heading Size="HeadingSize.Is5">What's the difference?</Heading>
+<Paragraph>
+    The biggest difference is that a merged mod contains the actual modified game files so the game can load it as-is, <strong>assuming there's no conflicts.</strong> That means you don't need to be using @ShortName to use a merged mod, but you won't get any of @ShortName's other benefits. On the other hand, if you download your patches as a preset, you'll have less likelihood of conflicts and you can merge your mods with @Brand.ShortName-compatible mods from anywhere, but you <strong>need</strong> to be using @ShortName to merge all your installed mods.
+</Paragraph>
+
+<Heading Size="HeadingSize.Is5">Can I mix-and-match mods with @ShortName?</Heading>
+<Paragraph>
+    Yes and no. You can install as many <em>presets</em> as you want, and @ShortName will just run them in order. If you have other <em>@Brand.ShortName-built</em> mods installed, @ShortName will do its best to merge those as well. However if you have other <em>non-@Brand.ShortName-compatible</em> mods installed, you'll need to ensure they're not modifying any of the same files that your merged mod does. 
+</Paragraph>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public bool IncludeIntro { get; set; } = true;
+
+    private string ToolName => $"{Brand.AppName} {Brand.ToolName}";
+
+    private string ShortName => string.Join(string.Empty,
+        ToolName.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0])
+        );
+
+}

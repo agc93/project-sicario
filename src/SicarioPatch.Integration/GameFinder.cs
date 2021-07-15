@@ -9,14 +9,13 @@ namespace SicarioPatch.Integration
     public class GameFinder : IGameSource
     {
         public string? LocateGamePath() {
-            AStoreGame game;
             var steam = new SteamHandler();
-            if (steam.TryGetByID(895870, out var steamGame) && !string.IsNullOrWhiteSpace(steamGame?.Path)) {
+            if (steam.FindAllGames() && steam.TryGetByID(895870, out var steamGame) && !string.IsNullOrWhiteSpace(steamGame?.Path)) {
                 return steamGame.Path;
             }
 
             var gog = new GOGHandler();
-            if (gog.Games.Any() && gog.Games.FirstOrDefault(g => g.GameID == 1430183808) is { } gogEntry) {
+            if (gog.FindAllGames() && gog.Games.Any() && gog.Games.FirstOrDefault(g => g.GameID == 1430183808) is { } gogEntry) {
                 return gogEntry.Path;
             }
 

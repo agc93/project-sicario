@@ -1,5 +1,4 @@
 ﻿@page "/test"
-@using System.IO
 @using System.Timers
 @inject ModParser ModParser;
 @inject IMediator Mediator
@@ -32,7 +31,7 @@
             @if (ParsedMod != null) {
                 @if (ParsedMod.Parameters.Any()) {
                     <div class="test-body-details-item">
-                        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                        <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
                             <Items>
                                 <Tab Name="params">Parameters</Tab>
                                 <Tab Name="modinfo">Mod Info</Tab>
@@ -68,22 +67,20 @@
 @code {
 
     [CascadingParameter(Name = "SnackbarStack")]
-    SnackbarStack snackbarStack { get; set; }
+    SnackbarStack SnackbarStack { get; set; }
 
     private string RawModFile { get; set; }
     private WingmanMod ParsedMod { get; set; }
 
-    private FileInfo ResultFile { get; set; }
-
     private string LastError { get; set; }
-    private System.Timers.Timer aTimer;
+    private Timer _timer;
     private bool IsLoading { get; set; }
 
     private List<WingmanMod> BuildSet => ParsedMod == null ? new List<WingmanMod>() : new List<WingmanMod> {ParsedMod};
     private SafeDictionary<string, string> Parameters { get; set; } = new(string.Empty);
 
     private StandaloneEditorConstructionOptions GetEditorOptions(MonacoEditor editor) {
-        return new StandaloneEditorConstructionOptions {
+        return new() {
             AutomaticLayout = true,
             AutoIndent = true,
             Language = "json",
@@ -91,48 +88,48 @@
         };
     }
     
-    string selectedTab = "params";
+    string _selectedTab = "params";
 
     private void OnSelectedTabChanged( string name )
     {
-        selectedTab = name;
+        _selectedTab = name;
+    }
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        _timer = new Timer(750);
+        _timer.Elapsed += (source, evt) => OnLoadEditor();
+        _timer.AutoReset = false;
     }
 
 
-    protected override async Task OnInitializedAsync() {
+    /*protected override async Task OnInitializedAsync() {
         aTimer = new Timer(750);
         aTimer.Elapsed += (source, evt) => OnLoadEditor();
         aTimer.AutoReset = false;
-    }
+    }*/
 
     private async Task TryLoadMod() {
         IsLoading = true;
         LastError = string.Empty;
         if (string.IsNullOrWhiteSpace(RawModFile)) return;
         try {
-            if (ModParser.ParseMod(RawModFile) is {FilePatches: { } } jsonMod && (jsonMod.FilePatches.Any() || (jsonMod.AssetPatches != null && jsonMod.AssetPatches.Any()))) {
+            if (await Task.Run(() => ModParser.ParseMod(RawModFile)) is { } jsonMod && ModParser.IsValid(jsonMod)) {
                 jsonMod.Metadata ??= new SetMetadata();
                 ParsedMod = jsonMod;
-    //snackbarStack?.Push("Successfully loaded mod!", SnackbarColor.Success);
             }
         }
         catch (Exception e) {
-            snackbarStack?.PushAsync($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
+            SnackbarStack?.PushAsync($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
             ParsedMod = null;
             LastError = e.Message;
         }
         IsLoading = false;
         try {
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception e) {
             Console.WriteLine(e);
-        }
-    }
-
-    private async Task OnTextChanged(string arg) {
-        if (arg.Any()) {
-            await TryLoadMod();
         }
     }
 
@@ -156,8 +153,8 @@
     }
 
     private void HandleKeyUp(KeyboardEvent obj) {
-        aTimer.Stop();
-        aTimer.Start();
+        _timer.Stop();
+        _timer.Start();
     }
 
 }

@@ -9,6 +9,7 @@ namespace SicarioPatch.App.Infrastructure
 {
     public abstract class UserAuthorization
     {
+        // ReSharper disable once InconsistentNaming
         private protected readonly AccessOptions _opts;
         private readonly Func<AccessOptions, List<string>> _selector;
         public const string UserIdClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
@@ -34,7 +35,7 @@ namespace SicarioPatch.App.Infrastructure
                        {
                            var user = u.ToLower();
                            return user.All(char.IsDigit)
-                               ? user == principal.FindFirst(UserIdClaim)?.Value?.ToLower()
+                               ? user == principal.FindFirst(UserIdClaim)?.Value.ToLower()
                                : user.Contains("#")
                                     ? user == $"{principal.Identity?.Name?.ToLower()}#{principal.FindFirst(DiscriminatorClaim)?.Value}"
                                     : user == principal.Identity?.Name?.ToLower();
@@ -81,7 +82,7 @@ namespace SicarioPatch.App.Infrastructure
     
     public class UploadAccessHandler : AuthorizationHandler<UploaderRequirement>
     {
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, UploaderRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, UploaderRequirement requirement)
         {
             if (requirement.AllowAllAuthenticated)
             {
@@ -90,6 +91,7 @@ namespace SicarioPatch.App.Infrastructure
             {
                 context.Succeed(requirement);
             }
+            return Task.CompletedTask;
         }
     }
 }
