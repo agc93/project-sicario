@@ -200,12 +200,12 @@ namespace SicarioPatch.Loader
 
             
 
-            var allMods = existingMods.SelectMany(m => m.Mods).ToList();
+            /*var allMods = existingMods.SelectMany(m => m.Mods).ToList();
             allMods.AddRange(embeddedPresets.SelectMany(p => p.Mods));
             allMods.AddRange(presets.SelectMany(p => p.Mods));
-            allMods.Add(slotLoader);
+            allMods.Add(slotLoader);*/
             
-            LogConsole($"[bold darkblue]Queuing mod build with {allMods.Count} mods[/]");
+            LogConsole($"[bold darkblue]Queuing mod build with {modList.Count} mods[/]");
             
 
             var req = new PatchRequest(modList) {
@@ -275,7 +275,11 @@ namespace SicarioPatch.Loader
             }
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
-                //run game here
+                var launcher = new GameLauncher(settings.InstallPath);
+                launcher.RunGame();
+                // because we're using an ancient version of ExecEngine
+                // this will actually wait for the game to exit.
+                // not ideal, but not a dealbreaker imo
             }
 
             return 0;
