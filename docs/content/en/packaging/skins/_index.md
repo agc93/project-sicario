@@ -55,3 +55,5 @@ When PSM runs on the user's install, it will add _three_ slots to the MG-29 with
 |F/S-15|`F-15SMTD`||VX-23|`F-22`|
 |CHIMERA|`ACG-01`||SP-34R|`SPEAR`|
 |PW-Mk.1|`PW-001`||||
+
+> You can even use custom skin slots in the same PAK as [an embedded preset](../mods) to include both a new skin slot and datatable changes

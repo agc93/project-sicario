@@ -6,13 +6,13 @@ weight: 20
 
 Things are a little trickier (but not dramatically so) for blueprint/datatable mods.
 
-The most important thing is that your blueprint changes need to already be in a Sicario preset. If you've already done that, you're 90% of the way there. If not check out [the docs](../../introduction/_index.md) to build your changes as a Sicario preset.
+The most important thing is that your blueprint changes need to already be in a {{< shortName >}} preset. If you've already done that, you're 90% of the way there. If not check out [the docs](../../introduction/_index.md) to build your changes as a {{< shortName >}} preset.
 
 Once you have your patch(es), it's time to turn them into a preset. Don't worry, it's easy.
 
 ### Presets
 
-A preset file is just a collection of Sicario patches bundled into one standalone file including any inputs they need to run. Just like a patch file, a preset file is just a JSON file with a special extension: `.dtp`. At its most basic, here's what a preset file looks like:
+A preset file is just a collection of {{< shortName >}} patches bundled into one standalone file including any inputs they need to run. Just like a patch file, a preset file is just a JSON file with a special extension: `.dtp`. At its most basic, here's what a preset file looks like:
 
 ```json
 {
@@ -42,3 +42,5 @@ This one is a tiny bit trickier but way cooler. When you go to *pack* your mod, 
 That way, users will only have to download and install one file! Obviously, if your mod _requires_ the changes from your patches then your mod will also then require {{< toolName >}} itself. 
 
 In general, there's only one thing that {{< toolName >}} adds that skin makers should be aware of but it's a big one: automatically adding skin slots to aircraft!
+
+> You can even use an embedded preset alongside the [custom skin slot support](../skins) to include both a new skin slot and datatable changes

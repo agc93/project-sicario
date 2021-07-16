@@ -20,8 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
         with:
-          fetch-depth: 0
-          submodules: recursive
+          submodules: true #only the docs needs recursive
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.x'
@@ -52,8 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
         with:
-          fetch-depth: 0
-          submodules: recursive
+          submodules: true
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '5.0.x'
