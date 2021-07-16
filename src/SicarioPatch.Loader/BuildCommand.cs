@@ -139,11 +139,11 @@ namespace SicarioPatch.Loader
                 );
             
             LogConsole($"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]");
-            
+
             partsList.Add(new MergePart {
                 Mods = embeddedPresets.SelectMany(ep => ep.Mods),
                 Parameters = mergedInputs,
-                Priority = 2
+                Priority = 1
             });
             
             //loose presets
@@ -166,7 +166,7 @@ namespace SicarioPatch.Loader
             partsList.Add(new MergePart {
                 Mods = presets.SelectMany(p => p.Mods),
                 Parameters = loosePresetInputs,
-                Priority = 1
+                Priority = 2
             });
             
             //skin merge
@@ -207,6 +207,17 @@ namespace SicarioPatch.Loader
             
             LogConsole($"[bold darkblue]Queuing mod build with {modList.Count} mods[/]");
             
+            if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
+                //build report
+                if (!Path.IsPathRooted(settings.ReportFile)) {
+                    settings.ReportFile = Path.Join(AppContext.BaseDirectory, settings.ReportFile);
+                }
+                var opts = new JsonSerializerOptions(_parser.Options) {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                var json = JsonSerializer.Serialize(report, opts);
+                await File.WriteAllTextAsync(settings.ReportFile, json);
+            }
 
             var req = new PatchRequest(modList) {
                 PackResult = true,
@@ -260,18 +271,6 @@ namespace SicarioPatch.Loader
 
                 resp.MoveTo(Path.Join(targetPath, resp.Name), true);
                 LogConsole($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
-            }
-
-            if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
-                //build report
-                if (!Path.IsPathRooted(settings.ReportFile)) {
-                    settings.ReportFile = Path.Join(targetPath, settings.ReportFile);
-                }
-                var opts = new JsonSerializerOptions(_parser.Options) {
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                };
-                var json = JsonSerializer.Serialize(report, opts);
-                await File.WriteAllTextAsync(settings.ReportFile, json);
             }
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {

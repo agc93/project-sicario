@@ -42,7 +42,7 @@ namespace SicarioPatch.Integration
 
         public IEnumerable<PatchRequest> GetSicarioMods(out List<string> inputFiles) {
             var allPaks = GetAllMods().ToList();
-            inputFiles = allPaks.Select(p => p.FullName).ToList();
+            inputFiles = new List<string>();
             var builtMods = new List<PatchRequest>();
             foreach (var pakFileInfo in allPaks) {
                 try {
@@ -59,6 +59,7 @@ namespace SicarioPatch.Integration
                     var request = new StreamReader(outSt).ReadToEnd();
                     var embed = JsonSerializer.Deserialize<EmbeddedRequest>(request, _parser.Options);
                     if (embed?.Request?.Mods != null && embed.Request.Mods.Any()) {
+                        inputFiles.Add(pakFileInfo.FullName);
                         builtMods.Add(embed.Request);
                     }
                 }
@@ -94,5 +95,13 @@ namespace SicarioPatch.Integration
             }
             return builtMods;
         }
+        
+        
+    }
+
+    public record EmbeddedResources
+    {
+        public List<Record> Presets { get; init; } = new();
+        public List<Record> Requests { get; init; } = new();
     }
 }

@@ -39,8 +39,6 @@ You can always just upload your preset file (i.e. the `dtm` file) to Nexus/ModDB
 
 This one is a tiny bit trickier but way cooler. When you go to *pack* your mod, you can pack your preset file into the PAK file itself and {{< toolName >}} will then unpack it from the PAK during merge and build with those patches. Your preset file can be packed anywhere in the PAK file _as long as_ it's in a folder named `sicario`. {{< toolName >}} will load and merge any `.dtp` files it find in a `sicario` folder anywhere in the PAK file.
 
-That way, users will only have to download and install one file! Obviously, if your mod _requires_ the changes from your patches then your mod will also then require {{< toolName >}} itself. 
-
-In general, there's only one thing that {{< toolName >}} adds that skin makers should be aware of but it's a big one: automatically adding skin slots to aircraft!
+That way, users will only have to download and install one file! Obviously, if your mod _requires_ the changes from your patches then your mod will also then require {{< toolName >}} itself.
 
 > You can even use an embedded preset alongside the [custom skin slot support](../skins) to include both a new skin slot and datatable changes
