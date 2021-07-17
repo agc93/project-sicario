@@ -30,7 +30,7 @@ namespace SicarioPatch.Integration
                 var pakRootPath = new FileInfo(pakPath).GetParentDirectoryPath();
                 var allPaks = Directory.EnumerateFiles(pakRootPath, "*.pak", SearchOption.AllDirectories);
                 return allPaks.Where(p => Path.GetFileNameWithoutExtension(p) != "ProjectWingman-WindowsNoEditor")
-                    .Where(p => new FileInfo(p).Directory?.Name != "~sicario").Select(p => new FileInfo(p));
+                    .Where(p => new FileInfo(p).Directory?.Name != "~sicario").Select(p => new FileInfo(p)).OrderBy(f => Path.GetRelativePath(pakPath, f.FullName));
             }
 
             return new List<FileInfo>();

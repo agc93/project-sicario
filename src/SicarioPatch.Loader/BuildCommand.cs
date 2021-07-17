@@ -142,7 +142,7 @@ namespace SicarioPatch.Loader
 
             partsList.Add(new MergePart {
                 Mods = embeddedPresets.SelectMany(ep => ep.Mods),
-                Parameters = mergedInputs,
+                Parameters = embeddedInputs,
                 Priority = 1
             });
             
@@ -151,6 +151,7 @@ namespace SicarioPatch.Loader
             var presetPaths = presetSearchPaths
                     .Where(Directory.Exists)
                     .SelectMany(d => Directory.EnumerateFiles(d, "*.dtp", SearchOption.AllDirectories))
+                    .OrderBy(f => f)
                     .ToList();
             var presets = _presetLoader.LoadFromFiles(presetPaths).ToList();
             
