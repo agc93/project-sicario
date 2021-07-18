@@ -225,7 +225,7 @@
 &lt;/tr>
 &lt;tr>
 &lt;td style="text-align:center">&lt;code>modifyPropertyValue&lt;/code>&lt;/td>
-&lt;td style="text-align:left">Modifies a numeric value &lt;em>based on it&amp;rsquo;s existing value&lt;/em>.&lt;/td>
+&lt;td style="text-align:left">Modifies a numeric value &lt;em>based on it&amp;rsquo;s existing value&lt;/em> (extremely alpha, not recommended).&lt;/td>
 &lt;/tr>
 &lt;tr>
 &lt;td style="text-align:center">&lt;code>textProperty&lt;/code>&lt;/td>
@@ -237,8 +237,17 @@
 &lt;h5 id="special-patch-types">Special Patch Types&lt;/h5>
 &lt;p>The 4 patch types above will handle the vast majority of Sicario patches reasonably well, but there&amp;rsquo;s two patch types that deserve extra attention: &lt;code>objectRef&lt;/code> and &lt;code>duplicateEntry&lt;/code>&lt;/p>
 &lt;blockquote>
-&lt;p>Both of these are much more complex to get working right and I&amp;rsquo;d recommend you start with the simpler changes handled by the regular patch types.&lt;/p>
+&lt;p>&lt;code>objectRef&lt;/code> and &lt;code>duplicateEntry&lt;/code> are both much more complex to get working right and I&amp;rsquo;d recommend you start with the simpler changes handled by the regular patch types.&lt;/p>
 &lt;/blockquote>
+&lt;p>####### &lt;code>textProperty&lt;/code>&lt;/p>
+&lt;p>The &lt;code>textProperty&lt;/code> patch type is just a variation on the &lt;code>propertyValue&lt;/code> type that can set the value of a &lt;code>TextProperty&lt;/code> more cleanly. The format for the &lt;code>value&lt;/code> is simple &lt;code>'&amp;lt;key&amp;gt;':'&amp;lt;string-value&amp;gt;'&lt;/code>. Note however, that the key is a little dangerous: if you set an existing key&amp;rsquo;s value using this patch it has the potential to change the text for unrelated objects. Unless you really need otherwise, I&amp;rsquo;d recommend letting Sicario generate a key for you which can be done with the special &lt;code>*&lt;/code> syntax:&lt;/p>
+&lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Change the FC-16&amp;#39;s role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:[&amp;#39;F-16C&amp;#39;].[0].{&amp;#39;Role*&amp;#39;}.&amp;lt;TextProperty&amp;gt;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;value&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;*:&amp;#39;Multirole&amp;#39;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
+&lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;textProperty&amp;#34;&lt;/span>
+&lt;span style="color:#000;font-weight:bold">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>When it runs, Sicario will set the &lt;code>TextProperty&lt;/code>&amp;rsquo;s key to a randomly generated unique ID to prevent any conflicts/issues&lt;/p>
 &lt;h6 id="duplicateentry-and-duplicateproperty">&lt;code>duplicateEntry&lt;/code> and &lt;code>duplicateProperty&lt;/code>&lt;/h6>
 &lt;p>This one is pretty powerful as its the most reliable way to &lt;em>add&lt;/em> new properties to an existing object, by duplicating an existing property of an object. Adding a new property just requires matching the parent property, then specifying the source property&amp;rsquo;s name and and the duplicate property&amp;rsquo;s (unique) name.&lt;/p>
 &lt;p>Here&amp;rsquo;s a patch that adds a new weapon based on the STDM:&lt;/p>
