@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
@@ -27,29 +28,38 @@ namespace SicarioPatch.Loader
         private readonly Integration.GameFinder _gameFinder;
         private readonly ILogger<BuildCommand> _logger;
         private readonly ModParser _parser;
-        private readonly SpectreConsoleLoggerConfiguration _loggerConfiguration;
+        
 #pragma warning disable 8618
         public class Settings : CommandSettings
         {
             [CommandOption(("-r|--run"))]
-
+            [Description("Attempts to launch the game after completing the merge build.")]
             public FlagValue<bool> RunAfterBuild { get; set; }
 
             [CommandOption("--installPath")]
+            [Description("Sets the game install path. Overrides the automatic detection.")]
             public string? InstallPath { get; set; }
             
             [CommandArgument(0, "[presetPaths]")]
             public string[]? PresetPaths { get; init; }
             
             [CommandOption("--no-clean")]
+            [Description("Do not remove existing files in the merge output directory.")]
             public FlagValue<bool> SkipTargetClean { get; init; }
             [CommandOption("--outputPath")]
+            [Description("Set the path to write the merged mod to.")]
             public string? OutputPath { get; set; }
             
             [CommandOption("-q|--quiet")]
+            [Description("Reduce the amount of information written to the console.")]
             public FlagValue<bool> Quiet { get; set; }
             
+            [CommandOption("--non-interactive")]
+            [Description("Ensures that there are no prompts or confirmations while building.")]
+            public bool NonInteractive { get; set; }
+            
             [CommandOption("--report")]
+            [Description("Writes a report file with the given name with details of the merged mod build. Format subject to change.")]
             public string? ReportFile { get; set; }
         }
 #pragma warning restore 8618
@@ -111,7 +121,7 @@ namespace SicarioPatch.Loader
                 Path.Join(settings.InstallPath, "ProjectWingman", "Content", "Presets"),
                 Path.Join(paksRoot, "~mods")
             };
-            
+
             _logger.LogDebug($"Searching {presetSearchPaths.Count} paths for loose presets");
 
             //existing mods
@@ -202,25 +212,15 @@ namespace SicarioPatch.Loader
                 .SelectMany(p => p.Mods)
                 .ToList();
 
-            
-
-            /*var allMods = existingMods.SelectMany(m => m.Mods).ToList();
-            allMods.AddRange(embeddedPresets.SelectMany(p => p.Mods));
-            allMods.AddRange(presets.SelectMany(p => p.Mods));
-            allMods.Add(slotLoader);*/
-            
             LogConsole($"[bold darkblue]Queuing mod build with {modList.Count} mods[/]");
+            
+            var targetPath = string.IsNullOrWhiteSpace(settings.OutputPath)
+                ? Path.Join(paksRoot, "~sicario")
+                : settings.OutputPath;
             
             if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
                 //build report
-                if (!Path.IsPathRooted(settings.ReportFile)) {
-                    settings.ReportFile = Path.Join(AppContext.BaseDirectory, settings.ReportFile);
-                }
-                var opts = new JsonSerializerOptions(_parser.Options) {
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                };
-                var json = JsonSerializer.Serialize(report, opts);
-                await File.WriteAllTextAsync(settings.ReportFile, json);
+                await WriteReport(settings.ReportFile, targetPath, report);
             }
 
             var req = new PatchRequest(modList) {
@@ -230,7 +230,6 @@ namespace SicarioPatch.Loader
                 UserName = $"loader:{Environment.MachineName}"
             };
             var resp = await _mediator.Send(req);
-            string targetPath;
             if (string.IsNullOrWhiteSpace(settings.OutputPath)) {
                 LogConsole(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
@@ -243,7 +242,6 @@ namespace SicarioPatch.Loader
                         return 204;
                     }
                 }
-                targetPath = Path.Join(paksRoot, "~sicario");
                 if (!Directory.Exists(targetPath)) {
                     Directory.CreateDirectory(targetPath);
                 }
@@ -259,7 +257,6 @@ namespace SicarioPatch.Loader
                 LogConsole($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
             }
             else {
-                targetPath = settings.OutputPath;
                 LogConsole(
                     $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
                 if (!Directory.Exists(targetPath)) {
@@ -276,16 +273,31 @@ namespace SicarioPatch.Loader
                 resp.MoveTo(Path.Join(targetPath, resp.Name), true);
                 LogConsole($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
             }
+            
+            //TODO: implement prompt/confirmation for interactive sessions
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
                 var launcher = new GameLauncher(settings.InstallPath);
                 launcher.RunGame();
                 // because we're using an ancient version of ExecEngine
                 // this will actually wait for the game to exit.
-                // not ideal, but not a dealbreaker imo
+                // not ideal, but not a deal-breaker imo
             }
 
             return 0;
+        }
+
+        private async Task WriteReport(string reportFilePath, string? targetPath, MergeReport report) {
+            targetPath ??= AppContext.BaseDirectory;
+            if (!Path.IsPathRooted(reportFilePath)) {
+                reportFilePath = Path.Join(targetPath, reportFilePath);
+            }
+
+            var opts = new JsonSerializerOptions(_parser.Options) {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            var json = JsonSerializer.Serialize(report, opts);
+            await File.WriteAllTextAsync(reportFilePath, json);
         }
 
         private static bool CheckForDeploymentManifest(string paksPath) {
