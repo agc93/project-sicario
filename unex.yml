@@ -1,0 +1,10 @@
+﻿Game: projectwingman
+ModId: 270
+FileName: PSM - Project Sicario Merger
+PreviousFile: auto
+FileDescription: |-
+  Vortex users: install and enable, then turn on PSM Integration in Settings > Interface.
+  
+  Manual users: unpack to your game directory and run to build your merged mod.
+
+  More details are available at https://sicario.modding.app/merger
