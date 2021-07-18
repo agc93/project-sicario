@@ -8,7 +8,7 @@ This is a little more niche and mostly just used to save time while _building_ p
 
 ### Defining Variables
 
-To define your variables, you can add a top-level key called `_vars` to your file and add your variables with name and value to that:
+To define your variables, you can add a top-level key called `_vars` to your mod and add your variables with name and value to that:
 
 ```json
 {
@@ -46,3 +46,5 @@ Then, your patches can retrieve that value using `vars.variableNameHere` in a te
   }
 }
 ```
+
+> Note that variable names only have to be unique to the mod they're defined in. Variables are not shared across mods so you don't have to worry about affecting other mods if you include it in a preset or merged mod.

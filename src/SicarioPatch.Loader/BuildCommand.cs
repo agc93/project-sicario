@@ -73,6 +73,7 @@ namespace SicarioPatch.Loader
              internal Dictionary<string, string> Parameters { get; init; } = new();
              internal IEnumerable<WingmanMod> Mods { get; init; } = new List<WingmanMod>();
              internal int Priority { get; init; } = 10;
+             internal string? Message { get; init; }
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
@@ -120,14 +121,16 @@ namespace SicarioPatch.Loader
                 .Select(m => m.TemplateInputs)
                 .Aggregate(new Dictionary<string, string>(), (total, next) => next.MergeLeft(total));
             
-            LogConsole($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
-            report.RebuildMods = inputMods;
-            
             partsList.Add(new MergePart {
                 Mods = existingMods.SelectMany(m => m.Mods),
                 Parameters = mergedInputs,
                 Priority = 3
             });
+            
+            LogConsole($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
+            report.RebuildMods = inputMods;
+            
+            
             
             //embedded presets
 
