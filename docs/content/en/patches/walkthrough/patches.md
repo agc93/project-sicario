@@ -40,11 +40,11 @@ Most of these types use a common convention for the `value` field: `DataType:val
 
 ##### Special Patch Types
 
-The 4 patch types above will handle the vast majority of {{< shortName >}} patches reasonably well, but there's two patch types that deserve extra attention: `objectRef` and `duplicateEntry`
+The patch types above will handle the vast majority of {{< shortName >}} patches reasonably well, but a few of them work a little differently and can be easier to get wrong (especially the first time). 
 
-> <code>objectRef</code> and <code>duplicateEntry</code> are both much more complex to get working right and I'd recommend you start with the simpler changes handled by the regular patch types.
+There's also two patch types that deserve extra attention: `objectRef` and `duplicateEntry`. These two patch types are both much more complex to get working right and I'd recommend you start with the simpler changes handled by the regular patch types.
 
-####### `textProperty`
+###### `textProperty`
 
 The `textProperty` patch type is just a variation on the `propertyValue` type that can set the value of a `TextProperty` more cleanly. The format for the `value` is simple `'<key>':'<string-value>'`. Note however, that the key is a little dangerous: if you set an existing key's value using this patch it has the potential to change the text for unrelated objects. Unless you really need otherwise, I'd recommend letting {{< shortName >}} generate a key for you which can be done with the special `*` syntax: 
 
