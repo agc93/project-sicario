@@ -200,7 +200,8 @@ namespace SicarioPatch.Loader
             //skin merge
             
             var skinPaths = _slotLoader.GetSkinPaths();
-            var slotLoader = _slotLoader.GetSlotMod(_slotLoader.GetSlotPatches(skinPaths));
+            var slotPatches = _slotLoader.GetSlotPatches(skinPaths).ToList();
+            var slotLoader = _slotLoader.GetSlotMod(slotPatches);
             report.AdditionalSkins = skinPaths
                 .ToDictionary(k => k.Key, v => v.Value.Select(p => Path.ChangeExtension(p, null)).Distinct().ToList())
                 .ToDictionary(k => k.Key, v => v.Value);

@@ -20,19 +20,28 @@ namespace SicarioPatch.Integration
 
         public Dictionary<string, List<string>> GetSkinPaths() {
             var pakPath = _gameSources.GetGamePakPath();
+            var additionalSkins = new List<string>();
             if (pakPath != null) {
                 var pakFiles = new FileInfo(pakPath).Directory!.EnumerateFiles("*_P.pak", SearchOption.AllDirectories);
                 foreach (var file in pakFiles) {
-                    var fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    var reader = _pakFileProvider.GetReader(fs);
-                    var pakFile = reader.ReadFile();
-                    var addSkins = pakFile.Records.Select(a => a.GetVirtualPath(pakFile)).Where(r =>
-                        r.StartsWith("ProjectWingman/Content/Assets/Skins"));
-                    return addSkins.GroupBy(a => new FileInfo(a).Directory?.Name ?? string.Empty).ToDictionary(g => g.Key, g => g.ToList());
+                    try {
+                        var fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        var reader = _pakFileProvider.GetReader(fs);
+                        var pakFile = reader.ReadFile();
+                        var addSkins = pakFile.Records.Select(a => a.GetVirtualPath(pakFile)).Where(r =>
+                            r.StartsWith("ProjectWingman/Content/Assets/Skins"));
+                        additionalSkins.AddRange(addSkins);
+                    }
+                    catch {
+                        //ignored
+                    }
                 }
             }
 
-            return new Dictionary<string, List<string>>();
+            return additionalSkins.Any()
+                ? additionalSkins.GroupBy(a => new FileInfo(a).Directory?.Name ?? string.Empty)
+                    .ToDictionary(g => g.Key, g => g.ToList())
+                : new Dictionary<string, List<string>>();
         }
 
         public IEnumerable<AssetPatchSet> GetSlotPatches(Dictionary<string, List<string>>? skinPaths = null) {
