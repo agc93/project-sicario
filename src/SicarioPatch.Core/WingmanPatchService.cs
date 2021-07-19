@@ -8,6 +8,7 @@ using HexPatch;
 using HexPatch.Build;
 using Microsoft.Extensions.Logging;
 using SicarioPatch.Assets;
+using SicarioPatch.Core.Diagnostics;
 
 namespace SicarioPatch.Core
 {
@@ -105,6 +106,7 @@ namespace SicarioPatch.Core
             foreach (var file in requiredFiles)
             {
                 var srcFile = _fileService.LocateFile(Path.GetFileName(file));
+                if (srcFile == null) throw new SourceFileNotFoundException(Path.GetFileName(file)); 
                 this.BuildContext.AddFile(Path.GetDirectoryName(file), srcFile);
                 if (extraFileSelector != null) {
                     var extraFiles = extraFileSelector.Invoke(file) ?? new List<string>();

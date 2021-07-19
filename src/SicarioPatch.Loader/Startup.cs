@@ -50,6 +50,7 @@ namespace SicarioPatch.Loader
             app.SetDefaultCommand<BuildCommand>();
             app.Configure(c =>
             {
+                // c.PropagateExceptions();
                 c.AddCommand<BuildCommand>("build");
             });
             return app;

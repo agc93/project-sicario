@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,12 @@ namespace SicarioPatch.Assets
                 foreach (var (patch, ctx) in matchedPatches) {
                     var newRecords = ctx.PatchType?.RunPatch(ctx.MatchedData, patch.Value);
                     if (newRecords != null) {
-                        y = ctx.Loader.RunInstructions(y, newRecords);
+                        try {
+                            y = ctx.Loader.RunInstructions(y, newRecords);
+                        }
+                        catch (Exception e) {
+                            throw new AssetInstructionException(ctx, e);
+                        }
                     }
                 }
                 var targetAssetPath = targetName == null ? fi.FullName : Path.ChangeExtension(Path.Join(Path.GetDirectoryName(fi.FullName), targetName), "uasset");

@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SicarioPatch.Core;
+using SicarioPatch.Core.Diagnostics;
 using SicarioPatch.Integration;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -87,6 +88,19 @@ namespace SicarioPatch.Loader
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
+            void BuildTargetPath(string? s) {
+                if (!Directory.Exists(s)) {
+                    Directory.CreateDirectory(s);
+                }
+
+                if (Directory.GetFiles(s).Any() &&
+                    !(settings.SkipTargetClean.IsSet && settings.SkipTargetClean.Value)) {
+                    foreach (var file in Directory.GetFiles(s)) {
+                        File.Delete(file);
+                    }
+                }
+            }
+
             void LogConsole(string message) {
                 if (settings.Quiet.IsSet && settings.Quiet.Value) {
                     return;
@@ -229,51 +243,51 @@ namespace SicarioPatch.Loader
                 Name = "SicarioMerge",
                 UserName = $"loader:{Environment.MachineName}"
             };
-            var resp = await _mediator.Send(req);
-            if (string.IsNullOrWhiteSpace(settings.OutputPath)) {
-                LogConsole(
-                    $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
-                var isVortexManaged = CheckForDeploymentManifest(paksRoot);
-                if (isVortexManaged) {
-                    LogConsole("[orange3][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
-                    LogConsole("We recommend using Vortex's PSM integration to manage your merged mod automatically.");
-                    var toContinue = (!settings.Quiet.IsSet || !settings.Quiet.Value) && _console.Prompt(new ConfirmationPrompt("Do you want to continue with this build anyway?"));
-                    if (!toContinue) {
-                        return 204;
+            try {
+                var resp = await _mediator.Send(req);
+                if (string.IsNullOrWhiteSpace(settings.OutputPath)) {
+                    LogConsole(
+                        $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the game folder[/]");
+                    var isVortexManaged = CheckForDeploymentManifest(paksRoot);
+                    if (isVortexManaged) {
+                        LogConsole("[orange3][bold]Warning![/] Your mods folder appears to be Vortex-managed![/]");
+                        LogConsole(
+                            "We recommend using Vortex's PSM integration to manage your merged mod automatically.");
+                        var toContinue = settings.NonInteractive || (!settings.Quiet.IsSet || !settings.Quiet.Value) &&
+                                         _console.Prompt(
+                                             new ConfirmationPrompt("Do you want to continue with this build anyway?"));
+                        if (!toContinue) {
+                            return 204;
+                        }
                     }
-                }
-                if (!Directory.Exists(targetPath)) {
-                    Directory.CreateDirectory(targetPath);
-                }
 
-                if (Directory.GetFiles(targetPath).Any() &&
-                    !(settings.SkipTargetClean.IsSet && settings.SkipTargetClean.Value)) {
-                    foreach (var file in Directory.GetFiles(targetPath)) {
-                        File.Delete(file);
-                    }
-                }
+                    BuildTargetPath(targetPath);
 
-                resp.MoveTo(Path.Join(targetPath, resp.Name), true);
-                LogConsole($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
+                    resp.MoveTo(Path.Join(targetPath, resp.Name), true);
+                    LogConsole($"[dodgerblue2]Your merged mod is installed and you can start the game.[/]");
+                }
+                else {
+                    LogConsole(
+                        $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
+                    BuildTargetPath(targetPath);
+
+                    resp.MoveTo(Path.Join(targetPath, resp.Name), true);
+                    LogConsole($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
+                }
             }
-            else {
-                LogConsole(
-                    $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
-                if (!Directory.Exists(targetPath)) {
-                    Directory.CreateDirectory(targetPath);
-                }
-
-                if (Directory.GetFiles(targetPath).Any() &&
-                    !(settings.SkipTargetClean.IsSet && settings.SkipTargetClean.Value)) {
-                    foreach (var file in Directory.GetFiles(targetPath)) {
-                        File.Delete(file);
-                    }
-                }
-
-                resp.MoveTo(Path.Join(targetPath, resp.Name), true);
-                LogConsole($"[dodgerblue2]Your merged mod is built in the [grey]'{targetPath}'[/] directory.[/]");
+            catch (SourceFileNotFoundException sEx) {
+                _logger.LogError(sEx.Message);
+                return 412;
             }
-            
+            catch (Assets.AssetInstructionException aEx) {
+                _logger.LogError(aEx,
+                    $"Error while running asset instructions, this is likely a bad patch or incorrect duplication.");
+                return 422;
+            }
+            catch (Exception e) {
+                _logger.LogError(e, "An unhandled error was encountered while building the mod file.");
+                return 400;
+            }
             //TODO: implement prompt/confirmation for interactive sessions
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
