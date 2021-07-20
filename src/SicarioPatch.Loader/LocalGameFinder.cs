@@ -8,13 +8,13 @@ namespace SicarioPatch.Loader
 {
     public class LocalGameFinder : IGameSource
     {
-        private string _rootPath;
+        private readonly string _rootPath;
         public LocalGameFinder() : this(AppContext.BaseDirectory) {
             
         }
 
         public LocalGameFinder(string rootPath) {
-            
+            _rootPath = rootPath;
         }
         private static Dictionary<string, Func<DirectoryInfo, DirectoryInfo?>> Candidates => new() {
             ["Project Wingman"] = di => di.GetFiles("ProjectWingman.exe").Any() ? di : null,
