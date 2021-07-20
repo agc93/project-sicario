@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
@@ -14,7 +15,6 @@ using SicarioPatch.Core.Diagnostics;
 using SicarioPatch.Integration;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Spectre.Console.Extensions.Logging;
 
 namespace SicarioPatch.Loader
 {
@@ -31,6 +31,7 @@ namespace SicarioPatch.Loader
         private readonly ModParser _parser;
         
 #pragma warning disable 8618
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
         public class Settings : CommandSettings
         {
             [CommandOption(("-r|--run"))]
@@ -88,7 +89,7 @@ namespace SicarioPatch.Loader
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
-            void BuildTargetPath(string? s) {
+            void BuildTargetPath(string s) {
                 if (!Directory.Exists(s)) {
                     Directory.CreateDirectory(s);
                 }
@@ -109,6 +110,7 @@ namespace SicarioPatch.Loader
             }
             if (string.IsNullOrWhiteSpace(settings.InstallPath)) {
                 var install = _gameFinder.GetGamePath();
+                install ??= new LocalGameFinder().GetGamePath() ?? new LocalGameFinder(Environment.CurrentDirectory).GetGamePath();
                 if (install == null) {
                     LogConsole("[bold red]Error![/] [orange3]Could not locate game install folder![/]");
                     return 412;
@@ -289,7 +291,6 @@ namespace SicarioPatch.Loader
                 _logger.LogError(e, "An unhandled error was encountered while building the mod file.");
                 return 400;
             }
-            //TODO: implement prompt/confirmation for interactive sessions
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
                 var launcher = new GameLauncher(settings.InstallPath);
