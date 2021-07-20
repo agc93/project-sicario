@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SicarioPatch.Core;
 using SicarioPatch.Integration;
+using SicarioPatch.Loader.Providers;
 using SicarioPatch.Templating;
 using Spectre.Cli.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
@@ -35,6 +36,7 @@ namespace SicarioPatch.Loader
                 .AddSingleton<PresetFileLoader>()
                 .AddSingleton<MergeLoader>()
                 .AddCoreServices()
+                .AddMergeComponents()
                 .AddUnPak()
                 .AddMediatR(mc => mc.AsScoped(),
                     typeof(Startup), typeof(PatchRequest))
@@ -97,6 +99,13 @@ namespace SicarioPatch.Loader
                 .AddSingleton<AppInfoProvider>()
                 .AddSingleton<IModBuilder, UnPakBuilder>()
                 .AddAssetServices();
+        }
+
+        internal static IServiceCollection AddMergeComponents(this IServiceCollection services) {
+            return services
+                .AddSingleton<IMergeProvider, EmbeddedPresetProvider>()
+                .AddSingleton<IMergeProvider, LoosePresetProvider>()
+                .AddSingleton<IMergeProvider, SkinMergeProvider>();
         }
         
         internal static LogLevel GetLogLevel() {

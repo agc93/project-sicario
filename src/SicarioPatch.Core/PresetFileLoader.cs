@@ -7,9 +7,9 @@ namespace SicarioPatch.Core
 {
     public class PresetFileLoader
     {
-        public IEnumerable<WingmanPreset> LoadFromFiles(IEnumerable<string> filePaths)
+        public Dictionary<string, WingmanPreset> LoadFromFiles(IEnumerable<string> filePaths)
         {
-            var fileMods = new List<WingmanPreset>();
+            var fileMods = new Dictionary<string, WingmanPreset>();
             foreach (var file in filePaths.Where(f => f.Length > 0 && File.ReadAllText(f).Any()))
             {
                 try
@@ -27,7 +27,7 @@ namespace SicarioPatch.Core
                     };
                     if (JsonSerializer.Deserialize<WingmanPreset>(allText, jsonOpts) is {Mods: { }} jsonPreset) {
                         // _logger?.LogTrace($"Successfully loaded mod data from {file}: {jsonMod.GetLabel(Path.GetFileName(file))}");
-                        fileMods.Add(jsonPreset);
+                        fileMods.Add(file, jsonPreset);
                     }
                 }
                 catch (System.Exception)

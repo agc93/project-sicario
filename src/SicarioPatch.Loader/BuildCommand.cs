@@ -124,97 +124,29 @@ namespace SicarioPatch.Loader
             }
 
             var paksRoot = Path.Join(settings.InstallPath, "ProjectWingman", "Content", "Paks");
-            var report = new MergeReport(settings.InstallPath);
 
             _config["GamePath"] = settings.InstallPath;
             _config["GamePakPath"] = Path.Join(paksRoot, "ProjectWingman-WindowsNoEditor.pak");
 
-            var partsList = new List<MergePart>();
-            
-            
-
             var presetSearchPaths = new List<string>(settings.PresetPaths ?? Array.Empty<string>()) {
                 Path.Join(settings.InstallPath, "ProjectWingman", "Content", "Presets"),
-                Path.Join(paksRoot, "~mods")
+                Path.Join(paksRoot, "~mods"),
+                Path.Join(paksRoot, "~presets")
             };
 
-            _logger.LogDebug($"Searching {presetSearchPaths.Count} paths for loose presets");
+            _logger.LogDebug($"Searching {presetSearchPaths.Count} paths for merge components");
 
-            //existing mods
-            
-            var existingMods = _mergeLoader.GetSicarioMods(out List<string> inputMods).ToList();
-            var mergedInputs = existingMods
-                .Select(m => m.TemplateInputs)
-                .Aggregate(new Dictionary<string, string>(), (total, next) => next.MergeLeft(total));
-            
-            partsList.Add(new MergePart {
-                Mods = existingMods.SelectMany(m => m.Mods),
-                Parameters = mergedInputs,
-                Priority = 3
-            });
-            
-            LogConsole($"[dodgerblue2]Loaded [bold]{existingMods.Count}[/] Sicario mods for rebuild[/]");
-            report.RebuildMods = inputMods;
-            
-            
-            
-            //embedded presets
-
-            var embeddedPresets = _mergeLoader.LoadPresetsFromMods().ToList();
-            var embeddedInputs = embeddedPresets
-                .Select(m => m.ModParameters)
-                .Aggregate(new Dictionary<string, string>(),
-                    (total, next) => total.MergeLeft(next)
-                );
-            
-            LogConsole($"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]");
-
-            partsList.Add(new MergePart {
-                Mods = embeddedPresets.SelectMany(ep => ep.Mods),
-                Parameters = embeddedInputs,
-                Priority = 1
-            });
-            
-            //loose presets
-            
-            var presetPaths = presetSearchPaths
-                    .Where(Directory.Exists)
-                    .SelectMany(d => Directory.EnumerateFiles(d, "*.dtp", SearchOption.AllDirectories))
-                    .OrderBy(f => f)
-                    .ToList();
-            var presets = _presetLoader.LoadFromFiles(presetPaths).ToList();
-            
-            LogConsole($"[dodgerblue2]Loaded [bold]{presets.Count}[/] loose presets from file.[/]");
-            report.PresetPaths = presetPaths;
-
-            var loosePresetInputs = presets
-                .Select(p => p.ModParameters)
-                .Aggregate(new Dictionary<string, string>(),
-                (total, next) => total.MergeLeft(next)
-                );
-            
-            partsList.Add(new MergePart {
-                Mods = presets.SelectMany(p => p.Mods),
-                Parameters = loosePresetInputs,
-                Priority = 2
-            });
-            
-            //skin merge
-            
-            var skinPaths = _slotLoader.GetSkinPaths();
-            var slotPatches = _slotLoader.GetSlotPatches(skinPaths).ToList();
-            var slotLoader = _slotLoader.GetSlotMod(slotPatches);
-            report.AdditionalSkins = skinPaths
-                .ToDictionary(k => k.Key, v => v.Value.Select(p => Path.ChangeExtension(p, null)).Distinct().ToList())
-                .ToDictionary(k => k.Key, v => v.Value);
-            LogConsole($"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]");
-            partsList.Add(new MergePart {
-                Mods = new []{slotLoader},
-            });
+            var mergeReq = new MergeComponentRequest {
+                SearchPaths = presetSearchPaths
+            };
+            var components = (await _mediator.Send(mergeReq)).ToList();
+            foreach (var mergeComponent in components.Where(mergeComponent => !string.IsNullOrWhiteSpace(mergeComponent.Message))) {
+                LogConsole($"{mergeComponent.Message}");
+            }
             
             //final merge
 
-            var inputParameterList = partsList
+            var inputParameterList = components
                 .OrderByDescending(p => p.Priority)
                 .Select(p => p.Parameters)
                 .Aggregate(new Dictionary<string, string>(), 
@@ -222,9 +154,8 @@ namespace SicarioPatch.Loader
                 );
 
             LogConsole($"Final mod will be built with [dodgerblue2]{inputParameterList.Keys.Count}[/] parameters");
-            report.InputParameters = inputParameterList;
 
-            var modList = partsList
+            var modList = components
                 .OrderBy(p => p.Priority)
                 .SelectMany(p => p.Mods)
                 .ToList();
@@ -235,10 +166,7 @@ namespace SicarioPatch.Loader
                 ? Path.Join(paksRoot, "~sicario")
                 : settings.OutputPath;
             
-            if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
-                //build report
-                await WriteReport(settings.ReportFile, targetPath, report);
-            }
+            
 
             var req = new PatchRequest(modList) {
                 PackResult = true,
@@ -291,6 +219,19 @@ namespace SicarioPatch.Loader
                 _logger.LogError(e, "An unhandled error was encountered while building the mod file.");
                 return 400;
             }
+            
+            if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
+                //build report
+                if (!Path.IsPathRooted(settings.ReportFile)) {
+                    settings.ReportFile = Path.Join(targetPath, settings.ReportFile);
+                }
+
+                var writer = new MergeReportWriter(_parser);
+                var reportFile = await writer.WriteReport(components, inputParameterList, settings.ReportFile);
+                if (reportFile?.Exists == true) {
+                    LogConsole($"Wrote merge report to '{reportFile.FullName}'.");
+                }
+            }
 
             if (settings.RunAfterBuild.IsSet && settings.RunAfterBuild.Value) {
                 var launcher = new GameLauncher(settings.InstallPath);
@@ -301,19 +242,6 @@ namespace SicarioPatch.Loader
             }
 
             return 0;
-        }
-
-        private async Task WriteReport(string reportFilePath, string? targetPath, MergeReport report) {
-            targetPath ??= AppContext.BaseDirectory;
-            if (!Path.IsPathRooted(reportFilePath)) {
-                reportFilePath = Path.Join(targetPath, reportFilePath);
-            }
-
-            var opts = new JsonSerializerOptions(_parser.Options) {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };
-            var json = JsonSerializer.Serialize(report, opts);
-            await File.WriteAllTextAsync(reportFilePath, json);
         }
 
         private static bool CheckForDeploymentManifest(string paksPath) {
