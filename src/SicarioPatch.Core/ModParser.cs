@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using HexPatch;
 
@@ -33,5 +34,9 @@ namespace SicarioPatch.Core
         }
 
         public JsonSerializerOptions Options => _jsonOpts;
+
+        public JsonSerializerOptions RelaxedOptions => new(_jsonOpts) {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
     }
 }

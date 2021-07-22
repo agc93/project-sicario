@@ -15,7 +15,7 @@ namespace SicarioPatch.Integration
             }
 
             var gog = new GOGHandler();
-            if (gog.FindAllGames() && gog.Games.Any() && gog.Games.FirstOrDefault(g => g.GameID == 1430183808) is { } gogEntry) {
+            if (gog.FindAllGames() && gog.Games.Any() && gog.Games.FirstOrDefault(g => g.GameID == 1609812781) is { } gogEntry) {
                 return gogEntry.Path;
             }
 

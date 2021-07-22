@@ -36,23 +36,43 @@ namespace SicarioPatch.Integration
             return new List<FileInfo>();
         }
 
+        private static Record? GetPreset(PakFile file) {
+            return file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
+        }
+
+        private static Record? GetRequest(PakFile file) {
+            return file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("_meta/sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".json");
+        }
+
+        private PakFile? ReadPakFile(FileInfo pakFileInfo) {
+            try {
+                var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
+                var file = reader.ReadFile();
+                return file?.FileStream == null ? null : file;
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+                //ignored
+            }
+
+            return null;
+        }
+
         public Dictionary<string, PatchRequest> GetSicarioMods() {
             var allPaks = GetAllMods().ToList();
             var builtMods = new Dictionary<string, PatchRequest>();
             foreach (var pakFileInfo in allPaks) {
                 try {
-                    var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
-                    var file = reader.ReadFile();
-                    if (file?.FileStream == null) continue;
-                    var presetFile =
-                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
+
+                    var file = ReadPakFile(pakFileInfo);
+                    if (file == null) continue;
+                    var presetFile = GetPreset(file);
                     if (presetFile != null) continue; //skip if the file also has a preset
-                    var requestFile =
-                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("_meta/sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".json");
-                    if (file?.FileStream == null || requestFile == null) continue;
+                    var requestFile = GetRequest(file);
+                    if (file.FileStream == null || requestFile == null) continue;
                     var outSt = requestFile.Unpack(file.FileStream);
                     var request = new StreamReader(outSt).ReadToEnd();
-                    var embed = JsonSerializer.Deserialize<EmbeddedRequest>(request, _parser.Options);
+                    var embed = JsonSerializer.Deserialize<EmbeddedRequest>(request, _parser.RelaxedOptions);
                     if (embed?.Request?.Mods != null && embed.Request.Mods.Any()) {
                         builtMods.Add(pakFileInfo.FullName, embed.Request);
                     }
@@ -64,54 +84,22 @@ namespace SicarioPatch.Integration
             }
             return builtMods;
         }
-
-        [Obsolete("Use other overload", false)]
-        public IEnumerable<PatchRequest> GetSicarioMods(out List<string> inputFiles) {
-            var allPaks = GetAllMods().ToList();
-            inputFiles = new List<string>();
-            var builtMods = new List<PatchRequest>();
-            foreach (var pakFileInfo in allPaks) {
-                try {
-                    var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
-                    var file = reader.ReadFile();
-                    if (file?.FileStream == null) continue;
-                    var presetFile =
-                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
-                    if (presetFile != null) continue; //skip if the file also has a preset
-                    var requestFile =
-                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("_meta/sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".json");
-                    if (file?.FileStream == null || requestFile == null) continue;
-                    var outSt = requestFile.Unpack(file.FileStream);
-                    var request = new StreamReader(outSt).ReadToEnd();
-                    var embed = JsonSerializer.Deserialize<EmbeddedRequest>(request, _parser.Options);
-                    if (embed?.Request?.Mods != null && embed.Request.Mods.Any()) {
-                        inputFiles.Add(pakFileInfo.FullName);
-                        builtMods.Add(embed.Request);
-                    }
-                }
-                catch (Exception e) {
-                    Console.WriteLine(e);
-                    //ignored
-                }
-            }
-            return builtMods;
-        }
         
-        public IEnumerable<WingmanPreset> LoadPresetsFromMods() {
+        
+        public Dictionary<string, WingmanPreset> LoadPresetsFromMods() {
             var allPaks = GetAllMods();
-            var builtMods = new List<WingmanPreset>();
+            var builtMods = new Dictionary<string, WingmanPreset>();
             foreach (var pakFileInfo in allPaks) {
                 try {
-                    var reader = _pakFileProvider.GetReader(pakFileInfo.OpenRead());
-                    var file = reader.ReadFile();
-                    var requestFile =
-                        file?.Records.FirstOrDefault(r => r.GetVirtualPath(file).Contains("sicario") && Path.GetExtension(r.GetVirtualPath(file)) == ".dtp");
-                    if (requestFile == null || file == null) continue;
+                    var file = ReadPakFile(pakFileInfo);
+                    if (file == null) continue;
+                    var requestFile = GetPreset(file);
+                    if (requestFile == null || file.FileStream == null) continue;
                     var outSt = requestFile.Unpack(file.FileStream);
                     var request = new StreamReader(outSt).ReadToEnd();
-                    var embed = JsonSerializer.Deserialize<WingmanPreset>(request, _parser.Options);
+                    var embed = JsonSerializer.Deserialize<WingmanPreset>(request, _parser.RelaxedOptions);
                     if (embed?.Mods != null && embed.Mods.Any()) {
-                        builtMods.Add(embed);
+                        builtMods.Add(pakFileInfo.FullName, embed);
                     }
                 }
                 catch (Exception e) {
@@ -121,13 +109,50 @@ namespace SicarioPatch.Integration
             }
             return builtMods;
         }
-        
-        
+
+        public Dictionary<string, EmbeddedResources> GetEmbeddedAssets() {
+            var allPaks = GetAllMods().ToList();
+            var builtMods = new Dictionary<string, EmbeddedResources>();
+                foreach (var pakFileInfo in allPaks) {
+                    try {
+
+                        var file = ReadPakFile(pakFileInfo);
+                        if (file == null) continue;
+                        var presetFile = GetPreset(file);
+                        if (presetFile != null && file.FileStream != null) {
+                            var embedPreset = ReadEmbeddedResource<WingmanPreset>(presetFile, file);
+                            if (embedPreset?.Mods != null && embedPreset.Mods.Any()) {
+                                builtMods.Add(pakFileInfo.FullName, new EmbeddedResources {Preset = embedPreset});
+                            }
+                            continue;
+                        }
+                        var requestFile = GetRequest(file);
+                        if (requestFile != null && file.FileStream != null) {
+                            var embed = ReadEmbeddedResource<EmbeddedRequest>(requestFile, file);
+                            if (embed?.Request?.Mods != null && embed.Request.Mods.Any()) {
+                                builtMods.Add(pakFileInfo.FullName, new EmbeddedResources {Request = embed.Request});
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e);
+                        //ignored
+                    }
+                }
+                return builtMods;
+        }
+
+        private TResource? ReadEmbeddedResource<TResource>(Record requestFile, PakFile file) {
+            var outSt = requestFile.Unpack(file.FileStream);
+            var request = new StreamReader(outSt).ReadToEnd();
+            var embed = JsonSerializer.Deserialize<TResource>(request, _parser.RelaxedOptions);
+            return embed;
+        }
     }
 
     public record EmbeddedResources
     {
-        public List<Record> Presets { get; init; } = new();
-        public List<Record> Requests { get; init; } = new();
+        public WingmanPreset? Preset { get; init; }
+        public PatchRequest? Request { get; init; }
     }
 }

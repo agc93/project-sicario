@@ -103,7 +103,7 @@ namespace SicarioPatch.Loader
 
         internal static IServiceCollection AddMergeComponents(this IServiceCollection services) {
             return services
-                .AddSingleton<IMergeProvider, EmbeddedPresetProvider>()
+                .AddSingleton<IMergeProvider, EmbeddedResourceProvider>()
                 .AddSingleton<IMergeProvider, LoosePresetProvider>()
                 .AddSingleton<IMergeProvider, SkinMergeProvider>();
         }
