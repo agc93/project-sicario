@@ -21,25 +21,6 @@ namespace SicarioPatch.App.Shared
             docsPath = key;
             return !string.IsNullOrWhiteSpace(docsPath);
         }
-
-        public static string ToolName(this IBrandProvider brand, NameFormat format = NameFormat.Normal) {
-            var toolName = $"{brand.AppName} {brand.ToolName}";
-            var acronym = string.Join(string.Empty,
-                toolName.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0])
-            );
-            return format switch {
-                NameFormat.Normal => toolName,
-                NameFormat.Short => acronym,
-                NameFormat.Long => $"{toolName} ({acronym})",
-                _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-            };
-        }
-    }
-
-    public enum NameFormat
-    {
-        Normal,
-        Short,
-        Long
+        
     }
 }

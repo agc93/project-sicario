@@ -2,6 +2,7 @@
 {
     public interface IBrandProvider
     {
+        public string ProjectName { get; }
         public string AppName { get; }
         public string OwnerName { get; }
         public string ShortName { get; }

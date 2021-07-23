@@ -7,12 +7,12 @@
 @if (IncludeIntro) {
     <Heading Size="HeadingSize.Is5">What is @ToolName (@ShortName)?</Heading>
     <Paragraph>
-        @ToolName (@ShortName) is (to really oversimplify it) the same basic functionality of @Brand.AppName, but running on your own PC. That means it can take the same patches available here (in the form of presets, more on that below) to merge otherwise incompatible mods together into one that the game can load. Since it's on your PC, @ShortName can load files directly from the game's install, and can adapt to @ShortName-compatible mods that you have installed.
+        @ToolName (@ShortName) is (to really oversimplify it) the same basic functionality of @Brand.ProjectName, but running on your own PC. That means it can take the same patches available here (in the form of presets, more on that below) to merge otherwise incompatible mods together into one that the game can load. Since it's on your PC, @ShortName can load files directly from the game's install, and can adapt to @ShortName-compatible mods that you have installed.
     </Paragraph>
 
     <Heading Size="HeadingSize.Is5">What can @ShortName do?</Heading>
     <Paragraph>
-        At a minimum, @ShortName can do everything that the @Brand.AppName you're using now can do, but on your own PC. Running locally means that @ShortName has a few other tricks:
+        At a minimum, @ShortName can do everything that the @Brand.ProjectName you're using now can do, but on your own PC. Running locally means that @ShortName has a few other tricks:
     </Paragraph>
     <ul>
         <li>Automatically add new skin slots to planes based on your installed @ShortName-compatible mods!</li>
@@ -51,7 +51,7 @@
     [Parameter]
     public bool IncludeIntro { get; set; } = true;
 
-    private string ToolName => $"{Brand.AppName} {Brand.ToolName}";
+    private string ToolName => $"{Brand.ProjectName} {Brand.ToolName}";
 
     private string ShortName => string.Join(string.Empty,
         ToolName.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0])

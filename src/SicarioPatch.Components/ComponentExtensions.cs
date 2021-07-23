@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SicarioPatch.Components
 {
@@ -21,5 +23,38 @@ namespace SicarioPatch.Components
             }
 
         }
+        
+        public static string ToolName(this IBrandProvider brand, NameFormat format = NameFormat.Normal) {
+            var toolName = $"{brand.ProjectName} {brand.ToolName}";
+            var acronym = string.Join(string.Empty,
+                toolName.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0])
+            );
+            return format switch {
+                NameFormat.Normal => toolName,
+                NameFormat.Short => acronym,
+                NameFormat.Long => $"{toolName} ({acronym})",
+                _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            };
+        }
+
+        public static string SiteName(this IBrandProvider brand, NameFormat format = NameFormat.Normal) {
+            var toolName = $"{brand.ProjectName} {brand.AppName}";
+            var acronym = string.Join(string.Empty,
+                toolName.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0])
+            );
+            return format switch {
+                NameFormat.Normal => toolName,
+                NameFormat.Short => acronym,
+                NameFormat.Long => $"{toolName} ({acronym})",
+                _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            };
+        }
+    }
+    
+    public enum NameFormat
+    {
+        Normal,
+        Short,
+        Long
     }
 }

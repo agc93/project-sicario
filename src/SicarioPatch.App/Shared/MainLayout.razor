@@ -13,7 +13,7 @@
                     <BarItem>
                         <BarLink To="">
                             <BarIcon IconName="MaterialIcons.Layers" />
-                            @Brand.AppName
+                            @Brand.ProjectName
                         </BarLink>
                     </BarItem>
                 </BarBrand>
@@ -22,14 +22,14 @@
                         <BarItem>
                             <BarLink To="build">
                                 <BarIcon IconName="IconName.Code"/>
-                                Build
+                                @Brand.AppName
                             </BarLink>
                         </BarItem>
                         <BarItem>
                             <BarDropdown>
                                 <BarDropdownToggle>
                                     <BarIcon IconName="MaterialIcons.MergeType"/>
-                                    Merger
+                                    @Brand.ToolName
                                 </BarDropdownToggle>
                                 <BarDropdownMenu>
                                     <BarDropdownItem To="/merger">
@@ -68,7 +68,7 @@
                                 </BarDropdownToggle>
                                 <BarDropdownMenu>
                                     <BarDropdownItem To="/about">
-                                        About @Brand.AppName
+                                        About @Brand.ProjectName
                                     </BarDropdownItem>
                                     <BarDropdownItem To="/faq">
                                         FAQ

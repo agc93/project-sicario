@@ -4,7 +4,7 @@
 @inject IJSRuntime JsRuntime
 @inject IBrandProvider Brand
 @* @attribute [Authorize(Policy = Policies.IsUser)] *@
-<h3>Build Merged Mod <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button></h3>
+<h3>Merge @Brand.AppName <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button></h3>
 @if (AvailableMods.Any())
 {
     <AuthorizeView>
@@ -72,7 +72,7 @@ else
 <Modal @ref="_modalRef">
     <ModalContent IsCentered="true">
         <ModalHeader>
-            <ModalTitle>How to build a merged mod</ModalTitle>
+            <ModalTitle>How to build a @Brand.ShortName merge</ModalTitle>
             <CloseButton Clicked="() => _modalRef.Hide()" />
         </ModalHeader>
         <ModalBody>
