@@ -41,22 +41,8 @@
                                 </BarDropdownMenu>
                             </BarDropdown>
                         </BarItem>
-                        <AuthorizeView Policy="@Policies.IsUploader">
-                            <BarItem>
-                                <BarLink To="upload">
-                                    <BarIcon IconName="IconName.FileUpload"/>
-                                    Upload
-                                </BarLink>
-                            </BarItem>
-                        </AuthorizeView>
-                        @* This is so not ready for production, but we're doing it anyway *@
-                        <AuthorizeView Policy="@Policies.IsUploader">
-                            <BarItem>
-                                <BarLink To="test">
-                                    <BarIcon IconName="MaterialIcons.Build" />
-                                    Test
-                                </BarLink>
-                            </BarItem>
+                        <AuthorizeView>
+                            <AuthorMenu/>
                         </AuthorizeView>
                     </BarStart>
                     <BarEnd>

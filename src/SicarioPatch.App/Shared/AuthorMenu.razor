@@ -1,0 +1,26 @@
+﻿@using Blazorise.Icons.Material
+<BarItem>
+    <BarDropdown>
+        <BarDropdownToggle>
+            <BarIcon IconName="MaterialIcons.Create"/>
+            Author Tools
+        </BarDropdownToggle>
+        <BarDropdownMenu>
+            @* This is so not ready for production, but we're doing it anyway *@
+            <BarDropdownItem To="test">
+                @* <BarIcon IconName="IconName.Bolt"/> *@
+                Patch Testing
+            </BarDropdownItem>
+            <AuthorizeView Policy="@Policies.IsUploader">
+                <BarDropdownItem To="upload">
+                    @* <BarIcon IconName="IconName.FileUpload"/>*@
+                    Upload
+                </BarDropdownItem>
+            </AuthorizeView>
+        </BarDropdownMenu>
+    </BarDropdown>
+</BarItem>
+
+@code {
+
+}
