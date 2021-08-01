@@ -114,4 +114,6 @@ Here's a very brief summary of the available filters for use in templates:
 |`<string='string'>`|`<StrProperty='saa,mlaa'>`|Same as above, but for non-numeric types|
 |`<string::string>`|`<S_CannonType::NewEnumerator2>`|Matches only enum properties, with the right enum type and the right enum value|
 
+> Due to a very weird bug I can't really fix right now: note that you should only include decimals for non-whole numbers. For now, `2500` is not the same as `2500.0`, so just leave the decimals off for whole numbers.
+
 There's also one special filter: `[*]`. That filter will just match everything and return all the properties it receives. This can be useful if you're trying to match a whole datatable for example.
