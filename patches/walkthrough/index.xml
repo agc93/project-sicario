@@ -192,6 +192,9 @@
 &lt;/tr>
 &lt;/tbody>
 &lt;/table>
+&lt;blockquote>
+&lt;p>Due to a very weird bug I can&amp;rsquo;t really fix right now: note that you should only include decimals for non-whole numbers. For now, &lt;code>2500&lt;/code> is not the same as &lt;code>2500.0&lt;/code>, so just leave the decimals off for whole numbers.&lt;/p>
+&lt;/blockquote>
 &lt;p>There&amp;rsquo;s also one special filter: &lt;code>[*]&lt;/code>. That filter will just match everything and return all the properties it receives. This can be useful if you&amp;rsquo;re trying to match a whole datatable for example.&lt;/p></description></item><item><title>Patches: Understanding Patches and Patch Types</title><link>/patches/walkthrough/patches/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough/patches/</guid><description>
 &lt;h3 id="patches">Patches&lt;/h3>
 &lt;p>Now we hit the real meat of a Sicario patch: the actual edit to make. Here&amp;rsquo;s the example for enabling AoA for all aircraft:&lt;/p>
