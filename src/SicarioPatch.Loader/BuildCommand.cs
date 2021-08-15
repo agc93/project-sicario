@@ -140,9 +140,12 @@ namespace SicarioPatch.Loader
                 SearchPaths = presetSearchPaths
             };
             var components = (await _mediator.Send(mergeReq)).ToList();
-            foreach (var mergeComponent in components.Where(mergeComponent => !string.IsNullOrWhiteSpace(mergeComponent.Message))) {
-                LogConsole($"{mergeComponent.Message}");
+            if (!settings.Quiet.Is(true)) {
+                foreach (var mergeComponent in components.Where(mergeComponent => !string.IsNullOrWhiteSpace(mergeComponent.Message))) {
+                    LogConsole($"{mergeComponent.Message}");
+                }
             }
+            
             
             //final merge
 
@@ -199,7 +202,7 @@ namespace SicarioPatch.Loader
                 }
                 else {
                     LogConsole(
-                        $"[green][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
+                        $"[green3_1][bold]Success![/] Your merged mod has been built and is now being installed to the specified output folder[/]");
                     BuildTargetPath(targetPath);
 
                     resp.MoveTo(Path.Join(targetPath, resp.Name), true);
@@ -239,6 +242,14 @@ namespace SicarioPatch.Loader
                 // because we're using an ancient version of ExecEngine
                 // this will actually wait for the game to exit.
                 // not ideal, but not a deal-breaker imo
+            }
+            
+            if (!settings.NonInteractive) {
+                // Console.WriteLine();
+                Console.WriteLine();
+                LogConsole("The PSM merge build is now complete!".PadLeft(6));
+                LogConsole("[bold]Press [green3_1]<ENTER>[/] to close this window![/]".PadLeft(6));
+                Console.ReadLine();
             }
 
             return 0;

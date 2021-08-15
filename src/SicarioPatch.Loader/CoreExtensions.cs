@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Spectre.Console.Cli;
 
 namespace SicarioPatch.Loader
 {
@@ -9,6 +10,10 @@ namespace SicarioPatch.Loader
                 Directory.CreateDirectory(path);
             }
             return Directory.Exists(path);
+        }
+
+        internal static bool Is(this FlagValue<bool> flagValue, bool target, bool defaultValue = false) {
+            return flagValue.IsSet ? flagValue.Value == target : defaultValue == target;
         }
     }
 }
