@@ -21,8 +21,15 @@ namespace SicarioPatch.Integration
             var localFile = _files.FindOne(f => f.AssetPath == fileName);
             if (localFile != null && !string.IsNullOrWhiteSpace(localFile.SourceIndexHash) &&
                 localFile.SourceIndexHash == srcHash && !string.IsNullOrWhiteSpace(localFile.OutputPath)) {
-                return new FileInfo(Path.Combine(WorkingDirectory.FullName,
-                    localFile.OutputPath));
+                var localFilePath = Path.Combine(WorkingDirectory.FullName,
+                    localFile.OutputPath);
+                if (File.Exists(localFilePath)) {
+                    return new FileInfo(localFilePath);
+                }
+                else {
+                    // ignored, the upsert below should fix this anyway
+                    // _files.DeleteMany(f => f.AssetPath == fileName);
+                }
             }
 
             var unpacked = UnpackFile(fileName, out srcHash);
