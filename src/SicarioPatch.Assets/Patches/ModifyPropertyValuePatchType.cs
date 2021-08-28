@@ -24,13 +24,13 @@ namespace SicarioPatch.Assets.Patches
                     case "IntProperty":
                         if (propertyData is IntPropertyData intProp && (parsedValue.ValueType ?? "IntProperty") == intProp.Type) {
                             intProp.Value =
-                                Convert.ToInt32(parsedValue.RunValueChange(Convert.ToDecimal(intProp.Value)));
+                                Convert.ToInt32(Math.Min(parsedValue.RunValueChange(Convert.ToDecimal(intProp.Value)), int.MaxValue));
                         }
                         break;
                     case "FloatProperty":
                         if (propertyData is FloatPropertyData floatProp && (parsedValue.ValueType ?? "FloatProperty") == floatProp.Type) {
                             floatProp.Value =
-                                Convert.ToSingle(parsedValue.RunValueChange(Convert.ToDecimal(floatProp.Value)));
+                                Convert.ToSingle(Math.Min(parsedValue.RunValueChange(Convert.ToDecimal(floatProp.Value)), Convert.ToDecimal(float.MaxValue)));
                         }
                         break;
                 }

@@ -49,6 +49,19 @@ namespace SicarioPatch.Assets.Patches
                             
                         }
                         break;
+                    case "BoolProperty":
+                        if (propertyData.Type == "ArrayProperty" && propertyData is ArrayPropertyData {
+                            ArrayType: "BoolProperty"
+                        } boolArrayProp) {
+                            boolArrayProp.Value = parsedValue.Value.Select(v =>
+                            {
+                                var valData = new BoolPropertyData(boolArrayProp.Name, boolArrayProp.Asset) {
+                                    Value = bool.Parse(v)
+                                };
+                                return valData;
+                            }).ToArray();
+                        }
+                        break;
                 }
             }
 
