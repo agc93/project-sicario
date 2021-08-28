@@ -18,17 +18,22 @@ namespace SicarioPatch.Loader.Providers
             var skinPaths = _slotLoader.GetSkinPaths();
             var slotPatches = _slotLoader.GetSlotPatches(skinPaths).ToList();
             var slotLoader = _slotLoader.GetSlotMod(slotPatches);
-            var skinSet = skinPaths
-                .ToDictionary(k => k.Key, v => v.Value.Select(p => Path.ChangeExtension(p, null)).Distinct().ToList())
-                .ToDictionary(k => k.Key, v => string.Join(";", v.Value));
-            return new[] {
-                new MergeComponent {
-                    Name = "customSkins",
-                    Mods = new[] {slotLoader},
-                    MergedResources = skinSet,
-                    Message = $"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]"
-                }
-            };
+            if (slotLoader != null) {
+                var skinSet = skinPaths
+                    .ToDictionary(k => k.Key,
+                        v => v.Value.Select(p => Path.ChangeExtension(p, null)).Distinct().ToList())
+                    .ToDictionary(k => k.Key, v => string.Join(";", v.Value));
+                return new[] {
+                    new MergeComponent {
+                        Name = "customSkins",
+                        Mods = new[] { slotLoader },
+                        MergedResources = skinSet,
+                        Message =
+                            $"[dodgerblue2]Successfully compiled skin merge with [bold]{slotLoader.GetPatchCount()}[/] patches.[/]"
+                    }
+                };
+            }
+            return System.Array.Empty<MergeComponent>();
         }
     }
 }
