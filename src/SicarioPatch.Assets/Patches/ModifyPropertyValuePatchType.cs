@@ -41,15 +41,22 @@ namespace SicarioPatch.Assets.Patches
 
         protected override Parser<ValueModification> ValueParser => Parsers.Terms.Identifier().Then(id => id.ToString())
             .Or(Parsers.Terms.Char('*').Then(c => string.Empty)).AndSkip(Parsers.Terms.Char(':'))
-            .And(ModifierParser).Then(res => new ValueModification
+            .And(NumericModifierParser).Then(res => new ValueModification
                 {ValueType = string.IsNullOrWhiteSpace(res.Item1) ? null : res.Item1, RunValueChange = res.Item2});
 
-        private Parser<Func<decimal, decimal>> ModifierParser => Parsers.Terms.Char('+')
+        private Parser<Func<decimal, decimal>> NumericModifierParser => Parsers.Terms.Char('+')
             .SkipAnd(NumberParser)
             .Then<Func<decimal, decimal>>(res => (arg) => arg + res)
             .Or(Parsers.Terms.Char('-').SkipAnd(NumberParser).Then<Func<decimal, decimal>>(res => arg => arg - res))
             .Or(Parsers.Terms.Char('/').SkipAnd(NumberParser).Then<Func<decimal, decimal>>(res => arg => arg / res))
             .Or(Parsers.Terms.Char('*').SkipAnd(NumberParser).Then<Func<decimal, decimal>>(res => arg => arg * res));
+
+        private Parser<Func<string, string>> StringModifierParser =>
+            Parsers.Terms.Char('+').SkipAnd(Parsers.Terms.String())
+                .Then<Func<string, string>>(res => (arg) => arg + res)
+                .Or(Parsers.Terms.Char('-').SkipAnd(Parsers.Terms.String())
+                    .Then<Func<string, string>>(res => (arg) => arg.Replace(res.ToString(), string.Empty)));
+        
 
         private Parser<decimal> NumberParser =>
             Parsers.Terms.Decimal().Or(Parsers.Terms.Integer().Then(Convert.ToDecimal));

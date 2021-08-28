@@ -23,7 +23,8 @@ namespace SicarioPatch.Core
             };
             var tempFile = Path.GetTempFileName();
             var opts = new JsonSerializerOptions(_parser.Options) {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                IgnoreNullValues = true
             };
             var json = JsonSerializer.Serialize(preset, opts);
             await File.WriteAllTextAsync(tempFile, json, Encoding.ASCII, cancellationToken);
