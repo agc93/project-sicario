@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Parlot.Fluent;
 using SicarioPatch.Assets.TypeLoaders;
+using static SicarioPatch.Assets.Patches.PropertyParsers;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
 
@@ -30,7 +31,7 @@ namespace SicarioPatch.Assets.Patches
                     case "FloatProperty":
                         if (propertyData is FloatPropertyData floatProp && (parsedValue.ValueType ?? "FloatProperty") == floatProp.Type) {
                             floatProp.Value =
-                                Convert.ToSingle(Math.Min(parsedValue.RunValueChange(Convert.ToDecimal(floatProp.Value)), Convert.ToDecimal(float.MaxValue)));
+                                Convert.ToSingle(Math.Min(parsedValue.RunValueChange(Convert.ToDecimal(floatProp.Value)), decimal.MaxValue));
                         }
                         break;
                 }
@@ -39,7 +40,7 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        protected override Parser<ValueModification> ValueParser => Parsers.Terms.Identifier().Then(id => id.ToString())
+        protected override Parser<ValueModification> ValueParser => PropertyType("Int", "Float").Then(id => id.ToString())
             .Or(Parsers.Terms.Char('*').Then(c => string.Empty)).AndSkip(Parsers.Terms.Char(':'))
             .And(NumericModifierParser).Then(res => new ValueModification
                 {ValueType = string.IsNullOrWhiteSpace(res.Item1) ? null : res.Item1, RunValueChange = res.Item2});
@@ -56,9 +57,5 @@ namespace SicarioPatch.Assets.Patches
                 .Then<Func<string, string>>(res => (arg) => arg + res)
                 .Or(Parsers.Terms.Char('-').SkipAnd(Parsers.Terms.String())
                     .Then<Func<string, string>>(res => (arg) => arg.Replace(res.ToString(), string.Empty)));
-        
-
-        private Parser<decimal> NumberParser =>
-            Parsers.Terms.Decimal().Or(Parsers.Terms.Integer().Then(Convert.ToDecimal));
     }
 }
