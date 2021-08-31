@@ -219,7 +219,11 @@ namespace SicarioPatch.Loader
                 return 422;
             }
             catch (Exception e) {
-                _logger.LogError(e, "An unhandled error was encountered while building the mod file.");
+                _logger.LogError("An unhandled error was encountered while building the mod file.");
+                _logger.LogDebug(e.Message);
+#if DEBUG
+                Console.WriteLine(e.StackTrace);
+#endif
                 return 400;
             }
             

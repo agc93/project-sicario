@@ -48,10 +48,14 @@ namespace SicarioPatch.Loader
         }
 
         internal static CommandApp GetApp() {
+            var level = GetLogLevel();
             var app = new CommandApp(new DependencyInjectionRegistrar(GetServices()));
             app.SetDefaultCommand<BuildCommand>();
             app.Configure(c =>
             {
+                if (level < LogLevel.Information) {
+                    c.PropagateExceptions();
+                }
                 // c.PropagateExceptions();
                 c.AddCommand<BuildCommand>("build");
             });
@@ -75,9 +79,9 @@ namespace SicarioPatch.Loader
             return services.AddSingleton<IConfigurationRoot>(config).AddSingleton<IConfiguration>(config);
         }
 
-        internal static IServiceCollection AddLogging(this IServiceCollection services) {
+        internal static IServiceCollection AddLogging(this IServiceCollection services, LogLevel? logLevel = null) {
             return services.AddLogging(logging => {
-                var level = GetLogLevel();
+                var level = logLevel ?? GetLogLevel();
                 logging.SetMinimumLevel(LogLevel.Trace);
                 logging.AddInlineSpectreConsole(c => {
                     c.LogLevel = level;

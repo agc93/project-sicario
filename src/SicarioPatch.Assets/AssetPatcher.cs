@@ -23,7 +23,7 @@ namespace SicarioPatch.Assets
         }
 
         public async Task<FileInfo> RunPatch(string sourcePath, IEnumerable<AssetPatchSet> sets, string targetName = null) {
-            sourcePath = Path.ChangeExtension(sourcePath, "uasset");
+            sourcePath = Path.GetExtension(sourcePath) == ".uexp" ? Path.ChangeExtension(sourcePath, "uasset") : sourcePath;
             var fi = new FileInfo(sourcePath);
             foreach (var set in sets) {
                 var y = new AssetWriter(fi.FullName, null);

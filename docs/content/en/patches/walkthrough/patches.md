@@ -27,7 +27,7 @@ Templates are covered in more detail in the [Property Templates](../template) se
 
 #### Types
 
-The two main types of patches currently in use are:
+The main types of patches currently in use are:
 
 |Type|Notes|
 |:--:|:----|
