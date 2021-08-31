@@ -209,7 +209,7 @@
 &lt;p>These are the actual values Sicario will be (respectively) looking for and inserting into the binary file. When it runs, Project Sicario will load the file into memory, parse the file (more on that below), look for &lt;em>any&lt;/em> values that match the &lt;strong>template&lt;/strong> value and then apply the &lt;strong>value&lt;/strong>. How exactly the value is applied varies based on the patch &lt;em>type&lt;/em>.&lt;/p>
 &lt;p>Templates are covered in more detail in the &lt;a href="../template">Property Templates&lt;/a> section.&lt;/p>
 &lt;h4 id="types">Types&lt;/h4>
-&lt;p>The two main types of patches currently in use are:&lt;/p>
+&lt;p>The main types of patches currently in use are:&lt;/p>
 &lt;table>
 &lt;thead>
 &lt;tr>
