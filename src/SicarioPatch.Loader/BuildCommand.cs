@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SicarioPatch.Assets;
 using SicarioPatch.Core;
 using SicarioPatch.Core.Diagnostics;
 using SicarioPatch.Integration;
@@ -29,7 +30,8 @@ namespace SicarioPatch.Loader
         private readonly Integration.GameFinder _gameFinder;
         private readonly ILogger<BuildCommand> _logger;
         private readonly ModParser _parser;
-        
+        private readonly IEngineInfoProvider _engineInfo;
+
 #pragma warning disable 8618
         [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
         public class Settings : CommandSettings
@@ -68,7 +70,8 @@ namespace SicarioPatch.Loader
 
         public BuildCommand(IAnsiConsole console, SkinSlotLoader slotLoader, IMediator mediator,
             PresetFileLoader presetLoader, MergeLoader mergeLoader, IConfiguration config,
-            Integration.GameFinder gameFinder, ILogger<BuildCommand> logger, ModParser parser) {
+            Integration.GameFinder gameFinder, ILogger<BuildCommand> logger, ModParser parser,
+            IEngineInfoProvider engineInfo) {
             _console = console;
             _slotLoader = slotLoader;
             _mediator = mediator;
@@ -78,14 +81,7 @@ namespace SicarioPatch.Loader
             _gameFinder = gameFinder;
             _logger = logger;
             _parser = parser;
-        }
-
-        internal record MergePart
-        {
-             internal Dictionary<string, string> Parameters { get; init; } = new();
-             internal IEnumerable<WingmanMod> Mods { get; init; } = new List<WingmanMod>();
-             internal int Priority { get; init; } = 10;
-             internal string? Message { get; init; }
+            _engineInfo = engineInfo;
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings) {
@@ -127,6 +123,8 @@ namespace SicarioPatch.Loader
 
             _config["GamePath"] = settings.InstallPath;
             _config["GamePakPath"] = Path.Join(paksRoot, "ProjectWingman-WindowsNoEditor.pak");
+            
+            _logger.LogInformation($"Running engine version {_engineInfo.GetEngineVersion() ?? "unknown"}");
 
             var presetSearchPaths = new List<string>(settings.PresetPaths ?? Array.Empty<string>()) {
                 Path.Join(settings.InstallPath, "ProjectWingman", "Content", "Presets"),
@@ -229,6 +227,7 @@ namespace SicarioPatch.Loader
             
             if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
                 //build report
+                // this could probably be a mediator publish but lets leave it for now
                 if (!Path.IsPathRooted(settings.ReportFile)) {
                     settings.ReportFile = Path.Join(targetPath, settings.ReportFile);
                 }

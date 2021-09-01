@@ -64,16 +64,16 @@ namespace SicarioPatch.Assets.Patches
         private static void AddObjectRef(ObjectReference parsedValue, ObjectPropertyData objectProp, Link referenceNameLink,
             Link referencePathLink) {
             var pathLinkRef = objectProp.Asset.AddHeaderReference(parsedValue.Path);
-            var pathLinkIndex = objectProp.Asset.SearchForLink((ulong) pathLinkRef);
+            var pathLinkIndex = objectProp.Asset.SearchForLink(pathLinkRef);
             var pathLink = pathLinkIndex == default
-                ? new Link(referencePathLink.Base, referencePathLink.Class, 0, (ulong) pathLinkRef)
+                ? new Link(referencePathLink.Base, referencePathLink.Class, 0, pathLinkRef)
                 : objectProp.Asset.GetLinkAt(pathLinkIndex);
             pathLinkIndex = objectProp.Asset.AddLink(pathLink);
 
             var nameHeaderRef = objectProp.Asset.AddHeaderReference(parsedValue.Name);
-            var nameLinkIndex = objectProp.Asset.SearchForLink((ulong) nameHeaderRef);
+            var nameLinkIndex = objectProp.Asset.SearchForLink(nameHeaderRef);
             var nameLink = nameLinkIndex == default
-                ? new Link(referenceNameLink.Base, referenceNameLink.Class, pathLinkIndex, (ulong) nameHeaderRef)
+                ? new Link(referenceNameLink.Base, referenceNameLink.Class, pathLinkIndex, nameHeaderRef)
                 : objectProp.Asset.GetLinkAt(nameLinkIndex);
             nameLinkIndex = objectProp.Asset.AddLink(nameLink);
 

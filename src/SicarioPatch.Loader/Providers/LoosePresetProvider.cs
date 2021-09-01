@@ -1,16 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using SicarioPatch.Assets;
 using SicarioPatch.Core;
+using SicarioPatch.Integration;
 
 namespace SicarioPatch.Loader.Providers
 {
     public class LoosePresetProvider : IMergeProvider
     {
         private readonly PresetFileLoader _presetLoader;
+        private readonly IEngineInfoProvider _engineInfo;
+        private readonly ILogger<LoosePresetProvider> _logger;
 
-        public LoosePresetProvider(PresetFileLoader presetLoader) {
+        public LoosePresetProvider(PresetFileLoader presetLoader, IEngineInfoProvider engineInfo, ILogger<LoosePresetProvider> logger) {
             _presetLoader = presetLoader;
+            _engineInfo = engineInfo;
+            _logger = logger;
         }
         public string Name => "loosePresets";
         public IEnumerable<MergeComponent> GetMergeComponents(List<string>? searchPaths) {
@@ -20,6 +27,14 @@ namespace SicarioPatch.Loader.Providers
                 .OrderBy(f => f)
                 .ToList();
             var presets = _presetLoader.LoadFromFiles(presetPaths) ?? new Dictionary<string, WingmanPreset>();
+            presets = presets.Where(p =>
+            {
+                var supported = p.Value.IsSupportedBy(_engineInfo);
+                if (!supported) {
+                    _logger.LogWarning("[bold]Incompatible embed![/] This preset is not supported by the current engine version and will not be loaded!");
+                }
+                return supported;
+            }).ToDictionary();
 
             var loosePresetInputs = presets
                 .Select(p => p.Value.ModParameters)

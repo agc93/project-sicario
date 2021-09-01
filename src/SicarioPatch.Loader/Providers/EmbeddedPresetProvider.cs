@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using SicarioPatch.Assets;
 using SicarioPatch.Core;
 using SicarioPatch.Integration;
 
@@ -8,9 +10,13 @@ namespace SicarioPatch.Loader.Providers
     public class EmbeddedResourceProvider : IMergeProvider
     {
         private readonly MergeLoader _mergeLoader;
+        private readonly IEngineInfoProvider _engineInfo;
+        private readonly ILogger<EmbeddedResourceProvider> _logger;
 
-        public EmbeddedResourceProvider(MergeLoader mergeLoader) {
+        public EmbeddedResourceProvider(MergeLoader mergeLoader, IEngineInfoProvider engineInfo, ILogger<EmbeddedResourceProvider> logger) {
             _mergeLoader = mergeLoader;
+            _engineInfo = engineInfo;
+            _logger = logger;
         }
         public string Name => "embeddedResources";
         public IEnumerable<MergeComponent> GetMergeComponents(List<string>? searchPaths) {
@@ -20,7 +26,13 @@ namespace SicarioPatch.Loader.Providers
             var embeddedResources = _mergeLoader.GetEmbeddedAssets();
             foreach (var (filePath, embeddedResource) in embeddedResources) {
                 if (embeddedResource.Preset != null) {
-                    embeddedPresets.Add(filePath, embeddedResource.Preset);
+                    var supported = embeddedResource.Preset.IsSupportedBy(_engineInfo);
+                    if (!supported) {
+                        _logger.LogWarning("[bold]Incompatible embed![/] This preset is not supported by the current engine version and will not be loaded!");
+                    }
+                    else {
+                        embeddedPresets.Add(filePath, embeddedResource.Preset);
+                    }
                 } else if (embeddedResource.Request != null) {
                     requests.Add(filePath, embeddedResource.Request);
                 }

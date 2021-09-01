@@ -5,21 +5,25 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SicarioPatch.Assets;
 
 namespace SicarioPatch.Core
 {
     public class PresetFileRequestHandler : IRequestHandler<PresetFileRequest, FileInfo>
     {
         private readonly ModParser _parser;
+        private readonly IEngineInfoProvider _engineInfo;
 
-        public PresetFileRequestHandler(ModParser parser) {
+        public PresetFileRequestHandler(ModParser parser, IEngineInfoProvider engineInfo) {
             _parser = parser;
+            _engineInfo = engineInfo;
         }
         public async Task<FileInfo> Handle(PresetFileRequest request, CancellationToken cancellationToken) {
             var preset = new WingmanPreset() {
                 Mods = request.Mods,
                 ModParameters = request.TemplateInputs,
-                Version = request.Version ?? 1
+                Version = request.Version ?? 1,
+                EngineVersion = _engineInfo.GetEngineVersion()
             };
             var tempFile = Path.GetTempFileName();
             var opts = new JsonSerializerOptions(_parser.Options) {

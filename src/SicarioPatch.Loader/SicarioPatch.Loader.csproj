@@ -10,6 +10,7 @@
         <IsPublishable>true</IsPublishable>
         <InvariantGlobalization>true</InvariantGlobalization>
         <DebugType>Embedded</DebugType>
+        <Version>0.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

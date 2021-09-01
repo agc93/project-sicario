@@ -10,13 +10,11 @@ namespace SicarioPatch.Assets
 {
     public class AssetPatcher
     {
-        private readonly IEnumerable<IAssetParserFragment> _fragments;
         private readonly IEnumerable<IAssetTypeLoader> _typeLoaders;
         private readonly IEnumerable<IAssetPatchType> _patchTypes;
         private readonly IEnumerable<ITemplateProvider> _templates;
 
-        public AssetPatcher(IEnumerable<IAssetParserFragment> fragments, IEnumerable<IAssetTypeLoader> typeLoaders, IEnumerable<IAssetPatchType> patchTypes, IEnumerable<ITemplateProvider> templates) {
-            _fragments = fragments;
+        public AssetPatcher(IEnumerable<IAssetTypeLoader> typeLoaders, IEnumerable<IAssetPatchType> patchTypes, IEnumerable<ITemplateProvider> templates) {
             _typeLoaders = typeLoaders;
             _patchTypes = patchTypes;
             _templates = templates;

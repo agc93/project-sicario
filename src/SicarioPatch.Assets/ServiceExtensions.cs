@@ -37,6 +37,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddAssetServices(this IServiceCollection services) {
             services.AddSingleton<AssetPatcher>();
+            // services.AddSingleton<EngineInfoProvider>();
+            services.AddSingleton<IEngineInfoProvider, EngineInfoProvider>();
             services.AddTypeLoaders().AddPatchTypes().AddTemplates();
             return services;
         }

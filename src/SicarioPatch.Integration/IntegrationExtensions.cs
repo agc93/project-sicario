@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SemanticVersioning;
+using SicarioPatch.Assets;
+using SicarioPatch.Core;
 using UnPak.Core;
 
 namespace SicarioPatch.Integration
@@ -26,6 +29,21 @@ namespace SicarioPatch.Integration
         internal static string TrimPathTo(this string path, string pathSegment, string separator = "/") {
             var finalParts = path.Split(separator).SkipWhile(s => !string.Equals(s, pathSegment)).ToList();
             return finalParts.Any() ? string.Join("/", finalParts) : path;
+        }
+
+        public static bool IsSupportedBy(this WingmanPreset preset, IEngineInfoProvider engineInfo) {
+            var presetRequested = preset.EngineVersion;
+            var engineVersion = engineInfo.GetEngineVersion();
+            if (!string.IsNullOrWhiteSpace(presetRequested) && !string.IsNullOrWhiteSpace(engineVersion)) {
+                if (Version.TryParse(engineVersion, true, out var engineVersionInfo) &&
+                    Version.TryParse(presetRequested, true, out var presetVersionInfo)) {
+                    var supported = engineVersionInfo == Version.Parse("0.0.0") || engineVersionInfo >= presetVersionInfo;
+                    return supported;
+                }
+                return false;
+            }
+
+            return true;
         }
     }
 }

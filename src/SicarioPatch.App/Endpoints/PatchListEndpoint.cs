@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Ardalis.ApiEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SicarioPatch.Assets;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.App.Endpoints

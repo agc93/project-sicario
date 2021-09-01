@@ -6,7 +6,7 @@ weight: 20
 
 Things are a little trickier (but not dramatically so) for blueprint/datatable mods.
 
-The most important thing is that your blueprint changes need to already be in a {{< shortName >}} preset. If you've already done that, you're 90% of the way there. If not check out [the docs](../../introduction/_index.md) to build your changes as a {{< shortName >}} preset.
+The most important thing is that your blueprint changes need to already be in a {{< shortName >}} patch. If you've already done that, you're 90% of the way there. If not check out [the docs](../../introduction/_index.md) to build your changes as a {{< shortName >}} patch.
 
 Once you have your patch(es), it's time to turn them into a preset. Don't worry, it's easy.
 
@@ -26,6 +26,10 @@ The `modParameters` key is optional and can be used to specify any required para
 > The parameters work the same way as they do in the hosted {{< appName >}} app, just this way the merger doesn't have to prompt for the values to use.
 
 The `mods` key is the important one and is an array of the patches included in the preset. Here is where you would put any patch(es) required for your mod to work. You can either add them as a single mod, or as several: that's up to you.
+
+#### Engine Version
+
+Presets also have an optional `engineVersion` key that can be used to indicate that your preset uses features only available in newer versions of {{< shortName >}}. If you set this value, then earlier versions of {{< toolName >}} will not attempt to load your preset as it might not be able to action them. This value is optional!
 
 ### Packaging
 
