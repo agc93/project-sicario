@@ -24,7 +24,7 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        protected override Parser<(int SourceIndex, int? TargetIndex)> ValueParser => Parsers.Terms.Integer()
+        protected internal override Parser<(int SourceIndex, int? TargetIndex)> ValueParser => Parsers.Terms.Integer()
             .And(Parsers.ZeroOrOne(Parsers.Terms.Char('>'))).And(Parsers.ZeroOrOne(Parsers.Terms.Integer()))
             .Then(res => (Convert.ToInt32(res.Item1), res.Item2 == '>' ? Convert.ToInt32(res.Item3) as int? : null));
     }

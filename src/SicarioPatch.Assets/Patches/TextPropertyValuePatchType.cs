@@ -26,7 +26,7 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        protected override Parser<(string? Namespace, string Key, string Value)> ValueParser => Parsers.ZeroOrOne(Parsers.Terms.Identifier()).And(Parsers.Terms.Identifier()
+        protected internal override Parser<(string? Namespace, string Key, string Value)> ValueParser => Parsers.ZeroOrOne(Parsers.Terms.Identifier()).And(Parsers.Terms.Identifier()
             .Or(Parsers.Terms.String(StringLiteralQuotes.Single)).Or(Parsers.Terms.Char('*')
                 .Then(c => new TextSpan(Guid.NewGuid().ToString("N").ToUpper())))
             .AndSkip(Parsers.Terms.Char(':')).And(Parsers.Terms.String())).Then(res =>

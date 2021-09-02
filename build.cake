@@ -108,7 +108,7 @@ Task("Run-Unit-Tests")
 });
 
 Task("Post-Build")
-	.IsDependentOn("Build")
+	.IsDependentOn("Run-Unit-Tests")
 	.Does(() =>
 {
 // 	CopyFiles(GetFiles("./build/Dockerfile*"), artifacts);
@@ -208,7 +208,8 @@ Task("Build-Docker-Image")
 #load "build/publish.cake"
 
 Task("Default")
-    .IsDependentOn("Post-Build");
+    .IsDependentOn("Post-Build")
+    .IsDependentOn("Run-Unit-Tests");
 
 Task("Publish")
     .IsDependentOn("Publish-Runtime")

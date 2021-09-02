@@ -69,7 +69,7 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        protected override Parser<(string ItemValueType, List<string> Value)> ValueParser =>  
+        protected internal override Parser<(string ItemValueType, List<string> Value)> ValueParser =>  
             Parsers.Terms.Identifier().AndSkip(Parsers.Terms.Char(':'))
                 .And(Parsers.Between(Parsers.Terms.Char('['), Parsers.Separated(Parsers.Terms.Char(','), Parsers.Terms.String(StringLiteralQuotes.Single).Then(x => x.ToString()).Or(Parsers.Terms.Integer().Then(x => x.ToString()))), Parsers.Terms.Char(']')))
                 .Then(x => (ValueType: x.Item1.ToString(), Value: x.Item2));

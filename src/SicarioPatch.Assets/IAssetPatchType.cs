@@ -21,6 +21,6 @@ namespace SicarioPatch.Assets
 
         protected abstract IEnumerable<AssetInstruction>? RunPatch(IEnumerable<PropertyData> propData, T parsedValue);
 
-        protected abstract Parser<T> ValueParser { get; }
+        protected internal abstract Parser<T> ValueParser { get; }
     }
 }

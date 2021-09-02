@@ -17,7 +17,7 @@ namespace SicarioPatch.Assets.Patches
                 {Type = InstructionType.Remove, Properties = new[] {pd}});
         }
 
-        protected override Parser<IEnumerable<string>> ValueParser => Parsers
+        protected internal override Parser<IEnumerable<string>> ValueParser => Parsers
             .Separated(Parsers.Terms.Char(','), Parsers.Terms.String(StringLiteralQuotes.Single))
             .Then(res => res.Select(ts => ts.ToString()));
     }

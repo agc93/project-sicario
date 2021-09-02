@@ -28,7 +28,7 @@ namespace SicarioPatch.Assets.Patches
             return new[] {new AssetInstruction {Type = InstructionType.Add, FixedProperties = newOutcomes}};
         }
 
-        protected override Parser<(string SourceName, int SourceIndex, string TargetName, int Index)> ValueParser => 
+        protected internal override Parser<(string SourceName, int SourceIndex, string TargetName, int Index)> ValueParser => 
             Parsers.Terms.String()
                 .And(Parsers.ZeroOrOne(Parsers.Terms.Char('[').SkipAnd(Parsers.Terms.Integer()).AndSkip(Parsers.Terms.Char(']'))).Then(zo => Convert.ToInt32(zo)))
                 .AndSkip(Parsers.Terms.Char('>'))
