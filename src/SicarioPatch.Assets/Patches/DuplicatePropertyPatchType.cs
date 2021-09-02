@@ -26,7 +26,7 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        protected override Parser<(string SourceName, string TargetName)> ValueParser => 
+        protected internal override Parser<(string SourceName, string TargetName)> ValueParser => 
             Parsers.Terms.String()
                 .AndSkip(Parsers.Terms.Char('>'))
                 .And(Parsers.Terms.String())

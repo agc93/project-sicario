@@ -46,15 +46,14 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        protected override Parser<ValueModification> ValueParser => PropertyType("Int", "Float").Then(id => id.ToString())
+        protected internal override Parser<ValueModification> ValueParser => PropertyType("Int", "Float").Then(id => id.ToString())
             .Or(Parsers.Terms.Char('*').Then(c => string.Empty)).AndSkip(Parsers.Terms.Char(':'))
             .And(NumericModifierParser)
             .And(RangeParser)
             .Then(res => new ValueModification
                 {ValueType = string.IsNullOrWhiteSpace(res.Item1) ? null : res.Item1, RunValueChange = res.Item2, ValueRange = res.Item3.Equals(default) ? null : res.Item3});
 
-        private Parser<Range> RangeParser => ZeroOrOne(Terms.Char('(')
-            .SkipAnd(Separated(Terms.Char('-'), Terms.Integer())).AndSkip(Terms.Char(')')).Then(res => new Range((Index)res[0], (Index)res[1])));
+        private Parser<Range> RangeParser => ZeroOrOne(Brackets("()", Range()));
         private Parser<Func<decimal, decimal>> NumericModifierParser => Parsers.Terms.Char('+')
             .SkipAnd(NumberParser)
             .Then<Func<decimal, decimal>>(res => (arg) => arg + res)

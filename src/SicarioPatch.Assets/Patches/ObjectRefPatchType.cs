@@ -40,16 +40,6 @@ namespace SicarioPatch.Assets.Patches
             return new List<AssetInstruction>();
         }
 
-        private static void AddObjectRef(ObjectReference parsedValue, ObjectPropertyData objectProp) {
-            var existingNameLinkIndex = objectProp.Asset.SearchForLink(objectProp.Value.Property);
-            var existingNameLink = objectProp.Asset.GetLinkAt(existingNameLinkIndex);
-            var existingPathLinkHeaderRef =
-                objectProp.Asset.links[Math.Abs(objectProp.Value.Linkage) - 1].Property;
-            var existingPathLinkIndex = objectProp.Asset.SearchForLink(existingPathLinkHeaderRef);
-            var existingPathLink = objectProp.Asset.GetLinkAt(existingPathLinkIndex);
-            AddObjectRef(parsedValue, objectProp, existingNameLink, existingPathLink);
-        }
-
         private static void AddObjectRef(ObjectReference parsedValue, ObjectPropertyData targetProp,
             ObjectPropertyData sourceProp) {
             var existingNameLinkIndex = sourceProp.Asset.SearchForLink(sourceProp.Value.Property);
@@ -83,7 +73,7 @@ namespace SicarioPatch.Assets.Patches
             objectProp.LinkValue = nameLinkIndex;
         }
 
-        protected override Parser<ObjectReference> ValueParser =>
+        protected internal override Parser<ObjectReference> ValueParser =>
             Parsers.Terms.String(StringLiteralQuotes.Single)
                 .AndSkip(Parsers.Terms.Char(':')).And(Parsers.Terms.String(StringLiteralQuotes.Single)).Then(res =>
                     new ObjectReference {
