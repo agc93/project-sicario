@@ -37,7 +37,7 @@ Once you have a preset, it's time to get it in the hands of users. You have a co
 
 ##### Loose Files
 
-You can always just upload your preset file (i.e. the `dtm` file) to Nexus/ModDB/Discord/wherever you want and let users download it directly. As long as it ends up in their `~mods` folder, {{< toolName >}} will load and build the preset just fine.
+You can always just upload your preset file (i.e. the `dtp` file) to Nexus/ModDB/Discord/wherever you want and let users download it directly. As long as it ends up in their `~mods` folder, {{< toolName >}} will load and build the preset just fine.
 
 ##### Embedded in your mod
 
