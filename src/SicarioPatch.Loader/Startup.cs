@@ -58,6 +58,7 @@ namespace SicarioPatch.Loader
                 }
                 // c.PropagateExceptions();
                 c.AddCommand<BuildCommand>("build");
+                c.AddCommand<PresetPackCommand>("preset-pack");
             });
             return app;
         }
