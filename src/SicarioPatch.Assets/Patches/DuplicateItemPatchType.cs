@@ -25,7 +25,7 @@ namespace SicarioPatch.Assets.Patches
                 }
             }
 
-            return new[] {new AssetInstruction {Type = InstructionType.Add, FixedProperties = newOutcomes}};
+            return new[] {new AssetInstruction {Type = InstructionType.Add, Properties = newOutcomes}};
         }
 
         protected internal override Parser<(string SourceName, int SourceIndex, string TargetName, int Index)> ValueParser => 

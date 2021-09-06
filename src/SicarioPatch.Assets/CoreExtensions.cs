@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UAssetAPI;
+using UAssetAPI.PropertyTypes;
 
 namespace SicarioPatch.Assets
 {
@@ -27,6 +29,12 @@ namespace SicarioPatch.Assets
                 return d;
             }
             return d;
+        }
+
+        internal static IEnumerable<PropertyData> WhereNotIn<T, TValue>(this IEnumerable<PropertyData> inputData, IEnumerable<T> removalCandidates)
+            where T : PropertyData<TValue> {
+            return inputData.Where(v =>
+                removalCandidates.All(iv => v is T data && !data.Value.Equals(iv.Value)));
         }
     }
 }

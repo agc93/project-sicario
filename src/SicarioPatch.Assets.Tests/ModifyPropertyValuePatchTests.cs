@@ -7,11 +7,11 @@ using Xunit;
 
 namespace SicarioPatch.Assets.Tests
 {
-    public class ModifyPropertyValueFragmentTests
+    public class ModifyPropertyValuePatchTests
     {
         private readonly ModifyPropertyValuePatchType _modifyPatchType;
 
-        public ModifyPropertyValueFragmentTests() {
+        public ModifyPropertyValuePatchTests() {
             _modifyPatchType = new ModifyPropertyValuePatchType();
         }
         [Fact]
@@ -19,11 +19,11 @@ namespace SicarioPatch.Assets.Tests
             var parsed = _modifyPatchType.ValueParser.Parse("IntProperty:+2");
             
             Assert.NotNull(parsed);
-            Assert.Equal(parsed.ValueType ,"IntProperty");
+            Assert.Equal("IntProperty",parsed.ValueType );
             Assert.Null(parsed.ValueRange);
 
             var result = parsed.RunValueChange(2);
-            Assert.Equal(result, 4);
+            Assert.Equal(4, result);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace SicarioPatch.Assets.Tests
             Assert.Null(parsed.ValueRange);
 
             var result = parsed.RunValueChange(6);
-            Assert.Equal(result, 4);
+            Assert.Equal(4, result);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace SicarioPatch.Assets.Tests
             var parsed = modifyPatchType.ValueParser.Parse("FloatProperty:+2.5(0-10)");
             
             Assert.NotNull(parsed);
-            Assert.Equal(parsed.ValueType, "FloatProperty");
+            Assert.Equal("FloatProperty", parsed.ValueType);
             Assert.NotNull(parsed.ValueRange);
             Assert.Equal(parsed.ValueRange, new Range(0, 10));
 
@@ -60,13 +60,13 @@ namespace SicarioPatch.Assets.Tests
             var parsed = modifyPatchType.ValueParser.Parse(template);
             
             Assert.NotNull(parsed);
-            Assert.Equal(parsed.ValueType, "FloatProperty");
+            Assert.Equal("FloatProperty", parsed.ValueType);
             Assert.NotNull(parsed.ValueRange);
-            Assert.Equal(parsed.ValueRange, new Range(0, 10));
+            Assert.Equal(new Range(0,10), parsed.ValueRange);
 
             var fProp = new FloatPropertyData() { Value = (float)16 };
             var result = modifyPatchType.RunPatch(new[] { fProp }, template);
-            Assert.Equal(fProp.Value, (float)10);
+            Assert.Equal(10, fProp.Value);
         }
         
         [Fact]
@@ -76,9 +76,9 @@ namespace SicarioPatch.Assets.Tests
             var parsed = modifyPatchType.ValueParser.Parse(template);
             
             Assert.NotNull(parsed);
-            Assert.Equal(parsed.ValueType, "IntProperty");
+            Assert.Equal("IntProperty", parsed.ValueType);
             Assert.NotNull(parsed.ValueRange);
-            Assert.Equal(parsed.ValueRange, new Range(10, 20));
+            Assert.Equal(new Range(10,20), parsed.ValueRange);
 
             var iProp = new IntPropertyData { Value = 10 };
             var result = modifyPatchType.RunPatch(new[] { iProp }, template);

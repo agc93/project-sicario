@@ -14,7 +14,7 @@ namespace SicarioPatch.Assets.Patches
         protected override IEnumerable<AssetInstruction>? RunPatch(IEnumerable<PropertyData> propData,
             IEnumerable<string> parsedValue) {
             return propData.Where(pd => parsedValue.Any(pv => pd.Name == pv)).Select(pd => new AssetInstruction
-                {Type = InstructionType.Remove, Properties = new[] {pd}});
+                {Type = InstructionType.Remove, Properties = new() {[pd.Name] = pd}});
         }
 
         protected internal override Parser<IEnumerable<string>> ValueParser => Parsers
