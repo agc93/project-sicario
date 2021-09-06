@@ -28,8 +28,10 @@ namespace SicarioPatch.Assets
                 var matchedPatches = set.Patches.ToDictionary(k => k, assetPatch =>
                 {
                     var parser = new TemplateParser(_typeLoaders, _templates);
-                    var (loader, fragments) = parser.ParseTemplate(assetPatch.Template);
-                    var data = loader.LoadData(y.data);
+                    var templateCtx = parser.ParseTemplate(assetPatch.Template);
+                    var loader = templateCtx.TypeLoader;
+                    var fragments = templateCtx.Fragments;
+                    var data = loader.LoadData(y.data, templateCtx.LoaderParameter);
                     var matchedData = fragments.Aggregate(data, (datas, fragment) => fragment.Match(datas));
                     var patchType = _patchTypes.FirstOrDefault(pt => pt.Type == assetPatch.Type);
                     return new PatchRunContext {Loader = loader, MatchedData = matchedData, PatchType = patchType}.RunMatch();

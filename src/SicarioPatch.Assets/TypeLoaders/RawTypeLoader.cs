@@ -8,7 +8,7 @@ namespace SicarioPatch.Assets.TypeLoaders
     public class RawTypeLoader : IAssetTypeLoader
     {
         public string Name => "raw";
-        public IEnumerable<PropertyData> LoadData(AssetReader reader) {
+        public IEnumerable<PropertyData> LoadData(AssetReader reader, string? parameter) {
             return reader.categories.Where(c => c is NormalCategory {Data: { }}).Cast<NormalCategory>()
                 .SelectMany(nc => nc.Data);
             // return  ? normal.Data : new List<PropertyData>();

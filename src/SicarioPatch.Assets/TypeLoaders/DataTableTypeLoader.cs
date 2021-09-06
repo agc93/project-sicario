@@ -10,7 +10,7 @@ namespace SicarioPatch.Assets.TypeLoaders
     public class DataTableTypeLoader : IAssetTypeLoader
     {
         public string Name => "datatable";
-        public IEnumerable<PropertyData> LoadData(AssetReader reader) {
+        public IEnumerable<PropertyData> LoadData(AssetReader reader, string? parameter) {
             if (reader.categories[0] is not DataTableCategory dtCategory) {
                 throw new InvalidOperationException("Could not load requested file as a datatable blueprint!");
             }

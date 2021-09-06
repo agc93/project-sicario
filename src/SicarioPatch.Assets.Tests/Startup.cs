@@ -15,7 +15,7 @@ namespace SicarioPatch.Assets.Tests
                     .AddClasses(cls => cls.AssignableTo<IAssetTypeLoader>()).AsImplementedInterfaces().WithSingletonLifetime()
                     .AddClasses(cls => cls.AssignableTo<IAssetPatchType>()).AsImplementedInterfaces().WithSingletonLifetime()
                 
-            );
+            ).AddTemplates().AddTypeLoaders();
         }
 
         public void Configure(IServiceProvider provider) {
