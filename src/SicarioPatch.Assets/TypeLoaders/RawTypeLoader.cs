@@ -9,9 +9,13 @@ namespace SicarioPatch.Assets.TypeLoaders
     {
         public string Name => "raw";
         public IEnumerable<PropertyData> LoadData(AssetReader reader, string? parameter) {
-            return reader.categories.Where(c => c is NormalCategory {Data: { }}).Cast<NormalCategory>()
-                .SelectMany(nc => nc.Data);
-            // return  ? normal.Data : new List<PropertyData>();
+            var cats = reader.categories.Where(c => c is NormalCategory {Data: { }}).Cast<NormalCategory>();
+            if (string.IsNullOrWhiteSpace(parameter)) {
+                return cats.SelectMany(nc => nc.Data);
+            } else if (int.TryParse(parameter, out var idx) && cats.ElementAtOrDefault(idx) is not null) {
+                return cats.ElementAt(idx).Data;
+            }
+            return new List<PropertyData>();
         }
 
         public AssetWriter RunInstructions(AssetWriter writer, IEnumerable<AssetInstruction> instructions) {
