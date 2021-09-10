@@ -33,10 +33,40 @@ The main types of patches currently in use are:
 |:--:|:----|
 |`propertyValue`|This is by far the most common/useful and for good reason: it's the most useful and versatile type. It sets the value of matching properties to the given value.|
 |`arrayPropertyValue`|Sibling type to `propertyValue` that creates/inserts an array value to the given properties using a simple array syntax|
-|`modifyPropertyValue`|Modifies a numeric value _based on it's existing value_ (extremely alpha, not recommended).|
+|`modifyPropertyValue`|Modifies a numeric value _based on it's existing value_.|
 |`textProperty`|Specialized patch type for working UE4's TextProperty fields more effectively.|
 
 Most of these types use a common convention for the `value` field: `DataType:value`. This ensures that the properties are set with the correct data types the game uses. Note that other patch types might not use the same convention.
+
+##### Patch Type Details
+
+###### `modifyPropertyValue`
+
+The `modifyPropertyValue` patch type has its own syntax to define exactly what sort of change you want, consisting of an operation (`+`,`-`,`*`,`/`) followed by the value to apply. For example, to double incoming float values:
+
+```json
+{
+  "template": "datatable:{'BaseStats*'}.{'MaxSpeed*'}.<FloatProperty>",
+  "value": "FloatProperty:*2",
+  "type": "modifyPropertyValue"
+}
+```
+
+You can also include a min-max range in the `value` field to lock the final result inside a range. For example, `IntProperty:+6(0-10)` will add 6 to the incoming integer, but ensure the final result is between 0 and 10, regardless of input.
+
+###### `arrayPropertyValue`
+
+The `arrayPropertyValue` uses the type prefix to set the type of the _items_ in the array, not the array itself. For example: 
+
+```json
+{
+  "template": "datatable:['ACG-01'].[0].{'HardpointSlots*'}",
+  "value": "IntProperty:[2,2,4,1]",
+  "type": "arrayPropertyValue"
+}
+```
+
+You can also prefix the array itself in the `value` key with a `-` or `+` to modify an existing array value, so a `value` of `IntProperty:+[2]` will _add_ a single `2` element to the matched array.
 
 ##### Special Patch Types
 

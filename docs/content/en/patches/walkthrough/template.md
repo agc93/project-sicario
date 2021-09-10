@@ -113,6 +113,7 @@ Here's a very brief summary of the available filters for use in templates:
 |`<string=int>`|`<IntProperty=2>`, `<FloatProperty=1.5>`|Matches only incoming properties of the specific type *and* specific value|
 |`<string='string'>`|`<StrProperty='saa,mlaa'>`|Same as above, but for non-numeric types|
 |`<string::string>`|`<S_CannonType::NewEnumerator2>`|Matches only enum properties, with the right enum type and the right enum value|
+|`{(string):{string=string}}`|`{*:{'Subtitle*'='0_Subtitle*'}}`|Matches a property based on its child property value (**experimental**)
 
 > Due to a very weird bug I can't really fix right now: note that you should only include decimals for non-whole numbers. For now, `2500` is not the same as `2500.0`, so just leave the decimals off for whole numbers.
 
