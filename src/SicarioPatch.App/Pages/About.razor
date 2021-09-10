@@ -1,5 +1,6 @@
 ﻿@page "/about"
 @inject BrandProvider Brand
+@inject IConfiguration Config
 <AppIntro />
 
 <Divider />
@@ -13,7 +14,11 @@
     @Brand.ToolName(NameFormat.Long) is now available! This tool condenses all the power of @Brand.ShortName into a tool you can easily run on your own PC to merge @Brand.ToolName(NameFormat.Short)-compatible mods into a ready-to-play merged mod including support for reading patches from your installed mods and even adding custom skin slots!  
 </Paragraph>
 <Paragraph>
-    Check out all the details in the <Link To="/merger">Merger section</Link>.
+    Check out all the details in the <Link To="/merger">Merger section</Link>. 
+    @if (Config.GetDocsPath(out var docsPath)) {
+        var _changelogPath = docsPath.TrimEnd('/') + "/changelog";
+        <span>You can also check the latest update info in the <a href="@_changelogPath" target="_blank">changelog</a>.</span>
+    }
 </Paragraph>
 
 <Divider />
