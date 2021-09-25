@@ -9,6 +9,7 @@ namespace SicarioPatch.App.Shared
         public string OwnerName { get; init; } = "agc93";
         public string ShortName { get; init; } = "Sicario";
         public string ToolName { get; } = "Merger";
+        public string GameName => "Project Wingman";
         public string AppName { get; } = "Builder";
     }
 }

@@ -6,7 +6,7 @@ using SicarioPatch.Assets;
 
 namespace SicarioPatch.Core
 {
-    public class WingmanMod : Mod
+    public class SicarioMod : Mod
     {
         [JsonPropertyName("_id")] 
         public string Id { get; set; } = string.Empty;
@@ -23,6 +23,10 @@ namespace SicarioPatch.Core
         [JsonPropertyName("assetPatches")]
         public Dictionary<string, List<AssetPatchSet>> AssetPatches { get; set; } =
             new Dictionary<string, List<AssetPatchSet>>();
+    }
+    public class WingmanMod : SicarioMod
+    {
+        
     }
 
     public class SicarioMetadata
