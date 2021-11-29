@@ -54,7 +54,7 @@ namespace SicarioPatch.Templating
             return await next();
         }
 
-        private Dictionary<string, List<PatchSet>> RenderFilePatchTemplates(PatchRequest request, WingmanMod mod, Dictionary<string, string> modelVars) {
+        private Dictionary<string, List<FilePatchSet>> RenderFilePatchTemplates(PatchRequest request, WingmanMod mod, Dictionary<string, string> modelVars) {
             var dict = mod.FilePatches.ToDictionary(k => k.Key, kvp =>
             {
                 var finalPatches = kvp.Value.Where(psList =>

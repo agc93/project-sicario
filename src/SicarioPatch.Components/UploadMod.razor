@@ -1,7 +1,6 @@
 ﻿@using System.IO
 @using System.Text.Json
 @using Blazorise
-@using HexPatch
 @inject ModParser ModParser
 @if (string.IsNullOrWhiteSpace(RawModFile))
 {
@@ -86,5 +85,5 @@ else if (ParsedMod != null)
     }
     
     [Parameter]
-    public EventCallback<(string FileName, WingmanMod Mod)> OnSaveMod { get; set; }
+    public EventCallback<(string FileName, WingmanMod)> OnSaveMod { get; set; }
 }

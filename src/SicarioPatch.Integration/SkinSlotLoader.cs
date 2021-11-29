@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HexPatch;
 using SicarioPatch.Assets;
 using SicarioPatch.Core;
 using UnPak.Core;
+using FilePatchSet = HexPatch.FilePatchSet;
 
 namespace SicarioPatch.Integration
 {
@@ -64,7 +64,7 @@ namespace SicarioPatch.Integration
             return assetPatches.Any()
                 ? new() {
                     Id = "skinSlots",
-                    FilePatches = new Dictionary<string, List<PatchSet>>(),
+                    FilePatches = new Dictionary<string, List<FilePatchSet>>(),
                     AssetPatches = new Dictionary<string, List<AssetPatchSet>> {
                         ["ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp"] =
                             (patchSets ?? GetSlotPatches()).ToList()

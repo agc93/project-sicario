@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using HexPatch;
+using ModEngine.Core;
 using SicarioPatch.Assets;
 
 namespace SicarioPatch.Core
@@ -26,7 +27,7 @@ namespace SicarioPatch.Core
     }
     public class WingmanMod : SicarioMod
     {
-        
+        public Dictionary<string, List<FilePatchSet>> FilePatches { get; set; } = new();
     }
 
     public class SicarioMetadata

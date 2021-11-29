@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using HexPatch.Build;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ModEngine.Build;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
-using SicarioPatch.Assets;
-using SicarioPatch.Assets.Fragments;
-using SicarioPatch.Assets.TypeLoaders;
 using SicarioPatch.Components;
 using SicarioPatch.Core;
 using SicarioPatch.Templating;

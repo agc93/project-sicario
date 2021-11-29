@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using HexPatch;
+using FilePatch = HexPatch.FilePatch;
 
 namespace SicarioPatch.Core
 {
@@ -21,7 +21,7 @@ namespace SicarioPatch.Core
             return pairs.ToDictionary(k => k.Key, v => v.Value);
         }
 
-        public static IEnumerable<Patch> GetAllPatches(this Mod mod)
+        public static IEnumerable<FilePatch> GetFilePatches(this WingmanMod mod)
         {
             var allPatches = mod.FilePatches.SelectMany(fp => fp.Value).SelectMany(ps => ps.Patches);
             return allPatches;

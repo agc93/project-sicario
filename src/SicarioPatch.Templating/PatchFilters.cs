@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Fluid;
 using Fluid.Ast;
 using Fluid.Values;
-using HexPatch;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.Templating

@@ -19,9 +19,21 @@
 
     <ItemGroup>
 <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
-       <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.16" /> 
+<!--       <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.16" /> -->
+<!--      <ProjectReference Include="../../../ModEngine/src/ModEngine.Build/ModEngine.Build.csproj" />-->
+<!--        <ProjectReference Include="../../../HexPatch/src/HexPatch/HexPatch.csproj" />-->
+        <PackageReference Include="HexPatch" Version="0.0.0-preview.0.17" />
+        <PackageReference Include="ModEngine.Build" Version="0.0.0-preview.0.1" />
       <PackageReference Include="MediatR" Version="9.0.0" />
       <ProjectReference Include="..\SicarioPatch.Assets\SicarioPatch.Assets.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Diagnostics" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Diagnostics\SourceFileNotFoundException.cs" />
     </ItemGroup>
 
 </Project>

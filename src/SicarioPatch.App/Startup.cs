@@ -4,7 +4,6 @@ using Blazorise.Material;
 using BuildEngine;
 using BuildEngine.Scripts;
 using HexPatch;
-using HexPatch.Build;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ModEngine.Build;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
@@ -56,6 +56,7 @@ namespace SicarioPatch.App
                 .AddSingleton<ISourceFileService, SourceFileService>()
                 .AddSingleton<FilePatcher>()
                 .AddSingleton<ModFileLoader<WingmanMod>>()
+                .AddSingleton<IModLoader<WingmanMod>, WingmanModLoader>()
                 .AddSingleton<WingmanModLoader>()
                 .AddSingleton<DirectoryBuildContextFactory>()
                 .AddSingleton<IAppInfoProvider, AppInfoProvider>()
