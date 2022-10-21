@@ -135,7 +135,8 @@ namespace SicarioPatch.Integration
                         }
                     }
                     catch (Exception e) {
-                        Console.WriteLine(e);
+                        Console.WriteLine($"Error encountered loading presets from {pakFileInfo.Name}. You may need to rebuild/re-download this mod: {e.GetType()}");
+                        // Console.WriteLine(e);
                         //ignored
                     }
                 }
@@ -145,6 +146,7 @@ namespace SicarioPatch.Integration
         private TResource? ReadEmbeddedResource<TResource>(Record requestFile, PakFile file) {
             var outSt = requestFile.Unpack(file.FileStream);
             var request = new StreamReader(outSt).ReadToEnd();
+            // Console.WriteLine($"Deserializing '{request.Length}' of {typeof(TResource).Name} from '{requestFile.FileName}'");
             var embed = JsonSerializer.Deserialize<TResource>(request, _parser.RelaxedOptions);
             return embed;
         }
