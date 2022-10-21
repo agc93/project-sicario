@@ -201,7 +201,7 @@
 &lt;p>Due to a very weird bug I can&amp;rsquo;t really fix right now: note that you should only include decimals for non-whole numbers. For now, &lt;code>2500&lt;/code> is not the same as &lt;code>2500.0&lt;/code>, so just leave the decimals off for whole numbers.&lt;/p>
 &lt;/blockquote>
 &lt;p>There&amp;rsquo;s also one special filter: &lt;code>[*]&lt;/code>. That filter will just match everything and return all the properties it receives. This can be useful if you&amp;rsquo;re trying to match a whole datatable for example.&lt;/p></description></item><item><title>Patches: Understanding Patches and Patch Types</title><link>/patches/walkthrough/patches/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/patches/walkthrough/patches/</guid><description>
-&lt;h3 id="patches">Patches&lt;/h3>
+&lt;h2 id="patches">Patches&lt;/h2>
 &lt;p>Now we hit the real meat of a Sicario patch: the actual edit to make. Here&amp;rsquo;s the example for enabling AoA for all aircraft:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Set CanUseAoA&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
@@ -210,10 +210,10 @@
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;propertyValue&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>In plain English, this object just tells Sicario &amp;ldquo;replace the value of any &lt;code>CanUseAoA&lt;/code> properties with &lt;code>true&lt;/code>&amp;rdquo;.&lt;/p>
-&lt;h4 id="template-and-value">Template and Value&lt;/h4>
+&lt;h3 id="template-and-value">Template and Value&lt;/h3>
 &lt;p>These are the actual values Sicario will be (respectively) looking for and inserting into the binary file. When it runs, Project Sicario will load the file into memory, parse the file (more on that below), look for &lt;em>any&lt;/em> values that match the &lt;strong>template&lt;/strong> value and then apply the &lt;strong>value&lt;/strong>. How exactly the value is applied varies based on the patch &lt;em>type&lt;/em>.&lt;/p>
 &lt;p>Templates are covered in more detail in the &lt;a href="../template">Property Templates&lt;/a> section.&lt;/p>
-&lt;h4 id="types">Types&lt;/h4>
+&lt;h3 id="types">Types&lt;/h3>
 &lt;p>The main types of patches currently in use are:&lt;/p>
 &lt;table>
 &lt;thead>
@@ -242,8 +242,8 @@
 &lt;/tbody>
 &lt;/table>
 &lt;p>Most of these types use a common convention for the &lt;code>value&lt;/code> field: &lt;code>DataType:value&lt;/code>. This ensures that the properties are set with the correct data types the game uses. Note that other patch types might not use the same convention.&lt;/p>
-&lt;h5 id="patch-type-details">Patch Type Details&lt;/h5>
-&lt;h6 id="modifypropertyvalue">&lt;code>modifyPropertyValue&lt;/code>&lt;/h6>
+&lt;h4 id="patch-type-details">Patch Type Details&lt;/h4>
+&lt;h5 id="modifypropertyvalue">&lt;code>modifyPropertyValue&lt;/code>&lt;/h5>
 &lt;p>The &lt;code>modifyPropertyValue&lt;/code> patch type has its own syntax to define exactly what sort of change you want, consisting of an operation (&lt;code>+&lt;/code>,&lt;code>-&lt;/code>,&lt;code>*&lt;/code>,&lt;code>/&lt;/code>) followed by the value to apply. For example, to double incoming float values:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:{&amp;#39;BaseStats*&amp;#39;}.{&amp;#39;MaxSpeed*&amp;#39;}.&amp;lt;FloatProperty&amp;gt;&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
@@ -251,7 +251,7 @@
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;modifyPropertyValue&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>You can also include a min-max range in the &lt;code>value&lt;/code> field to lock the final result inside a range. For example, &lt;code>IntProperty:+6(0-10)&lt;/code> will add 6 to the incoming integer, but ensure the final result is between 0 and 10, regardless of input.&lt;/p>
-&lt;h6 id="arraypropertyvalue">&lt;code>arrayPropertyValue&lt;/code>&lt;/h6>
+&lt;h5 id="arraypropertyvalue">&lt;code>arrayPropertyValue&lt;/code>&lt;/h5>
 &lt;p>The &lt;code>arrayPropertyValue&lt;/code> uses the type prefix to set the type of the &lt;em>items&lt;/em> in the array, not the array itself. For example:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;template&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;datatable:[&amp;#39;ACG-01&amp;#39;].[0].{&amp;#39;HardpointSlots*&amp;#39;}&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
@@ -259,10 +259,10 @@
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;arrayPropertyValue&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>You can also prefix the array itself in the &lt;code>value&lt;/code> key with a &lt;code>-&lt;/code> or &lt;code>+&lt;/code> to modify an existing array value, so a &lt;code>value&lt;/code> of &lt;code>IntProperty:+[2]&lt;/code> will &lt;em>add&lt;/em> a single &lt;code>2&lt;/code> element to the matched array.&lt;/p>
-&lt;h5 id="special-patch-types">Special Patch Types&lt;/h5>
+&lt;h4 id="special-patch-types">Special Patch Types&lt;/h4>
 &lt;p>The patch types above will handle the vast majority of Sicario patches reasonably well, but a few of them work a little differently and can be easier to get wrong (especially the first time).&lt;/p>
 &lt;p>There&amp;rsquo;s also two patch types that deserve extra attention: &lt;code>objectRef&lt;/code> and &lt;code>duplicateEntry&lt;/code>. These two patch types are both much more complex to get working right and I&amp;rsquo;d recommend you start with the simpler changes handled by the regular patch types.&lt;/p>
-&lt;h6 id="textproperty">&lt;code>textProperty&lt;/code>&lt;/h6>
+&lt;h5 id="textproperty">&lt;code>textProperty&lt;/code>&lt;/h5>
 &lt;p>The &lt;code>textProperty&lt;/code> patch type is just a variation on the &lt;code>propertyValue&lt;/code> type that can set the value of a &lt;code>TextProperty&lt;/code> more cleanly. The format for the &lt;code>value&lt;/code> is simple &lt;code>'&amp;lt;key&amp;gt;':'&amp;lt;string-value&amp;gt;'&lt;/code>. Note however, that the key is a little dangerous: if you set an existing key&amp;rsquo;s value using this patch it has the potential to change the text for unrelated objects. Unless you really need otherwise, I&amp;rsquo;d recommend letting Sicario generate a key for you which can be done with the special &lt;code>*&lt;/code> syntax:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;description&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;Change the FC-16&amp;#39;s role&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">,&lt;/span>
@@ -271,7 +271,7 @@
 &lt;span style="color:#204a87;font-weight:bold">&amp;#34;type&amp;#34;&lt;/span>&lt;span style="color:#000;font-weight:bold">:&lt;/span> &lt;span style="color:#4e9a06">&amp;#34;textProperty&amp;#34;&lt;/span>
 &lt;span style="color:#000;font-weight:bold">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>When it runs, Sicario will set the &lt;code>TextProperty&lt;/code>&amp;rsquo;s key to a randomly generated unique ID to prevent any conflicts/issues&lt;/p>
-&lt;h6 id="duplicateentry-and-duplicateproperty">&lt;code>duplicateEntry&lt;/code> and &lt;code>duplicateProperty&lt;/code>&lt;/h6>
+&lt;h5 id="duplicateentry-and-duplicateproperty">&lt;code>duplicateEntry&lt;/code> and &lt;code>duplicateProperty&lt;/code>&lt;/h5>
 &lt;p>This one is pretty powerful as its the most reliable way to &lt;em>add&lt;/em> new properties to an existing object, by duplicating an existing property of an object. Adding a new property just requires matching the parent property, then specifying the source property&amp;rsquo;s name and and the duplicate property&amp;rsquo;s (unique) name.&lt;/p>
 &lt;p>Here&amp;rsquo;s a patch that adds a new weapon based on the STDM:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
@@ -285,7 +285,7 @@
 &lt;p>&lt;code>duplicateProperty&lt;/code> follows the same logic but for duplicating properties on an object rather than the whole object. It&amp;rsquo;s a bit more niche.&lt;/p>
 &lt;/blockquote>
 &lt;p>Note that as covered in the &amp;ldquo;Patch Set Grouping&amp;rdquo; section above, patch sets are &lt;em>matched&lt;/em> together, so if you add a new property then want to match that property in later patches, make sure they&amp;rsquo;re in a separate patch &lt;em>set&lt;/em>.&lt;/p>
-&lt;h6 id="objectref">&lt;code>objectRef&lt;/code>&lt;/h6>
+&lt;h5 id="objectref">&lt;code>objectRef&lt;/code>&lt;/h5>
 &lt;p>The &lt;code>objectRef&lt;/code> patch type is used to change what object a property refers to. Internally, UE4 refers to objects using links that seem kind of convoluted on the surface: the property just has a number referring to an entry in the linked class list, which refers to another entry in the linked class list which then refers to an entry in the header list. That&amp;rsquo;s a mess, so the &lt;code>objectRef&lt;/code> patch type will handle updating each of those parts in order.&lt;/p>
 &lt;p>For example, here&amp;rsquo;s a patch that changes what texture the first skin slot on the F-16C uses:&lt;/p>
 &lt;div class="highlight">&lt;pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">&lt;span style="color:#000;font-weight:bold">{&lt;/span>
