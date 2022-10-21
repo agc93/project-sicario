@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HexPatch;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using ModEngine.Core;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.App.Infrastructure

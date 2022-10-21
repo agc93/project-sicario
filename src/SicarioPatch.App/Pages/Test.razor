@@ -146,7 +146,7 @@
 
     private void OnEditorInit(MonacoEditorBase obj) {
         Console.WriteLine("Editor init running");
-        var mod = new Mod();
+        var mod = new WingmanMod();
         var json = ModParser.ToJson(mod);
         _editor.Layout();
         _editor.SetValue(json);

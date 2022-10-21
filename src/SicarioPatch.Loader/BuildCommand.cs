@@ -4,15 +4,13 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SicarioPatch.Assets;
+using ModEngine.Build.Diagnostics;
 using SicarioPatch.Core;
-using SicarioPatch.Core.Diagnostics;
+using SicarioPatch.Engine;
 using SicarioPatch.Integration;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -211,7 +209,7 @@ namespace SicarioPatch.Loader
                 _logger.LogError(sEx.Message);
                 return 412;
             }
-            catch (Assets.AssetInstructionException aEx) {
+            catch (AssetInstructionException aEx) {
                 _logger.LogError(aEx,
                     $"Error while running asset instructions, this is likely a bad patch or incorrect duplication.");
                 return 422;

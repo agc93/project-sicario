@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HexPatch.Build;
 using MediatR;
+using ModEngine.Build;
 
 namespace SicarioPatch.Core
 {
@@ -19,14 +19,14 @@ namespace SicarioPatch.Core
         }
 
         private readonly Dictionary<string, IEnumerable<string>> _sideCars = new() {
-            [".uexp"] = new string[] {".uasset"},
+            // [".uexp"] = new string[] {".uasset"},
             [".uasset"] = new [] {".uexp"},
             [".umap"] = new[] {".uexp"}
         };
         
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken)
         {
-            using var mpServ = await _builder.GetPatchService(request.Mods, request.Name);
+            using var mpServ = await _builder.GetPatchEngineService(request.Mods, request.Name);
             if (request.AdditionalFiles.Any())
             {
                 mpServ.PreBuildAction = context =>
@@ -39,21 +39,22 @@ namespace SicarioPatch.Core
                 };
             }
 
-            mpServ.LoadAssetFiles(FileSelectors.SidecarFiles(_sideCars)).LoadFiles(FileSelectors.SidecarFiles(_sideCars));
+            await mpServ.LoadFiles(FileSelectors.SidecarFiles(_sideCars));
+            // await mpServ.LoadAssetFiles(FileSelectors.SidecarFiles(_sideCars)).LoadFiles(FileSelectors.SidecarFiles(_sideCars));
             await mpServ.RunPatches();
-            await mpServ.RunAssetPatches();
-            (bool Success, FileInfo Result)? result;
+            // await mpServ.RunAssetPatches();
+            (bool Success, FileSystemInfo Result)? result;
             if (request.PackResult)
             {
-                result = await mpServ.RunBuild($"merged-{DateTime.UtcNow.Ticks}_P.pak");
+                result = await mpServ.RunBuildAsync($"merged-{DateTime.UtcNow.Ticks}_P.pak");
             }
             else
             {
                 result = mpServ.RunAction(ctx => ctx.WorkingDirectory.ToZipFile());
             }
-            if (result != null && result.Value.Success) {
-                var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), result.Value.Result.Name));
-                result.Value.Result.MoveTo(tempFi.FullName);
+            if (result is { Success: true, Result: FileInfo info }) {
+                var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), info.Name));
+                info.MoveTo(tempFi.FullName);
                 return tempFi.Exists ? tempFi : null;
             }
             return null;

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using HexPatch;
+using ModEngine.Core;
 
 namespace SicarioPatch.Core
 {

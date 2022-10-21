@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using SicarioPatch.Assets;
 using SicarioPatch.Core;
+using SicarioPatch.Engine;
 using SicarioPatch.Integration;
 
 namespace SicarioPatch.Loader.Providers

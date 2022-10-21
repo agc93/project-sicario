@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using HexPatch.Build;
+using ModEngine.Build;
 
 namespace SicarioPatch.Core
 {
-    public class WingmanModLoader : IModFileLoader<WingmanMod>
+    public class WingmanModLoader : IModLoader<WingmanMod>
     {
         public WingmanModLoader(ModFileLoader<WingmanMod> loader)
         {
             _modFileLoader = loader;
         }
-        private readonly IModFileLoader<WingmanMod> _modFileLoader;
-        public Dictionary<string, WingmanMod> LoadFromFiles(IEnumerable<string> filePaths)
-        {
+        private readonly IModLoader<WingmanMod> _modFileLoader;
+        public Dictionary<string, WingmanMod> LoadFromFiles(IEnumerable<string> filePaths, List<Func<WingmanMod, bool>>? loadRequirements = null) {
             var loadedMods = _modFileLoader.LoadFromFiles(filePaths);
             foreach (var (fileName, mod) in loadedMods)
             {

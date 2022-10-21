@@ -3,11 +3,11 @@ using System.IO;
 using BuildEngine;
 using BuildEngine.Scripts;
 using HexPatch;
-using HexPatch.Build;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModEngine.Build;
 using SicarioPatch.Core;
 using SicarioPatch.Integration;
 using SicarioPatch.Loader.Providers;
@@ -97,8 +97,6 @@ namespace SicarioPatch.Loader
                 .AddSingleton<ISourceFileService>(p => p.GetRequiredService<GameArchiveFileService>())
                 .AddSingleton<ModParser>()
                 .AddSingleton<FilePatcher>()
-                // .AddSingleton<ModFileLoader<WingmanMod>>()
-                // .AddSingleton<WingmanModLoader>()
                 .AddSingleton<DirectoryBuildContextFactory>()
                 .AddSingleton<IAppInfoProvider, AppInfoProvider>()
                 .AddSingleton<AppInfoProvider>()

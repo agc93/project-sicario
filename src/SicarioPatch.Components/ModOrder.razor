@@ -4,13 +4,13 @@
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
                 @enabledMod.GetLabel()
-                @if (enabledMod?.ModInfo?.CanOverwrite == true || enabledMod.GetAllPatches().Any(ps => ps.Type.ToLower() == "before"))
+                @if (enabledMod?.ModInfo?.CanOverwrite == true)
                 {
                     <FadeTooltip Text="This mod might overwrite other mods in your selection, regardless of order">
                         <Icon Name="IconName.ExclamationTriangle"/>
                     </FadeTooltip>
                 }
-                @if (enabledMod.GetAllPatches().Any()) {
+                @if (enabledMod.FilePatches.Any()) {
                     <FadeTooltip Text="This mod uses the legacy method of directly hex patching game files. Use with caution.">
                         <Icon Name="IconName.ExclamationCircle" />
                     </FadeTooltip>

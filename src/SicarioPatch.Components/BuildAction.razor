@@ -86,7 +86,7 @@
 
     [Parameter]
     public Dictionary<string, string> BuildParameters { get; set; } = new Dictionary<string, string>();
-    
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -114,10 +114,11 @@
             Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName,
             UserName = state?.User?.Identity?.Name
         };
-        snackbarStack?.PushAsync("Queued mod build!", SnackbarColor.Success);
+        snackbarStack?.PushAsync("Queueing mod build!", SnackbarColor.Success);
         this.IsBuilding = true;
         timer.Start();
         try {
+            // var buildResult = await RequestProvider.BuildMod(Mods.ToList(), inputParams.ToDictionary(), new ModBuildOptions { PackResult = AutoPack, Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName, UserIdentifier = state?.User?.Identity?.Name });
             var buildResult = await Mediator.Send(req);
             ResultFile = buildResult;
             if (timer.Elapsed.TotalSeconds > 1) {

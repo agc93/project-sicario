@@ -1,0 +1,10 @@
+﻿<Project>
+    <PropertyGroup>
+        <DebugType>Embedded</DebugType>
+        
+<!--        <Nullable>enable</Nullable>-->
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+        <NoWarn>8632</NoWarn>
+    </PropertyGroup>
+</Project>

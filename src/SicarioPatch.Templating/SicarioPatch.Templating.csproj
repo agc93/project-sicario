@@ -4,13 +4,18 @@
         <TargetFramework>net5.0</TargetFramework>
         <DebugType>Embedded</DebugType>
     </PropertyGroup>
-
+    
     <ItemGroup>
-      <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
+        <PackageReference Include="ModEngine.Core" Version="0.0.0-preview.0.6" />
+        <PackageReference Include="ModEngine.Templating" Version="0.0.0-preview.0.6" />
+<!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Templating/ModEngine.Templating.csproj" />-->
+<!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Core/ModEngine.Core.csproj" />-->
+        <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Fluid.Core" Version="2.0.13" />
+<!--        <PackageReference Include="ModEngine.Core" Version="0.0.0-preview.0.3" />-->
     </ItemGroup>
 
 </Project>

@@ -7,5 +7,6 @@
         public string OwnerName { get; }
         public string ShortName { get; }
         public string ToolName { get; }
+        public string GameName { get; }
     }
 }

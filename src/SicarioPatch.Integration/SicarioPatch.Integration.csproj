@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="../SicarioPatch.shared.props" />
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
