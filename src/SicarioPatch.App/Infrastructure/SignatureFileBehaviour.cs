@@ -47,7 +47,7 @@ namespace SicarioPatch.App.Infrastructure
                     var (appName, appVersion) = _info.GetAppInfo();
                     var metaFile = new
                         {app = new {owner = _brand.OwnerName, name = appName, version = appVersion}, request = request};
-                    var json = JsonSerializer.Serialize(metaFile, _parser.Options);
+                    var json = JsonSerializer.Serialize(metaFile, _parser.RelaxedOptions);
                     if (!string.IsNullOrWhiteSpace(json)) {
                         await File.WriteAllTextAsync(summaryFile.FullName, json, cancellationToken);
                         if (summaryFile.Exists) {

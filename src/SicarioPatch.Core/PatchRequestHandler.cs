@@ -19,9 +19,9 @@ namespace SicarioPatch.Core
         }
 
         private readonly Dictionary<string, IEnumerable<string>> _sideCars = new() {
-            // [".uexp"] = new string[] {".uasset"},
+            [".uexp"] = new [] {".uasset"},
             [".uasset"] = new [] {".uexp"},
-            [".umap"] = new[] {".uexp"}
+            // [".umap"] = new[] {".uexp"}
         };
         
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken)

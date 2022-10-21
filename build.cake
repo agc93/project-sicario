@@ -1,5 +1,5 @@
 ﻿#load "build/helpers.cake"
-#addin nuget:?package=Cake.Docker
+#addin nuget:?package=Cake.Docker&version=1.1.2
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -72,7 +72,7 @@ Task("Restore")
 	// Restore all NuGet packages.
 	Information("Restoring solution...");
 	foreach (var project in projects.AllProjectPaths) {
-		DotNetCoreRestore(project.FullPath);
+		DotNetRestore(project.FullPath);
 	}
 });
 
@@ -82,12 +82,12 @@ Task("Build")
 	.Does(() =>
 {
 	Information("Building solution...");
-	var settings = new DotNetCoreBuildSettings {
+	var settings = new DotNetBuildSettings {
 		Configuration = configuration,
 		NoIncremental = true,
 		ArgumentCustomization = args => args.Append($"/p:Version={packageVersion}")
 	};
-	DotNetCoreBuild(solutionPath, settings);
+	DotNetBuild(solutionPath, settings);
 });
 
 Task("Run-Unit-Tests")
@@ -97,12 +97,12 @@ Task("Run-Unit-Tests")
     CreateDirectory(testResultsPath);
 	if (projects.TestProjects.Any()) {
 
-		var settings = new DotNetCoreTestSettings {
+		var settings = new DotNetTestSettings {
 			Configuration = configuration
 		};
 
 		foreach(var project in projects.TestProjects) {
-			DotNetCoreTest(project.Path.FullPath, settings);
+			DotNetTest(project.Path.FullPath, settings);
 		}
 	}
 });
@@ -120,7 +120,7 @@ Task("Publish-Runtime")
 {
 	var projectDir = $"{artifacts}publish";
 	CreateDirectory(projectDir);
-    DotNetCorePublish("./src/SicarioPatch.App/SicarioPatch.App.csproj", new DotNetCorePublishSettings {
+    DotNetPublish("./src/SicarioPatch.App/SicarioPatch.App.csproj", new DotNetPublishSettings {
         OutputDirectory = projectDir + "/dotnet-any",
 		Configuration = configuration
     });
@@ -129,14 +129,14 @@ Task("Publish-Runtime")
 		var runtimeDir = $"{projectDir}/{runtime}";
 		CreateDirectory(runtimeDir);
 		Information("Publishing for {0} runtime", runtime);
-		var settings = new DotNetCorePublishSettings {
+		var settings = new DotNetPublishSettings {
 			Runtime = runtime,
 			Configuration = configuration,
 			OutputDirectory = runtimeDir,
 			PublishSingleFile = true,
 			PublishTrimmed = true
 		};
-		DotNetCorePublish("./src/SicarioPatch.App/SicarioPatch.App.csproj", settings);
+		DotNetPublish("./src/SicarioPatch.App/SicarioPatch.App.csproj", settings);
 		CreateDirectory($"{artifacts}archive");
 		Zip(runtimeDir, $"{artifacts}archive/sicario-app-{runtime}.zip");
     }
@@ -149,7 +149,7 @@ Task("Publish-Merger")
 {
 	var projectDir = $"{artifacts}merger";
 	CreateDirectory(projectDir);
-    DotNetCorePublish("./src/SicarioPatch.Loader/SicarioPatch.Loader.csproj", new DotNetCorePublishSettings {
+    DotNetPublish("./src/SicarioPatch.Loader/SicarioPatch.Loader.csproj", new DotNetPublishSettings {
         OutputDirectory = projectDir + "/dotnet-any",
 		Configuration = configuration
     });
@@ -158,7 +158,7 @@ Task("Publish-Merger")
 		var runtimeDir = $"{projectDir}/{runtime}";
 		CreateDirectory(runtimeDir);
 		Information("Publishing for {0} runtime", runtime);
-		var settings = new DotNetCorePublishSettings {
+		var settings = new DotNetPublishSettings {
 			Runtime = runtime,
 			Configuration = configuration,
 			OutputDirectory = runtimeDir,
@@ -168,7 +168,7 @@ Task("Publish-Merger")
 			IncludeNativeLibrariesForSelfExtract = true,
 			ArgumentCustomization = args => args.Append($"/p:Version={packageVersion}").Append("/p:TrimMode=Link")
 		};
-		DotNetCorePublish("./src/SicarioPatch.Loader/SicarioPatch.Loader.csproj", settings);
+		DotNetPublish("./src/SicarioPatch.Loader/SicarioPatch.Loader.csproj", settings);
 		CreateDirectory($"{artifacts}archive");
 		Zip(runtimeDir, $"{artifacts}archive/sicario-merger-{runtime}.zip");
     }
@@ -181,13 +181,13 @@ Task("Build-NuGet-Packages")
 	Information("Building NuGet packages");
 	var nupkgDir = $"{artifacts}/nuget/";
 	CreateDirectory(nupkgDir);
-	var packSettings = new DotNetCorePackSettings
+	var packSettings = new DotNetPackSettings
      {
          Configuration = configuration,
          OutputDirectory = nupkgDir,
 		 ArgumentCustomization = args => args.Append($"/p:Version={packageVersion}")
      };
-	DotNetCorePack(solutionPath, packSettings);
+	DotNetPack(solutionPath, packSettings);
 });
 
 Task("Build-Docker-Image")
