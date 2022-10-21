@@ -19,14 +19,14 @@ namespace SicarioPatch.Core
         }
 
         private readonly Dictionary<string, IEnumerable<string>> _sideCars = new() {
-            [".uexp"] = new string[] {".uasset"},
+            // [".uexp"] = new string[] {".uasset"},
             [".uasset"] = new [] {".uexp"},
             [".umap"] = new[] {".uexp"}
         };
         
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken)
         {
-            using var mpServ = await _builder.GetPatchService(request.Mods, request.Name);
+            using var mpServ = await _builder.GetPatchEngineService(request.Mods, request.Name);
             if (request.AdditionalFiles.Any())
             {
                 mpServ.PreBuildAction = context =>
@@ -39,9 +39,10 @@ namespace SicarioPatch.Core
                 };
             }
 
-            await mpServ.LoadAssetFiles(FileSelectors.SidecarFiles(_sideCars)).LoadFiles(FileSelectors.SidecarFiles(_sideCars));
+            await mpServ.LoadFiles(FileSelectors.SidecarFiles(_sideCars));
+            // await mpServ.LoadAssetFiles(FileSelectors.SidecarFiles(_sideCars)).LoadFiles(FileSelectors.SidecarFiles(_sideCars));
             await mpServ.RunPatches();
-            await mpServ.RunAssetPatches();
+            // await mpServ.RunAssetPatches();
             (bool Success, FileSystemInfo Result)? result;
             if (request.PackResult)
             {

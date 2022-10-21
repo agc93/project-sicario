@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModEngine.Build;
+using ModEngine.Templating;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Components;
 using SicarioPatch.Core;
-using SicarioPatch.Templating;
 
 namespace SicarioPatch.App
 {

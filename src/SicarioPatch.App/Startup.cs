@@ -16,6 +16,7 @@ using ModEngine.Build;
 using SicarioPatch.App.Infrastructure;
 using SicarioPatch.App.Shared;
 using SicarioPatch.Core;
+using SicarioPatch.Engine;
 using SicarioPatch.Templating;
 
 namespace SicarioPatch.App
@@ -63,7 +64,7 @@ namespace SicarioPatch.App
                 .AddSingleton<AppInfoProvider>()
                 .AddSingleton<IModBuilder, PythonPackScript>()
                 .AddAssetServices()
-                .AddSingleton<Assets.IEngineInfoProvider, ConfigurationEngineInfoProvider>()
+                .AddSingleton<IEngineInfoProvider, ConfigurationEngineInfoProvider>()
                 ;
             if (Configuration.GetSection("Discord") is var discordOpts && discordOpts.Exists())
             {

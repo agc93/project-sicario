@@ -8,9 +8,9 @@ using HexPatch;
 using Microsoft.Extensions.Logging;
 using ModEngine.Build;
 using ModEngine.Build.Diagnostics;
-using SicarioPatch.Assets;
+using ModEngine.Core;
+using SicarioPatch.Engine;
 using Patch = ModEngine.Core.Patch;
-using PatchSet = ModEngine.Core.PatchSet;
 
 namespace SicarioPatch.Core
 {
@@ -77,13 +77,12 @@ namespace SicarioPatch.Core
                             var lPatch = new FilePatchSet()
                             {
                                 Name = "Length auto-correct",
-                                Patches = new List<FilePatch>
+                                Patches = new List<Patch>
                                 {
-                                    new FilePatch
-                                    {
+                                    new() {
                                         Description = "uexp Length",
                                         Template = lengthBytes,
-                                        Substitution = correctedBytes,
+                                        Value = correctedBytes,
                                         Type = "inPlace"
                                     }
                                 }
@@ -154,6 +153,20 @@ namespace SicarioPatch.Core
                 var mods = modCollection.ToList();
                 var ctx = _ctxFactory.CreateContext(ctxName);
                 return new WingmanPatchService(_assetPatcher, _filePatcher, _fileService, ctx, _modBuilder, mods, _tgtLogger);
+            }
+
+            public async Task<WingmanPatchEngine> GetPatchEngineService(IEnumerable<WingmanMod> modCollection, string? ctxName = null) {
+                var mods = modCollection.ToList();
+                var ctx = _ctxFactory.CreateContext(ctxName);
+                return new WingmanPatchEngine(mods, ctx, _fileService, _modBuilder, new[] {
+                    new ModPatchService<WingmanMod, DirectoryBuildContext>.PatchEngineDefinition<Patch>(new HexPatchEngine(_filePatcher, null), 
+                        mod => mod.FilePatches.ToDictionary(
+                            k => k.Key, 
+                            v => v.Value.Cast<PatchSet<Patch>>())
+                        ),
+                    new ModPatchService<WingmanMod, DirectoryBuildContext>.PatchEngineDefinition<Patch>(new AssetPatchEngine(_assetPatcher, null), 
+                        mod => mod.AssetPatches.ToDictionary(k => k.Key, v => v.Value.AsEnumerable()))
+                }, null);
             }
         }
 }

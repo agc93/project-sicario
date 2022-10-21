@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SicarioPatch.Assets;
+using ModEngine.Core;
 using SicarioPatch.Core;
 using UnPak.Core;
 using FilePatchSet = HexPatch.FilePatchSet;
@@ -44,13 +44,13 @@ namespace SicarioPatch.Integration
                 : new Dictionary<string, List<string>>();
         }
 
-        public IEnumerable<AssetPatchSet> GetSlotPatches(Dictionary<string, List<string>>? skinPaths = null) {
+        public IEnumerable<PatchSet> GetSlotPatches(Dictionary<string, List<string>>? skinPaths = null) {
             var skins = skinPaths ?? GetSkinPaths();
             foreach (var (aircraft, paths) in skins) {
                 var assetPaths = paths.Where(p => Path.GetExtension(p) == ".uasset").ToList();
-                yield return new AssetPatchSet() {
+                yield return new PatchSet() {
                     Name = $"Add {assetPaths.Count} {aircraft}",
-                    Patches = assetPaths.Select(p => new AssetPatch {
+                    Patches = assetPaths.Select(p => new ModEngine.Core.Patch {
                         Type = "objectRef",
                         Template = $"datatable:['{aircraft}'].{{'SkinLibraryLegacy*'}}",
                         Value = $"'{Path.GetFileNameWithoutExtension(p)}':'/Game/{Path.ChangeExtension(p.TrimPathTo("Assets"), null)}'"
@@ -59,13 +59,13 @@ namespace SicarioPatch.Integration
             }
         }
 
-        public WingmanMod? GetSlotMod(IEnumerable<AssetPatchSet>? patchSets = null) {
+        public WingmanMod? GetSlotMod(IEnumerable<PatchSet<Patch>>? patchSets = null) {
             var assetPatches = (patchSets ?? GetSlotPatches()).ToList();
             return assetPatches.Any()
                 ? new() {
                     Id = "skinSlots",
                     FilePatches = new Dictionary<string, List<FilePatchSet>>(),
-                    AssetPatches = new Dictionary<string, List<AssetPatchSet>> {
+                    AssetPatches = new Dictionary<string, List<PatchSet<Patch>>> {
                         ["ProjectWingman/Content/ProjectWingman/Blueprints/Data/AircraftData/DB_Aircraft.uexp"] =
                             (patchSets ?? GetSlotPatches()).ToList()
                     }

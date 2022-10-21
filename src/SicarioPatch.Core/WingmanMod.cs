@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using HexPatch;
 using ModEngine.Core;
-using SicarioPatch.Assets;
 
 namespace SicarioPatch.Core
 {
@@ -22,8 +21,8 @@ namespace SicarioPatch.Core
         public Dictionary<string, string> Variables { get; set; } = new Dictionary<string, string>();
 
         [JsonPropertyName("assetPatches")]
-        public Dictionary<string, List<AssetPatchSet>> AssetPatches { get; set; } =
-            new Dictionary<string, List<AssetPatchSet>>();
+        public Dictionary<string, List<PatchSet<Patch>>> AssetPatches { get; set; } =
+            new();
     }
     public class WingmanMod : SicarioMod
     {

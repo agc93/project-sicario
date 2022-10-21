@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using SemanticVersioning;
-using SicarioPatch.Assets;
 using SicarioPatch.Core;
+using SicarioPatch.Engine;
 using UnPak.Core;
 
 namespace SicarioPatch.Integration

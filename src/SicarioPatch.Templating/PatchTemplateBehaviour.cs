@@ -3,38 +3,21 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Fluid;
+using ModEngine.Templating;
 using HexPatch;
 using MediatR;
-using SicarioPatch.Assets;
+using ModEngine.Core;
 using SicarioPatch.Core;
 
 namespace SicarioPatch.Templating
 {
     public class PatchTemplateBehaviour : IPipelineBehavior<PatchRequest, FileInfo>
     {
-        private readonly FluidParser _parser;
-        private IEnumerable<ITemplateFilter> Filters { get; } = new List<ITemplateFilter>();
-        private IEnumerable<ITemplateModel> Models { get; } = new List<ITemplateModel>();
-        
+        private readonly TemplateService _template;
 
-        public PatchTemplateBehaviour()
-        {
-            _parser = new FluidParser().AddTags();
-            // _parser = new FluidParser();
-        }
 
-        public PatchTemplateBehaviour(IEnumerable<ITemplateFilterProvider> templates, IEnumerable<ITemplateModelProvider> modelProviders) : this()
-        {
-            if (templates.Any())
-            {
-                Filters = templates.SelectMany(provider => provider.LoadFilters());
-            }
-
-            if (modelProviders.Any())
-            {
-                Models = modelProviders.SelectMany(provider => provider.LoadModels());
-            }
+        public PatchTemplateBehaviour() {
+            _template = new TemplateService();
         }
 
         public async Task<FileInfo> Handle(PatchRequest request, CancellationToken cancellationToken,
@@ -45,24 +28,28 @@ namespace SicarioPatch.Templating
             
             foreach (var mod in request.Mods)
             {
-                var modelVars = RenderVariables(request, mod);
-                var dict = RenderFilePatchTemplates(request, mod, modelVars);
-                mod.FilePatches = dict.Where(kvp => kvp.Value.Any()).ToDictionary(k => k.Key, v => v.Value);
+                var modelVars = _template.RenderVariables(request.TemplateInputs, mod.Variables);
+                var dict = RenderFilePatchTemplates(request.TemplateInputs, mod, modelVars);
+                
+                mod.FilePatches = dict.Where(kvp => kvp.Value.Any()).ToDictionary(k => k.Key, v =>
+                {
+                    return v.Value.Select(ps => new FilePatchSet { Name = ps.Name, Patches = ps.Patches }).ToList();
+                });
                 var assetDict = RenderAssetPatchTemplates(request, mod, modelVars);
                 mod.AssetPatches = assetDict;
             }
             return await next();
         }
 
-        private Dictionary<string, List<FilePatchSet>> RenderFilePatchTemplates(PatchRequest request, WingmanMod mod, Dictionary<string, string> modelVars) {
+        private Dictionary<string, List<PatchSet<Patch>>> RenderFilePatchTemplates(Dictionary<string, string> templateInputs, WingmanMod mod, Dictionary<string, string> modelVars) {
             var dict = mod.FilePatches.ToDictionary(k => k.Key, kvp =>
             {
                 var finalPatches = kvp.Value.Where(psList =>
                 {
+                    
                     // REMEMBER: this is to keep the step, so have to return false to skip it
-                    if (mod.ModInfo.StepsEnabled.ContainsKey(psList.Name) &&
-                        _parser.TryParse(mod.ModInfo.StepsEnabled[psList.Name], out var skipTemplate)) {
-                        var rendered = skipTemplate.Render(GetInputContext(request, modelVars));
+                    if (mod.ModInfo.StepsEnabled.ContainsKey(psList.Name ?? string.Empty) &&
+                        _template.TryRender(mod.ModInfo.StepsEnabled[psList.Name], templateInputs, modelVars, out var rendered)) {
                         var result = !bool.TryParse(rendered, out var skip) || skip;
                         // var result = bool.TryParse(rendered, out var skip) || skip;
                         // do NOT invert result: result *is* inverted
@@ -70,41 +57,20 @@ namespace SicarioPatch.Templating
                     }
 
                     return true;
-                }).Select(psList =>
-                {
-                    psList.Patches = psList.Patches.Select(p =>
-                    {
-                        if (_parser.TryParse(p.Substitution, out var subTemplate)) {
-                            p.Substitution = subTemplate.Render(GetInputContext(request, modelVars));
-                        }
-
-                        if (_parser.TryParse(p.Template, out var template)) {
-                            p.Template = template.Render(GetInputContext(request, modelVars));
-                        }
-
-                        if (p.Window != null) {
-                            p.Window.After = SafeRender(request, p.Window.After, modelVars);
-                            p.Window.Before = SafeRender(request, p.Window.Before, modelVars);
-                        }
-
-                        return p;
-                    }).ToList();
-                    return psList;
-                }).ToList();
+                }).Select(psList => _template.RenderPatch(new PatchSet<Patch> {Name = psList.Name, Patches = psList.Patches}, templateInputs, modelVars)).ToList();
                 return finalPatches;
             });
             return dict;
         }
         
-        private Dictionary<string, List<AssetPatchSet>> RenderAssetPatchTemplates(PatchRequest request, WingmanMod mod, Dictionary<string, string> modelVars) {
+        private Dictionary<string, List<PatchSet<Patch>>> RenderAssetPatchTemplates(PatchRequest request, WingmanMod mod, Dictionary<string, string> modelVars) {
             var dict = mod.AssetPatches.ToDictionary(k => k.Key, kvp =>
             {
                 var finalPatches = kvp.Value.Where(psList =>
                 {
                     // REMEMBER: this is to keep the step, so have to return false to skip it
-                    if (mod.ModInfo.StepsEnabled.ContainsKey(psList.Name) &&
-                        _parser.TryParse(mod.ModInfo.StepsEnabled[psList.Name], out var skipTemplate)) {
-                        var rendered = skipTemplate.Render(GetInputContext(request, modelVars));
+                    if (psList.Name != null && mod.ModInfo.StepsEnabled.ContainsKey(psList.Name) &&
+                        _template.TryRender(mod.ModInfo.StepsEnabled[psList.Name], request.TemplateInputs, modelVars, out var rendered)) {
                         var result = !bool.TryParse(rendered, out var skip) || skip;
                         // var result = bool.TryParse(rendered, out var skip) || skip;
                         // do NOT invert result: result *is* inverted
@@ -112,80 +78,12 @@ namespace SicarioPatch.Templating
                     }
 
                     return true;
-                }).Select(psList =>
-                {
-                    psList.Patches = psList.Patches.Select(p =>
-                    {
-                        if (_parser.TryParse(p.Value, out var subTemplate)) {
-                            p.Value = subTemplate.Render(GetInputContext(request, modelVars));
-                        }
-
-                        /*if (_parser.TryParse(p.Template, out var template)) {
-                            p.Template = template.Render(GetInputContext(request, modelVars));
-                        }*/
-
-                        /*if (p.Window != null) {
-                            p.Window.After = SafeRender(request, p.Window.After, modelVars);
-                            p.Window.Before = SafeRender(request, p.Window.Before, modelVars);
-                        }*/
-
-                        return p;
-                    }).ToList();
-                    return psList;
-                }).ToList();
+                }).Select(psList => _template.RenderPatch(psList, request.TemplateInputs, modelVars)).ToList();
                 return finalPatches;
             });
             return dict;
         }
 
-        private string SafeRender(PatchRequest request, string inputKey, Dictionary<string, string> modelVars = null)
-        {
-            modelVars ??= new Dictionary<string, string>();
-            if (!string.IsNullOrWhiteSpace(inputKey) && _parser.TryParse(inputKey, out var template))
-            {
-                return template.Render(GetInputContext(request, modelVars));
-            }
-            else
-            {
-                return inputKey;
-            }
-        }
-
-        private TemplateContext GetContext(object templateInputs, Dictionary<string, string> additionalVars = null) {
-            var templOpts = TemplateOptions.Default;
-            templOpts.WithFilters(Filters);
-            var templCtx = new TemplateContext(templateInputs,templOpts);
-            
-            foreach (var templateModel in Models)
-            {
-                templCtx.SetValue(templateModel.Name, templateModel.GetModel());
-            }
-            if (additionalVars != null)
-            {
-                templCtx.SetValue("vars", additionalVars);
-            }
-            return templCtx;
-        }
-
-        private Dictionary<string, string> RenderVariables(PatchRequest request, WingmanMod mod)
-        {
-            var validVars = new Dictionary<string, string>();
-            if (mod.Variables != null)
-            {
-                foreach (var (varName, varTemplate) in mod.Variables)
-                {
-                    if (_parser.TryParse(varTemplate, out var subTemplate))
-                    {
-                        validVars.Add(varName, subTemplate.Render(GetInputContext(request, validVars)));
-                    }
-                }
-            }
-            return validVars;
-        }
-
-        private TemplateContext GetInputContext(PatchRequest request, Dictionary<string, string> additionalVars = null)
-        {
-            return GetContext(new {inputs = request.TemplateInputs}, additionalVars);
-        }
+        
     }
 }

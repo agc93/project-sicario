@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+    <Import Project="../SicarioPatch.shared.props" />
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <DebugType>Embedded</DebugType>
@@ -18,14 +18,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-<!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
-<!--       <PackageReference Include="HexPatch.Build" Version="0.0.0-preview.0.16" /> -->
-<!--      <ProjectReference Include="../../../ModEngine/src/ModEngine.Build/ModEngine.Build.csproj" />-->
+        
+        
+        <PackageReference Include="HexPatch" Version="0.0.0-preview.0.18" />
+        <PackageReference Include="ModEngine.Build" Version="0.0.0-preview.0.6" />
+<!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Build/ModEngine.Build.csproj" />-->
 <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch/HexPatch.csproj" />-->
-        <PackageReference Include="HexPatch" Version="0.0.0-preview.0.17" />
-        <PackageReference Include="ModEngine.Build" Version="0.0.0-preview.0.1" />
+        <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
       <PackageReference Include="MediatR" Version="9.0.0" />
-      <ProjectReference Include="..\SicarioPatch.Assets\SicarioPatch.Assets.csproj" />
+      <ProjectReference Include="..\SicarioPatch.Engine\SicarioPatch.Engine.csproj" />
     </ItemGroup>
 
     <ItemGroup>
