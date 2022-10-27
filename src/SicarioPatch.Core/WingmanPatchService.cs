@@ -159,12 +159,12 @@ namespace SicarioPatch.Core
                 var mods = modCollection.ToList();
                 var ctx = _ctxFactory.CreateContext(ctxName);
                 return new WingmanPatchEngine(mods, ctx, _fileService, _modBuilder, new[] {
-                    new ModPatchService<WingmanMod, DirectoryBuildContext>.PatchEngineDefinition<Patch>(new HexPatchEngine(_filePatcher, null), 
+                    new PatchEngineDefinition<WingmanMod, Patch>(new HexPatchEngine(_filePatcher, null), 
                         mod => mod.FilePatches.ToDictionary(
                             k => k.Key, 
                             v => v.Value.Cast<PatchSet<Patch>>())
                         ),
-                    new ModPatchService<WingmanMod, DirectoryBuildContext>.PatchEngineDefinition<Patch>(new AssetPatchEngine(_assetPatcher, null), 
+                    new PatchEngineDefinition<WingmanMod, Patch>(new AssetPatchEngine(_assetPatcher, null), 
                         mod => mod.AssetPatches.ToDictionary(k => k.Key, v => v.Value.AsEnumerable()))
                 }, null);
             }

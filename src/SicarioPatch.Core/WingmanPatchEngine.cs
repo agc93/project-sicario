@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ namespace SicarioPatch.Core
         // private readonly List<PatchEngineDefinition<Patch>> _patchEngines = new();
         // private IEnumerable<PatchEngineDefinition<Patch>> PatchEngines => _patchEngines.OrderBy(p => p.Priority);
 
-        public WingmanPatchEngine(List<WingmanMod> mods, DirectoryBuildContext context, ISourceFileService fileService, IModBuilder? modBuilder, IEnumerable<PatchEngineDefinition<Patch>> patchEngineDefinitions, ILogger<WingmanPatchEngine>? logger) : base(mods, context, fileService, modBuilder, patchEngineDefinitions, logger) {
+        public WingmanPatchEngine(List<WingmanMod> mods, DirectoryBuildContext context, ISourceFileService fileService, IModBuilder? modBuilder, IEnumerable<PatchEngineDefinition<WingmanMod, Patch>> patchEngineDefinitions, ILogger<WingmanPatchEngine>? logger) : base(mods, context, fileService, modBuilder, patchEngineDefinitions, logger) {
         }
 
         public override async Task<ModPatchService<WingmanMod, DirectoryBuildContext>> RunPatches() {

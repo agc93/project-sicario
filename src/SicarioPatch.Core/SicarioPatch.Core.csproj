@@ -21,7 +21,7 @@
         
         
         <PackageReference Include="HexPatch" Version="0.0.0-preview.0.18" />
-        <PackageReference Include="ModEngine.Build" Version="0.0.0-preview.0.6" />
+        <PackageReference Include="ModEngine.Build" Version="0.0.0-preview.0.9" />
 <!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Build/ModEngine.Build.csproj" />-->
 <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch/HexPatch.csproj" />-->
         <!--        <ProjectReference Include="../../../HexPatch/src/HexPatch.Build/HexPatch.Build.csproj" />-->
