@@ -2,13 +2,14 @@
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using ModEngine.Merge;
 using SicarioPatch.Core;
 using SicarioPatch.Engine;
 using SicarioPatch.Integration;
 
 namespace SicarioPatch.Loader.Providers
 {
-    public class LoosePresetProvider : IMergeProvider
+    public class LoosePresetProvider : IMergeProvider<WingmanMod>
     {
         private readonly PresetFileLoader _presetLoader;
         private readonly IEngineInfoProvider _engineInfo;
@@ -20,7 +21,7 @@ namespace SicarioPatch.Loader.Providers
             _logger = logger;
         }
         public string Name => "loosePresets";
-        public IEnumerable<MergeComponent> GetMergeComponents(List<string>? searchPaths) {
+        public IEnumerable<MergeComponent<WingmanMod>> GetMergeComponents(List<string>? searchPaths) {
             var presetPaths = (searchPaths ?? new List<string>())
                 .Where(Directory.Exists)
                 .SelectMany(d => Directory.EnumerateFiles(d, "*.dtp", SearchOption.AllDirectories))
@@ -41,7 +42,7 @@ namespace SicarioPatch.Loader.Providers
                 .Aggregate(new Dictionary<string, string>(),
                     (total, next) => total.MergeLeft(next)
                 );
-            yield return new MergeComponent {
+            yield return new MergeComponent<WingmanMod> {
                 Name = "loosePresets",
                 Priority = 2,
                 Parameters = loosePresetInputs,

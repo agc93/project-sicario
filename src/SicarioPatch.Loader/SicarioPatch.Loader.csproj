@@ -20,6 +20,7 @@
       <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.4.0" />
       <PackageReference Include="Spectre.Console" Version="0.40.0" />
       <PackageReference Include="Spectre.Console.Extensions.Logging" Version="0.3.0-alpha0011" />
+      <PackageReference Include="ModEngine.Merge" Version="0.0.0-preview.0.9" />
     </ItemGroup>
 
     <ItemGroup>

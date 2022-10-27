@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ModEngine.Build.Diagnostics;
+using ModEngine.Merge;
 using SicarioPatch.Core;
 using SicarioPatch.Engine;
 using SicarioPatch.Integration;
@@ -145,19 +146,11 @@ namespace SicarioPatch.Loader
             
             //final merge
 
-            var inputParameterList = components
-                .OrderByDescending(p => p.Priority)
-                .Select(p => p.Parameters)
-                .Aggregate(new Dictionary<string, string>(), 
-                    (total, next) => total.MergeLeft(next)
-                );
+            var inputParameterList = components.GetParameters();
 
             LogConsole($"Final mod will be built with [dodgerblue2]{inputParameterList.Keys.Count}[/] parameters");
 
-            var modList = components
-                .OrderBy(p => p.Priority)
-                .SelectMany(p => p.Mods)
-                .ToList();
+            var modList = components.GetMods();
 
             LogConsole($"[bold darkblue]Queuing mod build with {modList.Count} mods[/]");
             
@@ -216,7 +209,10 @@ namespace SicarioPatch.Loader
             }
             catch (Exception e) {
                 _logger.LogError("An unhandled error was encountered while building the mod file.");
-                _logger.LogDebug(e.Message);
+                // _logger.LogDebug(e.Message);
+                if (_logger.IsEnabled(LogLevel.Debug)) {
+                    _logger.LogError(e, $"Error while building {modList.Count} mods with {inputParameterList.Count} parameters.");
+                }
 #if DEBUG
                 Console.WriteLine(e.StackTrace);
 #endif
@@ -224,16 +220,22 @@ namespace SicarioPatch.Loader
             }
             
             if (!string.IsNullOrWhiteSpace(settings.ReportFile)) {
-                //build report
-                // this could probably be a mediator publish but lets leave it for now
-                if (!Path.IsPathRooted(settings.ReportFile)) {
-                    settings.ReportFile = Path.Join(targetPath, settings.ReportFile);
-                }
+                try {
+                    //build report
+                    // this could probably be a mediator publish but lets leave it for now
+                    if (!Path.IsPathRooted(settings.ReportFile)) {
+                        settings.ReportFile = Path.Join(targetPath, settings.ReportFile);
+                    }
 
-                var writer = new MergeReportWriter(_parser);
-                var reportFile = await writer.WriteReport(components, inputParameterList, settings.ReportFile);
-                if (reportFile?.Exists == true) {
-                    LogConsole($"Wrote merge report to '{reportFile.FullName}'.");
+                    var writer = new JsonReportWriter<WingmanMod>(_parser.RelaxedOptions);
+                    var reportFile = await writer.WriteReport(components, inputParameterList, settings.ReportFile);
+                    if (reportFile != null && File.Exists(reportFile.AbsoluteUri) == true) {
+                        LogConsole($"Wrote merge report to '{reportFile.AbsoluteUri}'.");
+                    }
+                }
+                catch (Exception e) {
+                    // report is considered non-essential, so ignoring errors here!
+                    _logger.LogWarning(e, "Error encountered while writing report file!");
                 }
             }
 

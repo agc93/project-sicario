@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ModEngine.Merge;
 using SicarioPatch.Core;
 using SicarioPatch.Integration;
 
 namespace SicarioPatch.Loader.Providers
 {
-    public class SkinMergeProvider : IMergeProvider
+    public class SkinMergeProvider : IMergeProvider<WingmanMod>
     {
         private readonly SkinSlotLoader _slotLoader;
 
@@ -14,7 +15,7 @@ namespace SicarioPatch.Loader.Providers
             _slotLoader = slotLoader;
         }
         public string Name => "customSkins";
-        public IEnumerable<MergeComponent> GetMergeComponents(List<string>? searchPaths) {
+        public IEnumerable<MergeComponent<WingmanMod>> GetMergeComponents(List<string>? searchPaths) {
             var skinPaths = _slotLoader.GetSkinPaths();
             var slotPatches = _slotLoader.GetSlotPatches(skinPaths).ToList();
             var slotLoader = _slotLoader.GetSlotMod(slotPatches);
@@ -24,7 +25,7 @@ namespace SicarioPatch.Loader.Providers
                         v => v.Value.Select(p => Path.ChangeExtension(p, null)).Distinct().ToList())
                     .ToDictionary(k => k.Key, v => string.Join(";", v.Value));
                 return new[] {
-                    new MergeComponent {
+                    new MergeComponent<WingmanMod> {
                         Name = "customSkins",
                         Mods = new[] { slotLoader },
                         MergedResources = skinSet,
@@ -33,7 +34,7 @@ namespace SicarioPatch.Loader.Providers
                     }
                 };
             }
-            return System.Array.Empty<MergeComponent>();
+            return System.Array.Empty<MergeComponent<WingmanMod>>();
         }
     }
 }

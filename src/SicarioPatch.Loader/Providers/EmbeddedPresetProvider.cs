@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using ModEngine.Merge;
 using SicarioPatch.Core;
 using SicarioPatch.Engine;
 using SicarioPatch.Integration;
 
 namespace SicarioPatch.Loader.Providers
 {
-    public class EmbeddedResourceProvider : IMergeProvider
+    public class EmbeddedResourceProvider : IMergeProvider<WingmanMod>
     {
         private readonly MergeLoader _mergeLoader;
         private readonly IEngineInfoProvider _engineInfo;
@@ -19,8 +20,8 @@ namespace SicarioPatch.Loader.Providers
             _logger = logger;
         }
         public string Name => "embeddedResources";
-        public IEnumerable<MergeComponent> GetMergeComponents(List<string>? searchPaths) {
-            var components = new List<MergeComponent>();
+        public IEnumerable<MergeComponent<WingmanMod>> GetMergeComponents(List<string>? searchPaths) {
+            var components = new List<MergeComponent<WingmanMod>>();
             var embeddedPresets = new Dictionary<string, WingmanPreset>();
             var requests = new Dictionary<string, PatchRequest>();
             var embeddedResources = _mergeLoader.GetEmbeddedAssets();
@@ -43,7 +44,7 @@ namespace SicarioPatch.Loader.Providers
                 .Aggregate(new Dictionary<string, string>(),
                     (total, next) => total.MergeLeft(next)
                 );
-            components.Add(new MergeComponent {
+            components.Add(new MergeComponent<WingmanMod> {
                 Name = "embeddedPresets",
                 Message =
                     $"[dodgerblue2]Loaded [bold]{embeddedPresets.Count}[/] embedded presets from installed mods[/]",
@@ -56,7 +57,7 @@ namespace SicarioPatch.Loader.Providers
             var mergedInputs = requests
                 .Select(m => m.Value.TemplateInputs)
                 .Aggregate(new Dictionary<string, string>(), (total, next) => next.MergeLeft(total));
-            components.Add(new MergeComponent {
+            components.Add(new MergeComponent<WingmanMod> {
                 Name = "sicarioRequests",
                 Mods = requests.SelectMany(m => m.Value.Mods),
                 Parameters = mergedInputs,

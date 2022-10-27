@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModEngine.Build;
+using ModEngine.Merge;
 using SicarioPatch.Core;
 using SicarioPatch.Integration;
 using SicarioPatch.Loader.Providers;
@@ -106,9 +107,9 @@ namespace SicarioPatch.Loader
 
         internal static IServiceCollection AddMergeComponents(this IServiceCollection services) {
             return services
-                .AddSingleton<IMergeProvider, EmbeddedResourceProvider>()
-                .AddSingleton<IMergeProvider, LoosePresetProvider>()
-                .AddSingleton<IMergeProvider, SkinMergeProvider>();
+                .AddSingleton<IMergeProvider<WingmanMod>, EmbeddedResourceProvider>()
+                .AddSingleton<IMergeProvider<WingmanMod>, LoosePresetProvider>()
+                .AddSingleton<IMergeProvider<WingmanMod>, SkinMergeProvider>();
         }
         
         internal static LogLevel GetLogLevel() {
