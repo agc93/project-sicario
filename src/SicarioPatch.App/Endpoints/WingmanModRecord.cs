@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using ModEngine.Core;
 using SicarioPatch.Core;
+using SicarioPatch.Engine;
 
 namespace SicarioPatch.App.Endpoints
 {
